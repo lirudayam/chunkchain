@@ -1,4 +1,7 @@
-# Chunkchain
+<p align="center">
+	<img src="assets/ChunkChain_Logo.svg" width="50%" />
+</p>
+
 
 Chunkchain is a free and open-source blockchain simulation tool. It is designed to support any lectures in lower and higher education related to blockchain or distributed ledger technology. Since hands-on learning experiences are crucial for developed a more in-depth understanding, this tool showcases the technology of distributed ledgers in a varity of use cases.
 
