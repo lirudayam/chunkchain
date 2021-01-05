@@ -49,7 +49,19 @@
         l: []   // l - list of transactions
     };
 
+    // Enums for types of messages
+    const oMsgKeys = {
+        "A": "Outgoing message into unconfirmed transactions",
+        "B": "New block found",
+        "C": "Copy of blockchain"
+    }
+    const aKeys = Object.keys(oMsgKeys);
+
     let aBlockchain = [];
+    let bMining = true;
+
+    let oBlock = Object.assign({}, oBlockInterface);
+    let oMiningIntervalCaller = null;
 
     // Public-Private Key Simulation functions
     // Herefore we simulate that the Bugout Address is the public key
@@ -103,15 +115,60 @@
     }
 
     // Functions to create a block
+    function startNewBlock() {
+        oBlock = Object.assign({}, oBlockInterface);
+    }
+
     function verifyBlock(oBlock) {
-        var sComboundString = oBlock.tx.map((tx) => tx.h).join("");
+        var sComboundString = oBlock.l.map((tx) => tx.h).join("");
 
         // replace this soon with the real previous block
-        sComboundString += oBlock.previous_block;
-        sComboundString += oBlock.time;
-        sComboundString += oBlock.nonce;
+        sComboundString += oBlock.p;
+        sComboundString += oBlock.t;
+        sComboundString += oBlock.n;
 
-        return oBlock.h === CryptoJS.SHA1(sComboundString);
+        return oBlock.h === CryptoJS.SHA1(sComboundString).toString();
+    }
+
+    function calculateBlockHash(oBlock, nonce) {
+        var sComboundString = oBlock.l.map((tx) => tx.h).join("");
+
+        // replace this soon with the real previous block
+        sComboundString += oBlock.p;
+        sComboundString += oBlock.t;
+        sComboundString += nonce;
+        return CryptoJS.SHA1(sComboundString).toString();
+    }
+
+    function proofOfWorkMining(difficulty){
+        var nonce = 0;
+        var hash = "";
+
+        if (oMiningIntervalCaller !== null) {
+            clearInterval(oMiningIntervalCaller);
+        }
+
+        const miningFn = () => {
+            if (bMining && oBlock.l.length > 3 && hash.substr(0, difficulty) !== Array(difficulty + 1).join("0")){
+                oBlock.t = moment().valueOf();
+                nonce++;
+                hash = calculateBlockHash(oBlock, nonce);
+                
+                if (hash.substr(0, difficulty) === Array(difficulty + 1).join("0")) {
+                    log("Nonce found: " + nonce); 
+
+                    oBlock.h = hash;
+                    oBlock.n = nonce;
+
+                    b.send("B" + JSON.stringify(oBlock));
+                    aBlockchain.push(oBlock);
+                    startNewBlock();
+                    clearInterval(oMiningIntervalCaller);
+                    return nonce;  
+                }
+            }  
+        }    
+        oMiningIntervalCaller = setInterval(miningFn, 50);    
     }
 
     // Get connected with our peers via torrent server
@@ -134,15 +191,37 @@
   log(b.address() + " [ me ]");
   
   b.on("message", function(address, message) {
-        // check if incoming message is of JSON format
-        if (/^[\],:{}\s]*$/.test(message.replace(/\\["\\\/bfnrtu]/g, '@').
-        replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
-        replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
-            log(address + ": " + message);
-            var oJSONMessage = JSON.parse(message);
-            log(address + ": " + oJSONMessage.message + " [intended message for you]");
-            log(address + ": " + " [transaction is " + (verifyTx(oJSONMessage) ? "valid" : "invalid") + "]");
-        } else {
+        // check what message came in
+        var sFirstLetter = message.substr(0, 1);
+        if (sFirstLetter === "A") {
+            // new unconfirmed transaction arrived
+            log(address + ": [unconfirmed message]");
+
+            var oTx = JSON.parse(message.substr(1));
+            if (oTx.s === address) {
+                oBlock.l.push(oTx);
+
+                proofOfWorkMining(2);
+            }
+            
+
+        } else if (sFirstLetter === "B") {
+            // new block arrived
+            log(address + ": [block has been found]");
+
+            var oFoundBlock = JSON.parse(message.substr(1));
+            if (verifyBlock(oFoundBlock)) {
+                // TODO: add it to the blockchain
+
+                oFoundBlock.l.forEach((oTx) => log(oTx.s + ": " + oTx.m));
+                if (oMiningIntervalCaller !== null) {
+                    clearInterval(oMiningIntervalCaller);
+                }
+                aBlockchain.push(oFoundBlock);
+                startNewBlock();
+            }
+        } 
+        else {
             log(address + ": " + message);
         }
   });
@@ -150,14 +229,21 @@
   document.getElementById("input").onkeydown = function(ev) {
     if (ev.keyCode == 13) {
       if (b.lastwirecount) {
-        //b.send(ev.target.textContent);
+        
         var oChat = Object.assign({}, oChatInterface);
         oChat.s = publicAddress;
         oChat.r = "all";
         oChat.m = ev.target.textContent;
         oChat.c = 10;
-        console.log(JSON.stringify(createTxHash(oChat, privateKey)));
-        b.send(JSON.stringify(createTxHash(oChat, privateKey)));
+
+        var oTx = createTxHash(oChat, privateKey);
+        console.log(oTx);
+        b.send("A" + JSON.stringify(createTxHash(oChat, privateKey)));
+        oBlock.l.push(oTx);
+
+        proofOfWorkMining(2);
+
+
         ev.target.textContent = "";
       }
       ev.preventDefault();
