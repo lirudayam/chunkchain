@@ -26,26 +26,27 @@
 </body>
 <script>
     // Our interfaces for chats
+    // using short codes to decrease network traffic and RAM consumption
     const oChatInterface = {
-        sender: "",
-        recipient: "",
-        message: "",
-        coins: 0,
-        unix_timestamp: 0,
-        hash: ""
+        s: "", // s - sender
+        r: "", // r - recipient
+        m: "", // m - message
+        c: 0,  // c - coins
+        t: 0,  // t - unix timestamp
+        h: ""  // h - hash
     };
 
     const oBlockInterface = {
-        "hash":"",
-        "previous_block":"",
-        "merkle_root":"",
-        "time":0,
-        "nonce":0,
-        "n_tx":0,
-        "size":0,
-        "block_index": 0,
-        "miner": "",
-        "tx": []
+        h: "",  // h - hash
+        p: "",  // p - previous block
+        m: "",  // m - merkle root
+        t: 0,   // t - time
+        n: 0,   // n - nonce
+        no: 0,  // no - number of transactions
+        s: 0,   // s - size
+        b: 0,   // b - block_index
+        r: "",  // r - miner
+        l: []   // l - list of transactions
     };
 
     let aBlockchain = [];
@@ -81,36 +82,36 @@
     
     // Functions to encrypt our messages and to decrypt them
     function createTxHash(oChat, sPrivateKey) {
-        oChat.unix_timestamp = moment().valueOf();
-        var sComboundString = oChat.sender + oChat.recipient + oChat.message + oChat.coins + oChat.unix_timestamp;
+        oChat.t = moment().valueOf();
+        var sComboundString = oChat.s + oChat.r + oChat.m + oChat.c + oChat.t;
         var sHashString = CryptoJS.enc.Hex.stringify(CryptoJS.SHA1(sComboundString.toString()));
 
         // sign the hash with the private key
-        oChat.hash = CryptoJS.AES.encrypt(sHashString, sPrivateKey).toString();
+        oChat.h = CryptoJS.AES.encrypt(sHashString, sPrivateKey).toString();
 
         return oChat;
     }
 
     function verifyTx(oChat) {
-        var sComboundString = oChat.sender + oChat.recipient + oChat.message + oChat.coins + oChat.unix_timestamp;
+        var sComboundString = oChat.s + oChat.r + oChat.m + oChat.c + oChat.t;
 
         // simulate an asymmetric encyrption
-        var sPrivatePersonKey = getPrivateKey(oChat.sender);
+        var sPrivatePersonKey = getPrivateKey(oChat.s);
 
         var sEncryptCombound = CryptoJS.enc.Hex.stringify(CryptoJS.SHA1(sComboundString.toString()));
-        return CryptoJS.AES.decrypt(oChat.hash, sPrivatePersonKey).toString(CryptoJS.enc.Utf8) === sEncryptCombound && oChat.unix_timestamp < moment().valueOf();
+        return CryptoJS.AES.decrypt(oChat.h, sPrivatePersonKey).toString(CryptoJS.enc.Utf8) === sEncryptCombound && oChat.t < moment().valueOf();
     }
 
     // Functions to create a block
     function verifyBlock(oBlock) {
-        var sComboundString = oBlock.tx.map((tx) => tx.hash).join("");
+        var sComboundString = oBlock.tx.map((tx) => tx.h).join("");
 
         // replace this soon with the real previous block
         sComboundString += oBlock.previous_block;
         sComboundString += oBlock.time;
         sComboundString += oBlock.nonce;
 
-        return oBlock.hash === CryptoJS.SHA1(sComboundString);
+        return oBlock.h === CryptoJS.SHA1(sComboundString);
     }
 
     // Get connected with our peers via torrent server
@@ -151,10 +152,10 @@
       if (b.lastwirecount) {
         //b.send(ev.target.textContent);
         var oChat = Object.assign({}, oChatInterface);
-        oChat.sender = publicAddress;
-        oChat.recipient = "all";
-        oChat.message = ev.target.textContent;
-        oChat.coins = 10;
+        oChat.s = publicAddress;
+        oChat.r = "all";
+        oChat.m = ev.target.textContent;
+        oChat.c = 10;
         console.log(JSON.stringify(createTxHash(oChat, privateKey)));
         b.send(JSON.stringify(createTxHash(oChat, privateKey)));
         ev.target.textContent = "";
