@@ -60,7 +60,7 @@
     let aBlockchain = [];
     let bMining = true;
 
-    let oBlock = Object.assign({}, oBlockInterface);
+    var oBlock = Object.assign({}, oBlockInterface);
     let oMiningIntervalCaller = null;
 
     // Public-Private Key Simulation functions
@@ -116,7 +116,9 @@
 
     // Functions to create a block
     function startNewBlock() {
+        oBlock = null;
         oBlock = Object.assign({}, oBlockInterface);
+        oBlock.l = [];
     }
 
     function verifyBlock(oBlock) {
@@ -161,7 +163,7 @@
                     oBlock.n = nonce;
 
                     b.send("B" + JSON.stringify(oBlock));
-                    aBlockchain.push(oBlock);
+                    //aBlockchain.push(oBlock);
                     startNewBlock();
                     clearInterval(oMiningIntervalCaller);
                     return nonce;  
@@ -219,6 +221,7 @@
                 }
                 aBlockchain.push(oFoundBlock);
                 startNewBlock();
+                console.log(oBlock);
             }
         } 
         else {
@@ -239,7 +242,7 @@
         var oTx = createTxHash(oChat, privateKey);
         console.log(oTx);
         b.send("A" + JSON.stringify(createTxHash(oChat, privateKey)));
-        oBlock.l.push(oTx);
+        //oBlock.l.push(oTx);
 
         proofOfWorkMining(2);
 
