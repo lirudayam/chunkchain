@@ -189,7 +189,14 @@
 
     log(privateKey + " [ private key ]");
 
-  b.on("seen", function(address) { log(address + " [ seen ]"); });
+    b.on("seen", function(address) { 
+        log(address + " [ seen ]"); 
+
+        if (aBlockchain.length > 0) {
+            // whenever a new participant joins the entire blockchain will be send
+            b.send("C" + JSON.stringify(aBlockchain));
+        }
+    });
   log(b.address() + " [ me ]");
   
   b.on("message", function(address, message) {
@@ -224,6 +231,18 @@
                 console.log(oBlock);
             }
         } 
+        else if (sFirstLetter === "C") {
+            // the new blockchain is there
+            var aRecievedBlockchain = JSON.parse(message.substr(1));
+            if (aRecievedBlockchain.length > aBlockchain.length) {
+                // recieved blockchain is greater than one's wn
+                if (!(aRecievedBlockchain.some(block => !verifyBlock(block)))) {
+                    // all blocks are standalone valid
+                    aBlockchain = aRecievedBlockchain;
+                }
+            }
+            
+        }
         else {
             log(address + ": " + message);
         }
