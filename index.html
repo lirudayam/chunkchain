@@ -53,12 +53,16 @@
     const oMsgKeys = {
         "A": "Outgoing message into unconfirmed transactions",
         "B": "New block found",
-        "C": "Copy of blockchain"
+        "C": "Copy of blockchain",
+        "N": "Announce nickname",
+        "S": "Shared nickname dictionary"
     }
     const aKeys = Object.keys(oMsgKeys);
 
     let aBlockchain = [];
     let bMining = true;
+
+    let oNickNames = {};
 
     var oBlock = Object.assign({}, oBlockInterface);
     let oMiningIntervalCaller = null;
@@ -173,6 +177,14 @@
         oMiningIntervalCaller = setInterval(miningFn, 50);    
     }
 
+    // supporting functions
+    function getNickname(sAddress) {
+        if (oNickNames.hasOwnProperty(sAddress)) {
+            return oNickNames[sAddress]
+        };
+        return sAddress;
+    }
+
     // Get connected with our peers via torrent server
     var b = Bugout("chunkchain");
 
@@ -180,22 +192,40 @@
     const publicAddress = b.address();
     const privateKey = getPrivateKey(b.address());
 
+    const sUserNickName = prompt("Please choose a nickname", "");
+
 
 
   log("Hello world!");
 
-  
+    
   log(b.address());
+
+    // Register personal nickname across the network
+    b.send("N" + JSON.stringify({
+        k: publicAddress,
+        n: sUserNickName
+    }));
+    oNickNames[publicAddress] = sUserNickName; 
 
     log(privateKey + " [ private key ]");
 
     b.on("seen", function(address) { 
-        log(address + " [ seen ]"); 
+        log(getNickname(address) + " [ seen ]"); 
+
+        // send the nickname dicitonary as well
+        b.send("S" + JSON.stringify(oNickNames));
 
         if (aBlockchain.length > 0) {
             // whenever a new participant joins the entire blockchain will be send
             b.send("C" + JSON.stringify(aBlockchain));
         }
+    });
+
+    b.on("left", function(address) { 
+        log(getNickname(address) + " [ left ]"); 
+
+        delete oNickNames[address];
     });
   log(b.address() + " [ me ]");
   
@@ -204,7 +234,7 @@
         var sFirstLetter = message.substr(0, 1);
         if (sFirstLetter === "A") {
             // new unconfirmed transaction arrived
-            log(address + ": [unconfirmed message]");
+            log(getNickname(address) + ": [unconfirmed message]");
 
             var oTx = JSON.parse(message.substr(1));
             if (oTx.s === address) {
@@ -216,13 +246,13 @@
 
         } else if (sFirstLetter === "B") {
             // new block arrived
-            log(address + ": [block has been found]");
+            log(getNickname(address) + ": [block has been found]");
 
             var oFoundBlock = JSON.parse(message.substr(1));
             if (verifyBlock(oFoundBlock)) {
                 // TODO: add it to the blockchain
 
-                oFoundBlock.l.forEach((oTx) => log(oTx.s + ": " + oTx.m));
+                oFoundBlock.l.forEach((oTx) => log(getNickname(oTx.s) + ": " + oTx.m));
                 if (oMiningIntervalCaller !== null) {
                     clearInterval(oMiningIntervalCaller);
                 }
@@ -243,8 +273,20 @@
             }
             
         }
+        else if (sFirstLetter === "N") {
+            // a list of new nicknames arrived
+            var oNickNameObject = JSON.parse(message.substr(1));
+            oNickNames[oNickNameObject.k] = oNickNameObject.n;
+        }
+        else if (sFirstLetter === "S") {
+            // a list of new nicknames arrived
+            var oNickNameDirectory = JSON.parse(message.substr(1));
+            for (const [sAddress, sRelatedNickName] of Object.entries(oNickNameDirectory)) {
+                oNickNames[sAddress] = sRelatedNickName;
+            }
+        }
         else {
-            log(address + ": " + message);
+            log(getNickname(address) + ": " + message);
         }
   });
 
