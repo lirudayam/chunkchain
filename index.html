@@ -55,12 +55,16 @@
         "B": "New block found",
         "C": "Copy of blockchain",
         "N": "Announce nickname",
-        "S": "Shared nickname dictionary"
+        "S": "Shared nickname dictionary",
+        "M+": "New miner",
+        "M-": "Participant stops mining"
     }
     const aKeys = Object.keys(oMsgKeys);
 
     let aBlockchain = [];
     let bMining = true;
+
+    let iNumberOfMiners = 0;
 
     let oNickNames = {};
 
@@ -185,6 +189,20 @@
         return sAddress;
     }
 
+    function startMining(b) {
+        if (bMining === false) {
+            bMining = true;
+            b.send("M+");
+        }
+    }
+
+    function stopMining(b) {
+        if (bMining === true) {
+            bMining = false;
+            b.send("M-");
+        }
+    }
+
     // Get connected with our peers via torrent server
     var b = Bugout("chunkchain");
 
@@ -218,7 +236,10 @@
 
         if (aBlockchain.length > 0) {
             // whenever a new participant joins the entire blockchain will be send
-            b.send("C" + JSON.stringify(aBlockchain));
+            b.send("C" + JSON.stringify({
+                b: aBlockchain,
+                n: iNumberOfMiners
+            }));
         }
     });
 
@@ -264,11 +285,16 @@
         else if (sFirstLetter === "C") {
             // the new blockchain is there
             var aRecievedBlockchain = JSON.parse(message.substr(1));
-            if (aRecievedBlockchain.length > aBlockchain.length) {
+            if (aRecievedBlockchain.b.length > aBlockchain.length) {
                 // recieved blockchain is greater than one's wn
-                if (!(aRecievedBlockchain.some(block => !verifyBlock(block)))) {
+                if (!(aRecievedBlockchain.b.some(block => !verifyBlock(block)))) {
                     // all blocks are standalone valid
-                    aBlockchain = aRecievedBlockchain;
+                    aBlockchain = aRecievedBlockchain.b;
+                }
+
+                // recieved number of miners has changes
+                if (aRecievedBlockchain.n !== iNumberOfMiners) {
+                    iNumberOfMiners = aRecievedBlockchain.n;
                 }
             }
             
@@ -284,6 +310,14 @@
             for (const [sAddress, sRelatedNickName] of Object.entries(oNickNameDirectory)) {
                 oNickNames[sAddress] = sRelatedNickName;
             }
+        }
+        else if (message.substr(0, 2) === "M+") {
+            // a new miner is registered
+            iNumberOfMiners += 1;
+        }
+        else if (message.substr(0, 2) === "M-") {
+            // a participant stops mining
+            iNumberOfMiners -= 1;
         }
         else {
             log(getNickname(address) + ": " + message);
@@ -303,11 +337,8 @@
         var oTx = createTxHash(oChat, privateKey);
         console.log(oTx);
         b.send("A" + JSON.stringify(createTxHash(oChat, privateKey)));
-        //oBlock.l.push(oTx);
 
         proofOfWorkMining(2);
-
-
         ev.target.textContent = "";
       }
       ev.preventDefault();
