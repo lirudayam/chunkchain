@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Chunkchain - Blockchain Try Out</title>
+  <link href="style.css" rel="stylesheet" />
+  <script>
+    function log(message) {
+      document.getElementById("log").textContent += message + "\n";
+    }
+  </script>
+  <script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment.js"></script>
+  
+</head>
+<body>
+    <div class="header">
+        <img src="assets/ChunkChain_Logo.svg" width="200px" />
+
+        <div class="header_items">
+            <a>zur Blockchain-Ansicht</a>
+            <span>dein Kontostand: <b>100 Token</b></span>
+        </div>
+    </div>
+
+    <div class="main_body">
+        <h1 class="page_title">Chat</h1>
+        <p class="introduction_section">
+Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern <b>on-chain</b> (alle Daten in der Blockchain). <br />
+Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
+        </p>
+
+        <div class="chat_container">
+            <div class="chat_window"></div>
+            <div class="background_activity"></div>
+        </div>
+    </div>
+
+</body>
+</html>
