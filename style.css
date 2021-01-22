@@ -69,8 +69,67 @@ body {
 .chat_window {
     background-color: #F2F2F2;
     border: 1px solid #B3B3B3;
+    display: grid;
+    grid-column-gap: 0;
+    grid-template-columns: 25fr 75fr;
 }
 
 .background_activity {
     margin: 10px;
+}
+
+.conversations_container {
+    padding: 0;
+    border-right: 1px solid #B3B3B3;
+}
+
+[data-letters]:before {
+    content:attr(data-letters);
+    display:inline-block;
+    font-size:0.8rem;
+    width:2rem;
+    height:2rem;
+    line-height:2rem;
+    text-align:center;
+    border-radius:50%;
+    background:#AAA;
+    vertical-align:middle;
+    margin-right:1em;
+    color:white;
+}
+
+.conversation {
+    border-bottom: 1px solid #B3B3B3;
+    cursor: pointer;
+    padding: 20px 5px 15px 20px;
+    margin: 0;
+    width: calc(100% - 25px);
+    font-size:0.8rem;
+}
+
+[data-letters-selected]:before {
+    content:attr(data-letters-selected);
+    display:inline-block;
+    font-size:0.8rem;
+    width:2rem;
+    height:2rem;
+    line-height:2rem;
+    text-align:center;
+    border-radius:50%;
+    background:#FFF;
+    vertical-align:middle;
+    margin-right:1em;
+    color: #00B9F2;
+    font-weight:bold;
+}
+
+.selected {
+    border-bottom: 1px solid #B3B3B3;
+    cursor: pointer;
+    margin: 0;
+    padding: 20px 5px 15px 20px;
+    width: calc(100% - 25px);
+    font-size:0.8rem;
+    background-color: #00B9F2;
+    color: #FFF;
 }
