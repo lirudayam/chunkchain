@@ -5,6 +5,7 @@
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <title>Chunkchain - Blockchain Try Out</title>
   <link href="style.css" rel="stylesheet" />
+  
   <script>
     function log(message) {
       document.getElementById("log").textContent += message + "\n";
@@ -39,7 +40,18 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
                     <p data-letters-selected="M" class="conversation selected"> Minion99</p>
                 </div>
             </div>
-            <div class="background_activity"></div>
+            <div class="background_activity">
+				<h3 class="minor_title">Aktivitäten im Netzwerk</h3>
+				<div class="switch_container">
+					<span>alle</span>
+					<label class="switch">
+						<input type="checkbox">
+						<span class="slider"></span>
+					</label>
+					<span>nur meine Aktivitäten</span>
+				</div>
+				
+            </div>
         </div>
     </div>
 
