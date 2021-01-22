@@ -5,7 +5,7 @@
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <title>Chunkchain - Blockchain Try Out</title>
   <link href="style.css" rel="stylesheet" />
-  
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
   <script>
     function log(message) {
       document.getElementById("log").textContent += message + "\n";
@@ -16,7 +16,25 @@
   <script src="https://momentjs.com/downloads/moment.js"></script>
   
 </head>
-<body>
+<body ng-app="chunkchain">
+	<script>
+		angular.module('chunkchain', [])
+		  .controller('ChatController', ['$scope', function($scope) {
+			$scope.activityIndicator = true;
+			$scope.selectedConversation = 'Alle';
+			$scope.activeConversations = [
+				'Alle',
+				'kürbis_123',
+				'minion99'
+			]
+			$scope.activityHasChanged = function() {
+			  	console.log($scope.activityIndicator);
+			};
+			$scope.conversationSelected = function(sSelectedItem) {
+				$scope.selectedConversation = sSelectedItem;
+			};
+		  }]);
+	  </script>
     <div class="header">
         <img src="assets/ChunkChain_Logo.svg" width="200px" />
 
@@ -26,7 +44,7 @@
         </div>
     </div>
 
-    <div class="main_body">
+    <div class="main_body" ng-controller="ChatController">
         <h1 class="page_title">Chat</h1>
         <p class="introduction_section">
 Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern <b>on-chain</b> (alle Daten in der Blockchain). <br />
@@ -36,8 +54,9 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
         <div class="chat_container">
             <div class="chat_window">
                 <div class="conversations_container">
-                    <p data-letters="MN" class="conversation"> My Name</p>
-                    <p data-letters-selected="M" class="conversation selected"> Minion99</p>
+					<p ng-repeat="convo in activeConversations" class="conversation {{ convo === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo)">
+						{{ convo }}
+					</li>
                 </div>
             </div>
             <div class="background_activity">
@@ -45,7 +64,7 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 				<div class="switch_container">
 					<span>alle</span>
 					<label class="switch">
-						<input type="checkbox">
+						<input type="checkbox" ng-model="activityIndicator" ng-change="activityHasChanged()">
 						<span class="slider"></span>
 					</label>
 					<span>nur meine Aktivitäten</span>

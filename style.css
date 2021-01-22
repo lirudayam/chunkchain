@@ -83,7 +83,7 @@ body {
     border-right: 1px solid #B3B3B3;
 }
 
-[data-letters]:before {
+.conversation[data-letters]:before {
     content:attr(data-letters);
     display:inline-block;
     font-size:0.8rem;
@@ -107,8 +107,8 @@ body {
     font-size:0.8rem;
 }
 
-[data-letters-selected]:before {
-    content:attr(data-letters-selected);
+.selected[data-letters]:before {
+    content:attr(data-letters);
     display:inline-block;
     font-size:0.8rem;
     width:2rem;
