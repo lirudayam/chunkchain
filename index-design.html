@@ -27,6 +27,8 @@
 				'kürbis_123',
 				'minion99'
 			]
+			$scope.tokenPerMessage = 1;
+			$scope.currentMessage = "";
 			$scope.activityHasChanged = function() {
 			  	console.log($scope.activityIndicator);
 			};
@@ -62,16 +64,29 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
             <div class="background_activity">
 				<h3 class="minor_title">Aktivitäten im Netzwerk</h3>
 				<div class="switch_container">
-					<span>alle</span>
+					<span class="{{ !activityIndicator ? 'switch_selected' : '' }}">alle</span>
 					<label class="switch">
 						<input type="checkbox" ng-model="activityIndicator" ng-change="activityHasChanged()">
 						<span class="slider"></span>
 					</label>
-					<span>nur meine Aktivitäten</span>
+					<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
 				</div>
 				
-            </div>
-        </div>
+			</div>
+			<div class="chat_window_footer">
+				<div class="chat_window_footer_new_chat_container">
+					<button class="button">neuer Chat</button>
+				</div>
+				<div class="chat_window_footer_message">
+					<input type="number" size="2" maxlength="2" ng-model="tokenPerMessage" />
+					Token
+					<div class="flexible_grow"></div>
+					<input type="text" size="50" maxlength="300" placeholder="Nachricht..." ng-model="currentMessage" />
+					<button class="button" [disabled]="currentMessage !== ''">senden</button>
+				</div>
+			</div>
+		</div>
+		
     </div>
 
 </body>

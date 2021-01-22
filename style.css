@@ -24,7 +24,7 @@ body {
     font-size: 0.75rem;
 }
 
-.header_items a {
+.header_items a, button {
     background-color: #00B9F2;
     color: #FFF;
     padding: 5px 20px;
@@ -35,6 +35,30 @@ body {
     
     margin-left: auto;
     cursor: pointer;
+    box-shadow: none;
+    border:none;
+}
+
+button {
+    appearance: none;
+    font-weight:normal;
+    margin: 0 auto;
+    padding: 8px;
+}
+button:disabled,
+button[disabled]{
+  background-color: #cccccc;
+  color: #666666;
+}
+input {
+    appearance: none;
+    font-weight:normal;
+    padding: 8px;
+    border: 1px solid #B3B3B3;
+}
+input[type=number] {
+    width: 50px;
+    margin-right: 10px;
 }
 
 .main_body {
@@ -63,7 +87,7 @@ body {
     display: grid;
     grid-column-gap: calc(20px * 2);
     grid-template-columns: 70fr 30fr;
-    height: 400px;
+    height: 600px;
 }
 
 .chat_window {
@@ -74,6 +98,17 @@ body {
     grid-template-columns: 25fr 75fr;
 }
 
+.chat_window_footer {
+    background-color: #F2F2F2;
+    border: 1px solid #B3B3B3;
+    display: grid;
+    grid-column-gap: 0;
+    grid-template-columns: 25fr 75fr;
+    margin-top: -1px;
+    height:60px;
+}
+
+
 .background_activity {
     margin: 10px;
 }
@@ -81,6 +116,22 @@ body {
 .conversations_container {
     padding: 0;
     border-right: 1px solid #B3B3B3;
+}
+
+.chat_window_footer_new_chat_container {
+    padding: 10px 10px 10px 90px;
+    border-right: 1px solid #B3B3B3;
+}
+
+.chat_window_footer_message {
+    padding: 10px;
+    font-size: 0.7rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.flexible_grow {
+    flex-grow: 1;
 }
 
 .conversation[data-letters]:before {
@@ -96,6 +147,8 @@ body {
     vertical-align:middle;
     margin-right:1em;
     color:white;
+    -webkit-transition: .4s;
+    transition: .4s;
 }
 
 .conversation {
@@ -105,6 +158,8 @@ body {
     margin: 0;
     width: calc(100% - 25px);
     font-size:0.8rem;
+    -webkit-transition: .4s;
+    transition: .4s;
 }
 
 .selected[data-letters]:before {
@@ -157,6 +212,11 @@ body {
     height: 28px;
   }
   
+.switch_selected {
+    color: #000;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
   /* Hide default HTML checkbox */
   .switch input {
     opacity: 0;
