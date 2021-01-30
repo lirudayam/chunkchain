@@ -8,16 +8,19 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
   <script>
     function log(message) {
-      document.getElementById("log").textContent += message + "\n";
+		console.log(message);
+      //document.getElementById("log").textContent += message + "\n";
     }
   </script>
   <script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
   <script src="https://momentjs.com/downloads/moment.js"></script>
+  <script src="./logic.js"></script>
   
 </head>
 <body ng-app="chunkchain">
 	<script>
+		let fnScope = null;
 		angular.module('chunkchain', [])
 		  .controller('ChatController', ['$scope', function($scope) {
 			$scope.activityIndicator = true;
@@ -62,12 +65,22 @@
 			  	console.log($scope.activityIndicator);
 			};
 			$scope.conversationSelected = function(sSelectedItem) {
+				console.log(sSelectedItem);
 				$scope.selectedConversation = sSelectedItem;
 			};
 			$scope.feedItemSelected = function (sFeedItem) {
 
-			}
+			};
+			fnScope = $scope;
 		  }]);
+
+		  window.onload = () => {
+			//const oAngularScope = angular.element(document.body).scope();
+			console.log(fnScope);
+			console.log(fnScope.activeConversations);
+		  }
+
+
 	  </script>
     <div class="header">
         <img src="assets/ChunkChain_Logo.svg" width="200px" />
@@ -113,6 +126,9 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 						<div ng-if="feedItem.type == '+' ">
 							<b>{{ feedItem.actor }}</b> ist dem Netzwerk beigetreten.
 						</div>
+						<div ng-if="feedItem.type == '-' ">
+							<b>{{ feedItem.actor }}</b> hat das Netzwerk verlassen.
+						</div>
 						<div ng-if="feedItem.type == 'M+' ">
 							<b>{{ feedItem.actor }}</b> sucht jetzt auch nach Blöcken (mining).
 						</div>
@@ -121,6 +137,9 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 						</div>
 						<div ng-if="feedItem.type == 'B' ">
 							<b>{{ feedItem.actor }}</b> hat einen neuen Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
+						</div>
+						<div ng-if="feedItem.type == 'S' ">
+							Du hast einen Block gefunden. <b>{{ feedItem.nonce }}</b> ist die Lösung
 						</div>
 					</div>
 				</div>
