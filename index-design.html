@@ -43,7 +43,21 @@
 					'actor': 'minion99',
 					'n': 5
 				}
-			]
+			];
+			$scope.messagesList = [
+				{
+					'd': 'r', // direction - recieving
+					'm': 'Hallo, wie geht\'s dir?'
+				},
+				{
+					'd': 's', // direction - sending
+					'm': 'Soweit, ganz gut. Und selber?'
+				},
+				{
+					'd': 'r', // direction - recieving
+					'u': true // unspend transaction
+				},
+			];
 			$scope.activityHasChanged = function() {
 			  	console.log($scope.activityIndicator);
 			};
@@ -77,7 +91,12 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<p ng-repeat="convo in activeConversations" class="conversation {{ convo === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo)">
 						{{ convo }}
 					</p>
-                </div>
+				</div>
+				<div class="messages_container">
+					<div ng-repeat="message in messagesList" class="message {{ message.d === 's' ? 'sent' : '' }} {{ message.u ? 'unspend' : '' }}">
+						{{ message.u ? "warten auf Nachricht..." : message.m }}
+					</div>
+				</div>
             </div>
             <div class="background_activity">
 				<h3 class="minor_title">Aktivitäten im Netzwerk</h3>

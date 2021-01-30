@@ -290,3 +290,32 @@ input:checked+.slider:before {
     border-bottom: 1px solid #B3B3B3;
     padding: 10px 0;
 }
+
+.messages_container {
+    width: calc(100% - 20px);
+    padding: 10px;
+    height: calc(100% - 20px);
+    overflow-y: auto;
+}
+
+.message {
+    padding: 10px;
+    font-size: 0.8rem;
+    background-color: #afafaf;
+    border-radius: 4px 4px 4px 10px;
+    max-width: 50%;
+    clear: both;
+    float: left;
+    margin: 5px 0;
+}
+
+.sent {
+    background-color: #00B9F2;
+    color: #FFF;
+    float: right;
+    border-radius: 4px 10px 4px 4px ;
+}
+
+.unspend {
+    font-style: italic;
+}
