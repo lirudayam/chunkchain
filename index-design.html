@@ -29,12 +29,30 @@
 			]
 			$scope.tokenPerMessage = 1;
 			$scope.currentMessage = "";
+			$scope.feedNews = [
+				{
+					'type': '+',
+					'actor': 'minion99'
+				},
+				{
+					'type': 'M+',
+					'actor': 'kürbis_123'
+				},
+				{
+					'type': 'B',
+					'actor': 'minion99',
+					'n': 5
+				}
+			]
 			$scope.activityHasChanged = function() {
 			  	console.log($scope.activityIndicator);
 			};
 			$scope.conversationSelected = function(sSelectedItem) {
 				$scope.selectedConversation = sSelectedItem;
 			};
+			$scope.feedItemSelected = function (sFeedItem) {
+
+			}
 		  }]);
 	  </script>
     <div class="header">
@@ -58,7 +76,7 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
                 <div class="conversations_container">
 					<p ng-repeat="convo in activeConversations" class="conversation {{ convo === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo)">
 						{{ convo }}
-					</li>
+					</p>
                 </div>
             </div>
             <div class="background_activity">
@@ -70,6 +88,22 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 						<span class="slider"></span>
 					</label>
 					<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
+				</div>
+				<div class="activity_feed">
+					<div class="activity_item" ng-repeat="feedItem in feedNews.reverse()" ng-click="feedItemSelected(feedItem)">
+						<div ng-if="feedItem.type == '+' ">
+							<b>{{ feedItem.actor }}</b> ist dem Netzwerk beigetreten.
+						</div>
+						<div ng-if="feedItem.type == 'M+' ">
+							<b>{{ feedItem.actor }}</b> sucht jetzt auch nach Blöcken (mining).
+						</div>
+						<div ng-if="feedItem.type == 'M-' ">
+							<b>{{ feedItem.actor }}</b> hat die Suche nach Blöcken aufgegeben.
+						</div>
+						<div ng-if="feedItem.type == 'B' ">
+							<b>{{ feedItem.actor }}</b> hat einen neuen Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
+						</div>
+					</div>
 				</div>
 				
 			</div>
