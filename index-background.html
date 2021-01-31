@@ -16,6 +16,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
   <script src="https://momentjs.com/downloads/moment.js"></script>
   
+  
 </head>
 <body ng-app="chunkchain">
 	<script>
@@ -58,7 +59,12 @@
 			$scope.symText = "Mein Text";
 			$scope.symKey = "Schlüssel";
 			$scope.symEncrypt = "";
-			$scope.symDecryptKey = $scope.symKey
+			$scope.symDecryptKey = $scope.symKey;
+
+			$scope.coins = 1;
+			$scope.publicKey = "6c157587185fd2";
+			$scope.privateKey = "6c157587185fd2";
+
 			$scope.missionSelected = function(sSelectedItem) {
 				$scope.selectedMission = sSelectedItem;
 			};
@@ -83,6 +89,17 @@
 
 				}
 				return "";
+			}
+			$scope.timestamp = function () {
+				return moment().unix();
+			}
+			$scope.hashTx = function () {
+				const sComboundString = $scope.publicKey + "all" + $scope.messageSimulation + $scope.coins + $scope.timestamp();
+				const sHashString = CryptoJS.enc.Hex.stringify(CryptoJS.SHA1(sComboundString.toString()));
+				return sHashString;
+			}
+			$scope.hashTxSigned = function () {
+				return CryptoJS.AES.encrypt($scope.hashTx(), $scope.privateKey).toString();
 			}
 			
 			fnScope = $scope;
@@ -271,6 +288,70 @@
 										Dein Schlüssel: <input type="text" size="60" ng-model="symDecryptKey" /> <br /><br />
 										Deine Nachricht lautet: <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
 									</div>
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Was schicken wir uns immer?' ">
+					<p class="introduction_section">
+						Deine Nachricht wird als eine Transaktion geschickt. Dabei sieht die Struktur wie folgt aus:
+
+						<ul class="flow">
+							<li><b>Orginale Transaction</b> <br /><br />
+								{<br />
+									<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+									<span class="attribute">recipient:</span> "all",<br />
+									<span class="attribute">message:</span> "<input type="text" size="10" ng-model="messageSimulation" />",<br />
+									<span class="attribute">coins:</span> {{ coins }}<br />
+								}<br />
+							</li>
+							<li><b>Zeitstempel dazu</b> <br /><br />
+								{<br />
+									<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+									<span class="attribute">recipient:</span> "all",<br />
+									<span class="attribute">message:</span> "{{ messageSimulation }}",<br />
+									<span class="attribute">coins:</span> {{ coins }}<br />
+									<span class="attribute">time:</span> <span class="highlighted">{{ timestamp() }}</span><br />
+								}<br />
+							</li>
+							<li><b>Hash hinzufügen</b> <br /><br />
+								{<br />
+									<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+									<span class="attribute">recipient:</span> "all",<br />
+									<span class="attribute">message:</span> "{{ messageSimulation }}",<br />
+									<span class="attribute">coins:</span> {{ coins }}<br />
+									<span class="attribute">time:</span> {{ timestamp() }}<br />
+									<span class="attribute">hash:</span> <div class="cut-text">{{ hashTx() }}</div><br />
+								}</li>
+							<li><b>Hash signieren mit private key</b> <br /><br />
+								{<br />
+									<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+									<span class="attribute">recipient:</span> "all",<br />
+									<span class="attribute">message:</span> "{{ messageSimulation }}",<br />
+									<span class="attribute">coins:</span> {{ coins }}<br />
+									<span class="attribute">time:</span> {{ timestamp() }}<br />
+									<span class="attribute">hash:</span> <div class="cut-text">{{ hashTxSigned() }}</div><br />
+								}</li>
+								<li><b>ins P2P-Netzwerk</b></li>
+						  </ul>
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Wo sind die Nachrichten?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Dazu müssen wir uns nur unser P2P-Netzwerk anschauen.<br />
+									Wir haben hier extra Redundanz, sodass das System robuster wird.<br />
+									Also hat auch jeder eine vollständige Kopie der Daten.<br />
+									Das kann natürlich ziemlich schnell, ziemlich gross werden, weswegen es auch off-chain Lösungen gibt.<br />
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
 								</td>
 							</tr>
 						</table>

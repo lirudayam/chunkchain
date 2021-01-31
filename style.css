@@ -81,22 +81,26 @@ input[type=number] {
     line-height: 130%;
     font-weight: lighter;
 }
+
 table {
     width: 100%;
-    border:none;
+    border: none;
     font-size: 0.8rem;
     font-weight: lighter;
     line-height: 130%;
-    table-layout:fixed;
+    table-layout: fixed;
 }
+
 td {
     padding: 10px;
     width: calc(50% - 20px);
     line-height: 130%;
 }
+
 .center_image {
     text-align: center;
 }
+
 .center_image img {
     width: 50%;
 }
@@ -352,7 +356,7 @@ input:checked+.slider:before {
 .level_container {
     width: 100%;
     padding: 10px 0;
-    
+
     display: flex;
     justify-content: space-between;
     flex-direction: row;
@@ -428,9 +432,76 @@ select option {
 }
 
 .form {
-    display:grid;
+    display: grid;
     grid-template-columns: 30fr 70fr;
     grid-gap: 10px;
     align-items: center;
-    justify-content:center;
+    justify-content: center;
+}
+
+.flow {
+    display: flex;
+    list-style: none;
+}
+
+.flow li {
+    padding: 10px;
+    border: 1px solid black;
+    margin: 0 25px;
+    position: relative;
+    font-size: 0.8rem;
+}
+
+.flow li:not(:last-child):after {
+    content: '';
+    height: 1px;
+    background: black;
+    width: 50px;
+    position: absolute;
+    right: -50px;
+    top: 50%;
+}
+
+.flow li:not(:last-child):before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: 50%;
+    border-style: solid;
+    border-width: 7px 0 7px 20px;
+    border-color: transparent transparent transparent black;
+    right: -50px;
+    transform: translateY(-50%);
+}
+.flow input {
+    padding: 3px;
+}
+.flow li:last-child {
+    border: none;
+    vertical-align: center;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.attribute {
+    color: #AAA;
+    font-weight: lighter;
+    padding: 5px 0 0 10px;
+    line-height: 200%;
+}
+
+.highlighted {
+    color: #00B9F2;
+}
+
+.cut-text { 
+    text-overflow: ellipsis;
+    overflow: hidden; 
+    width: 160px; 
+    height: 1.2em; 
+    white-space: nowrap;
+    display: inline-block;
+    color: #00B9F2;
 }
