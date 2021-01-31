@@ -30,15 +30,15 @@
 					'Sind die Daten echt?'
 				],
 				'Level 2: Anfänger': [
-					'Wie sieht ein Block aus?',
 					'Was ist ein Hash?',
 					'Was ist Verschlüsselung?',
-					'Was schicken wir uns immer?'
+					'Was schicken wir uns immer?',
+					'Wo sind die Nachrichten?'
 				],
 				'Level 3: Fortgeschritten': [
 					'Was ist mein Schlüsssel?',
+					'Wie sieht ein Block aus?',
 					'Wie entsteht ein Block?',
-					'Wo sind die Nachrichten?',
 					'Wie entsteht die Kette?'
 				],
 				'Level 4: Profi': [
@@ -55,9 +55,36 @@
 			};
 			$scope.selectedLevel = 'Level 1: Einsteiger';
 			$scope.selectedMission = '';
+			$scope.symText = "Mein Text";
+			$scope.symKey = "Schlüssel";
+			$scope.symEncrypt = "";
+			$scope.symDecryptKey = $scope.symKey
 			$scope.missionSelected = function(sSelectedItem) {
 				$scope.selectedMission = sSelectedItem;
 			};
+			$scope.hash = function(sInput) {
+				return CryptoJS.SHA1(sInput).toString();
+			};
+			$scope.encrypt = function(sInput, sKey) {
+				const encrypt = CryptoJS.AES.encrypt(sInput, CryptoJS.enc.Base64.parse(sKey), { iv: CryptoJS.enc.Base64.parse("iv"), padding: CryptoJS.pad.NoPadding });
+				console.log(encrypt);
+				if ($scope.symEncrypt === "") {
+					$scope.symEncrypt = encrypt.toString(CryptoJS.format.Hex);
+				}
+				return encrypt.toString(CryptoJS.format.Hex);
+			};
+			$scope.decrypt = function(sInput, sKey) {
+				if (sInput !== "") {
+					const encryptedHex = CryptoJS.enc.Hex.parse(sInput);
+					const decrypt = CryptoJS.AES.decrypt({ciphertext: encryptedHex}, CryptoJS.enc.Base64.parse(sKey), { iv: CryptoJS.enc.Base64.parse("iv"), padding: CryptoJS.pad.NoPadding });
+					//
+					console.log(decrypt); //CryptoJS.enc.Utf8
+					return decrypt.toString(); //TODO: fix it
+
+				}
+				return "";
+			}
+			
 			fnScope = $scope;
 		  }]);
 
@@ -73,19 +100,13 @@
         <img src="assets/ChunkChain_Logo.svg" width="200px" />
 
         <div class="header_items">
-            <a>zur Blockchain-Ansicht</a>
+            <a>zur Chat-Ansicht</a>
             <span>dein Kontostand: <b>100 Token</b></span>
         </div>
     </div>
 
     <div class="main_body" ng-controller="ChatController">
-        <h1 class="page_title">Was im Hintergrund alles passiert...</h1>
-        <p class="introduction_section">
-Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern <b>on-chain</b> (alle Daten in der Blockchain). <br />
-Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
-		</p>
-		
-		<div class="background_container">
+        <div class="background_container">
 			<div class="level_container">
 				<select ng-options="level as level for (level, data) in levelList" ng-model="selectedLevel"></select>
 				
@@ -97,9 +118,166 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 			</div>
 
 			<div class="info_container">
-				<h3 class="minor_title">{{ selectedMission }}</h3>
+				<h1 class="page_title">{{ selectedMission }}</h1>
 				<div ng-if="selectedMission == 'Unser Netzwerk' ">
-					Hallo.
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Unser Chat basiert auf eine verteilten System. Aber was ist ein verteiltes System?<br />
+									Unten siehst du unsere klassische Client-Server-Architektur wie du sie aus Chat-Apps wie WhatsApp und Co kennst.<br />
+									Normalerweise schicken wir die Nachrichten an einen Server und dieser leitet sie dann weiter.<br />
+								</td>
+								<td>
+									Bei uns sind das anders aus. Wie du siehst, gibt es kein Server. Jeder kommuniziert direkt mit jedem.<br />
+									Da wir alle gleichwertig in diesem Netzwerk sind, reden wir gar nicht mehr von Client oder Server, sondern von Peers.<br />
+									Wir sind alle Peers, weswegen uns das zu einem Peer-to-Peer Netzwerk macht aka P2P.<br />
+								</td>
+							</tr>
+							<tr>
+								<td class="center_image">
+									<img src="./assets/Client_Server.svg" />
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network.svg" />
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Wo sind die Daten?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Tatsächlich ist das eine gute Frage und gar nicht so einfach.<br />
+									Schauen wir uns da nocheinmal die klassische Client-Server-Architektur an.<br />
+									Hier werden alle Daten auf dem Server in einer zentralen Datenbank gespeichert.<br />
+								</td>
+								<td>
+									Und hier speichern wir tatsächlich <i>alle</i> Daten auf <i>allen</i> Peer-Rechnern.<br />
+									Diese Redundanz ist bewusst erzeugt, um das System stabiler zu machen.<br />
+									Fällt ein Rechner aus, sind genug andere noch da. Doch das ganze System hat auch Nachteile.<br />
+								</td>
+							</tr>
+							<tr>
+								<td class="center_image">
+									<img src="./assets/Client_Server_Data.svg" />
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Sind die Daten echt?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Auch das ist eine sehr gute Frage.<br />
+									Bei klassischen Client-Server-Architektur, sind die Daten zentral auf dem Server.<br />
+									Wir vertrauen also diesem Server, dass die Daten echt sind.<br />
+									Das machen wir sehr häufig. Wir vertrauen Services wie Amazon, PayPal, Instagram tagtäglich.<br />
+								</td>
+								<td>
+									Was ist aber wenn wir keine zentrale Instanz haben, der wir vertrauen können?<br />
+									Das P2P Network erzeugt bewusst Redundanz, sodass wir nicht einer einzelnen Person vertrauen müssen.<br />
+									Stattdessen vertrauen wir dem gesamten System und überprüfen uns gegenseitig.<br />
+									Das bedeutet aber auch, dass wir auf jede noch so kleine Information gemeinsam einigen müssen.<br />
+								</td>
+							</tr>
+							<tr>
+								<td class="center_image">
+									<img src="./assets/Client_Server_Data.svg" />
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+
+				<div ng-if="selectedMission == 'Was ist ein Hash?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Ein Hash ist eine Möglichkeit eine Zeichenkette (String) zu komprimieren.<br />
+									Wenn wir einen String hashen, bekommen wir immer einen neuen String einer fixen Länge raus.<br />
+									Dabei ist egal, wie lang der anfängliche String ist, es kommt immer die gleiche Länge vom Hash raus.<br /><br />
+									
+									Hashes haben dabei drei wesentliche Eigenschaften:
+									<ul>
+										<li>Aus einem Hash ist es unmöglich den orginalen String zurückzubekommen</li>
+										<li>Es ist unmöglich aus einem String-Hash-Paar einen weiteren String mit dem gleichen Hash zu finden</li>
+										<li>Es ist unmöglich zwei Strings zu finden, die den gleichen Hash haben</li>
+									</ul>
+								</td>
+								<td>
+									Der Vorteil ist, Hashes sind leicht zu speichern und man kann so Daten überprüfen.<br />
+									Änderst du nur einen Buchstaben im orginalen String, sieht der Hash komplett anders aus.<br /><br />
+
+									Willst du es ausprobieren, z.B. SHA1 (Secure Hash Algorithm):<br />
+									<input type="text" size="60" placeholder="Gib deinen Text ein..." ng-model="hashInput" /> <br /><br />
+									Hash: <b>{{ hash(hashInput) }}</b>
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Was ist Verschlüsselung?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Es gibt zwei Arten von Verschlüssung.<br />
+									Die <b>symmetrische</b> Verschlüsselung nutzt das Prinzip, dass du eine Nachricht mit dem gleichen Schlüssel verschlüsseln und entschlüsseln kannst.<br />
+									Das ist ähnlich eines Haustürschlosses. Du kannst deinen Schlüssel nutzen, um die Tür aufzumachen und abzuschliessen.<br /><br />
+								</td>
+								<td>
+									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen Schlüssel zum Verschlüsseln und einen zum Entschlüsseln.<br />
+									Man spricht dabei von <b>private Key</b> (Verschlüsselung) und <b>public Key</b> (Entschlüsselung).<br />
+									Um ein solches Key-Paar zu erzeugen, generierst du einen private key und leitest einen public key davon ab.<br />
+									Man kann von einm public key nie den dazugehörigen private key erraten.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Ein Beispiel: <br />
+									<div class="form">
+										Deine Nachricht lautet: <input type="text" size="60" ng-model="symText" /> <br /><br />
+										Dein Schlüssel: <input type="text" size="60" ng-model="symKey" /> <br /><br />
+										Verschlüsselte Nachricht: <b>{{ encrypt(symText, symKey) }}</b>
+									</div>
+									<br /><br />
+									Zum Entschlüsseln:
+									<div class="form">
+										Verschlüsselte Nachricht: <input type="text" size="60" ng-model="symEncrypt" /> <br /><br />
+										Dein Schlüssel: <input type="text" size="60" ng-model="symDecryptKey" /> <br /><br />
+										Deine Nachricht lautet: <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
+									</div>
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
 				</div>
 			</div>
 		</div>
