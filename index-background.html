@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Chunkchain - Blockchain Try Out</title>
+  <link href="style.css" rel="stylesheet" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script>
+    function log(message) {
+		console.log(message);
+      //document.getElementById("log").textContent += message + "\n";
+    }
+  </script>
+  <script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment.js"></script>
+  
+</head>
+<body ng-app="chunkchain">
+	<script>
+		let fnScope = null;
+		angular.module('chunkchain', [])
+		  .controller('ChatController', ['$scope', function($scope) {
+			$scope.levelList = {
+				'Level 1: Einsteiger': [
+					'Überblick',
+					'Unser Netzwerk',
+					'Wo sind die Daten?',
+					'Sind die Daten echt?'
+				],
+				'Level 2: Anfänger': [
+					'Wie sieht ein Block aus?',
+					'Was ist ein Hash?',
+					'Was ist Verschlüsselung?',
+					'Was schicken wir uns immer?'
+				],
+				'Level 3: Fortgeschritten': [
+					'Was ist mein Schlüsssel?',
+					'Wie entsteht ein Block?',
+					'Wo sind die Nachrichten?',
+					'Wie entsteht die Kette?'
+				],
+				'Level 4: Profi': [
+					'Wie kann ich verschlüsseln?',
+					'Soll ich Blöcke suchen?',
+					'Kann ich löschen?',
+					'Wie finden wir Konsens?'
+				],
+				'Level 5: Voll-Profi': [
+					'Wie wird die Blocksuche geregelt?',
+					'Was sind unbestätigte Nachrichten?',
+					'Kann ich Daten manipulieren?'
+				]
+			};
+			$scope.selectedLevel = 'Level 1: Einsteiger';
+			$scope.selectedMission = '';
+			$scope.missionSelected = function(sSelectedItem) {
+				$scope.selectedMission = sSelectedItem;
+			};
+			fnScope = $scope;
+		  }]);
+
+		  window.onload = () => {
+			//const oAngularScope = angular.element(document.body).scope();
+			console.log(fnScope);
+			console.log(fnScope.activeConversations);
+		  }
+
+
+	  </script>
+    <div class="header">
+        <img src="assets/ChunkChain_Logo.svg" width="200px" />
+
+        <div class="header_items">
+            <a>zur Blockchain-Ansicht</a>
+            <span>dein Kontostand: <b>100 Token</b></span>
+        </div>
+    </div>
+
+    <div class="main_body" ng-controller="ChatController">
+        <h1 class="page_title">Was im Hintergrund alles passiert...</h1>
+        <p class="introduction_section">
+Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern <b>on-chain</b> (alle Daten in der Blockchain). <br />
+Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
+		</p>
+		
+		<div class="background_container">
+			<div class="level_container">
+				<select ng-options="level as level for (level, data) in levelList" ng-model="selectedLevel"></select>
+				
+				<div class="mission_container">
+					<div ng-repeat="mission in levelList[selectedLevel]" class="{{ mission === selectedMission ? 'selected_mission' : 'mission' }}" ng-click="missionSelected(mission)">
+						{{ mission }}
+					</div>
+				</div>
+			</div>
+
+			<div class="info_container">
+				<h3 class="minor_title">{{ selectedMission }}</h3>
+				<div ng-if="selectedMission == 'Unser Netzwerk' ">
+					Hallo.
+				</div>
+			</div>
+		</div>
+
+    </div>
+
+</body>
+</html>

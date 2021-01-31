@@ -279,7 +279,7 @@ input:checked+.slider:before {
 }
 
 .activity_feed {
-    width:100%;
+    width: 100%;
     padding: 10px;
     height: 80%;
     overflow-y: auto;
@@ -314,9 +314,96 @@ input:checked+.slider:before {
     background-color: #00B9F2;
     color: #FFF;
     float: right;
-    border-radius: 4px 10px 4px 4px ;
+    border-radius: 4px 10px 4px 4px;
 }
 
 .unspend {
     font-style: italic;
+}
+
+.background_container {
+    width: 100%;
+}
+
+.info_container {
+    width: 100px;
+    margin-top: 10px;
+}
+
+.level_container {
+    width: 100%;
+    padding: 10px 0;
+    border-bottom: 1px solid #B3B3B3;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+}
+
+.mission_container {
+    display: flex;
+    flex-direction: row;
+}
+
+.mission,
+.selected_mission,
+.mission_uncompleted {
+    min-width: 65px;
+    padding: 10px 15px;
+    font-size: 0.75rem;
+    background-color: #E6E6E6;
+    margin: 0px 5px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.mission_uncompleted:before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    transform: translate(50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff0000;
+    mix-blend-mode: darken;
+}
+
+.selected_mission {
+    background-color: #00B9F2;
+    color: #FFF;
+    font-weight: bolder;
+}
+
+/* class applies to select element itself, not a wrapper element */
+select {
+    display: block;
+    font-size: 0.8rem;
+    padding: 10px 30px 10px 10px;
+    /* useful when width is set to anything other than 100% */
+    box-sizing: border-box;
+    margin: 0;
+    border: 1px solid #B3B3B3;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #E6E6E6;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat, repeat;
+    /* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
+    background-position: right .7em top 50%, 0 0;
+    /* icon size, then gradient */
+    background-size: .65em auto, 100%;
+}
+
+/* Focus style */
+select:focus {
+    outline: none;
+}
+
+/* Set options to normal weight */
+select option {
+    font-weight: normal;
 }
