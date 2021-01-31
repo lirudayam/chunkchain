@@ -433,7 +433,7 @@ select option {
 
 .form {
     display: grid;
-    grid-template-columns: 30fr 70fr;
+    grid-template-columns: 40fr 60fr;
     grid-gap: 10px;
     align-items: center;
     justify-content: center;

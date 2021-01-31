@@ -262,31 +262,30 @@
 						<table>
 							<tr>
 								<td>
-									Es gibt zwei Arten von Verschlüssung.<br />
 									Die <b>symmetrische</b> Verschlüsselung nutzt das Prinzip, dass du eine Nachricht mit dem gleichen Schlüssel verschlüsseln und entschlüsseln kannst.<br />
-									Das ist ähnlich eines Haustürschlosses. Du kannst deinen Schlüssel nutzen, um die Tür aufzumachen und abzuschliessen.<br /><br />
+									Das ist ähnlich wie bei einem Haustürschloss. Du kannst deinen Schlüssel nutzen, um die Tür aufzumachen und abzuschliessen.<br /><br />
 								</td>
 								<td>
-									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen Schlüssel zum Verschlüsseln und einen zum Entschlüsseln.<br />
-									Man spricht dabei von <b>private Key</b> (Verschlüsselung) und <b>public Key</b> (Entschlüsselung).<br />
-									Um ein solches Key-Paar zu erzeugen, generierst du einen private key und leitest einen public key davon ab.<br />
-									Man kann von einm public key nie den dazugehörigen private key erraten.
+									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen Schlüssel zum Verschlüsseln (<b>private key</b>) und einen zum Entschlüsseln (<b>public key</b>).<br />
+									Um ein solches Schlüssel-Paar zu erzeugen, generierst du einen private key und leitest einen public key davon ab.<br />
+									Man kann von einem public key nie den dazugehörigen private key erraten. <br />
+									Du kannst natürlich auch private und public key andersherum einsetzen.
 								</td>
 							</tr>
 							<tr>
 								<td>
 									Ein Beispiel: <br />
 									<div class="form">
-										Deine Nachricht lautet: <input type="text" size="60" ng-model="symText" /> <br /><br />
-										Dein Schlüssel: <input type="text" size="60" ng-model="symKey" /> <br /><br />
+										Nachricht: <input type="text" size="50" ng-model="symText" /> <br /><br />
+										Dein Schlüssel: <input type="text" size="50" ng-model="symKey" /> <br /><br />
 										Verschlüsselte Nachricht: <b>{{ encrypt(symText, symKey) }}</b>
 									</div>
-									<br /><br />
+									<br /><hr /><br />
 									Zum Entschlüsseln:
 									<div class="form">
-										Verschlüsselte Nachricht: <input type="text" size="60" ng-model="symEncrypt" /> <br /><br />
-										Dein Schlüssel: <input type="text" size="60" ng-model="symDecryptKey" /> <br /><br />
-										Deine Nachricht lautet: <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
+										Verschlüsselte Nachricht: <input type="text" size="50" ng-model="symEncrypt" /> <br /><br />
+										Dein Schlüssel: <input type="text" size="50" ng-model="symDecryptKey" /> <br /><br />
+										Entschlüsselte Nachricht: <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
 									</div>
 								</td>
 							</tr>
@@ -354,6 +353,67 @@
 								</td>
 								<td class="center_image">
 									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+
+				<div ng-if="selectedMission == 'Was ist ein Block?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Bisher hast du einiges gelernt zu unserem P2P-Netzwerk und zu Hashes und Verschlüsselung.<br />
+									Nachrichten sind immer Transaktionen und enthalten viele Informationen und den signierten Hash.<br /><br />
+
+									Wie du ebenfalls zuvor gesehen hast, müssen wir uns in einem P2P-Netzwerk auf jede Information einigen.<br />
+									Das würde sehr viel Abstimmung bedeuten.<br />
+									Stattdessen sammeln wir neue Daten einfach in einem Pool (<b>unconfirmed transactions</b>).<br />
+									Nun kann sich jemand der Aufgabe stellen, einige dieser Transaktionen zu sammeln und zur Abstimmung bringen.<br /><br />
+
+									Der Vorgang einen Block zur Abstimmung zu bringen, benötigt viel Aufwand.<br />
+									Das siehst du gleich.
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Wie sieht ein Block aus?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Ein Block ist eine Ansammlung an Transaktionen. <br />
+									Sobald ein Block bestätigt ist, hat jeder Teilnehmer im P2P-Netzwerk die Info, dass dieser Block wahre Daten enthält. <br /><br />
+
+									Ein Block besteht dabei aus einem <b>block body</b> und <b>block header</b>.<br />
+									Der Body enthält nur die Liste der Transaktionen. <br /><br />
+
+									Bisher haben wir gelernt, dass wir mit einem Hash überprüfen können, ob ein String verändert wurde.<br />
+									Wenn wir diesen Hash signieren, können wir sogar sicherstellen, dass niemand den Hash ändern kann.<br />
+									Aber wie können wir feststellen, dass niemand einen Block ändern kann? <br /><br />
+
+									Dazu müssen wir von allen Transaktionshashes, einen grossen Hash (<b>block hash</b>) bauen.<br />
+									Damit können wir super leicht feststellen, ob jetzt jemand auch nur irgendetwas verändert hat.<br />
+									Diesen speichern wir im block header ab.<br /><br />
+
+									Wie wir jetzt aber sicherstellen können, dass niemand diesen block hash verändert, siehst du in der nächsten Mission.<br />
+									Du kannst dir aber zuerst mal einen x-beliebigen Block anschauen.
+								</td>
+								<td class="center_image">
+									<!--
+										Place here real block
+									-->
 								</td>
 							</tr>
 						</table>
