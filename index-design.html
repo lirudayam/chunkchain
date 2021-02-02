@@ -7,6 +7,7 @@
   <link href="style.css" rel="stylesheet" />
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
   <script>
+	let fnScope = null;
     function log(message) {
 		console.log(message);
       //document.getElementById("log").textContent += message + "\n";
@@ -20,20 +21,19 @@
 </head>
 <body ng-app="chunkchain">
 	<script>
-		let fnScope = null;
 		angular.module('chunkchain', [])
 		  .controller('ChatController', ['$scope', function($scope) {
 			$scope.activityIndicator = true;
-			$scope.selectedConversation = 'Alle';
+			$scope.selectedConversation = 'all';
 			$scope.activeConversations = [
-				'Alle',
-				'kürbis_123',
-				'minion99'
+				'all',
+				//'kürbis_123',
+				//'minion99'
 			]
 			$scope.tokenPerMessage = 1;
 			$scope.currentMessage = "";
 			$scope.feedNews = [
-				{
+				/*{
 					'type': '+',
 					'actor': 'minion99'
 				},
@@ -45,10 +45,10 @@
 					'type': 'B',
 					'actor': 'minion99',
 					'n': 5
-				}
+				}*/
 			];
 			$scope.messagesList = [
-				{
+				/*{
 					'd': 'r', // direction - recieving
 					'm': 'Hallo, wie geht\'s dir?'
 				},
@@ -59,7 +59,7 @@
 				{
 					'd': 'r', // direction - recieving
 					'u': true // unspend transaction
-				},
+				},*/
 			];
 			$scope.activityHasChanged = function() {
 			  	console.log($scope.activityIndicator);
@@ -70,6 +70,54 @@
 			};
 			$scope.feedItemSelected = function (sFeedItem) {
 
+			};
+			$scope.newParticipant = function (sNickname) {
+				$scope.activeConversations.push(sNickname);
+				$scope.feedNews.push({
+					'type': '+',
+					'actor': sNickname
+				});
+			};
+			$scope.participantLeft = function (sNickname) {
+				$scope.activeConversations.remove(sNickname);
+				$scope.feedNews.push({
+					'type': '-',
+					'actor': sNickname
+				});
+			};
+			$scope.newMessage = function (sNickname) {
+				$scope.activeConversations.push(sNickname);
+				$scope.feedNews.push({
+					'type': 'MSG',
+					'actor': sNickname
+				});
+			};
+			$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
+				if (bSelfFlag) {
+					$scope.feedNews.push({
+						'type': 'S',
+						'nonce': sNonce
+					});
+				}
+				else {
+					$scope.feedNews.push({
+						'type': 'B',
+						'actor': sNickname,
+						'n': iMessages
+					});
+				}
+				$scope.messagesList = aBlockchain.map(block => block.l)
+										.flat().filter(tx => tx.r === $scope.selectedConversation)
+										.map(tx => {
+											return {
+												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+												'm': tx.m
+											}
+										});
+			};
+			$scope.onEnter = function () {
+				sendMessage($scope.currentMessage);
+				$scope.currentMessage = "";
 			};
 			fnScope = $scope;
 		  }]);
@@ -141,6 +189,9 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 						<div ng-if="feedItem.type == 'S' ">
 							Du hast einen Block gefunden. <b>{{ feedItem.nonce }}</b> ist die Lösung
 						</div>
+						<div ng-if="feedItem.type == 'MSG' ">
+							<b>{{ feedItem.actor }}</b> hat eine Nachricht geschrieben.
+						</div>
 					</div>
 				</div>
 				
@@ -153,8 +204,10 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<input type="number" size="2" maxlength="2" ng-model="tokenPerMessage" />
 					Token
 					<div class="flexible_grow"></div>
-					<input type="text" size="50" maxlength="300" placeholder="Nachricht..." ng-model="currentMessage" />
-					<button class="button" [disabled]="currentMessage !== ''">senden</button>
+					<form ng-submit="onEnter()">
+						<input type="text" size="50" maxlength="300" placeholder="Nachricht..." ng-model="currentMessage" />
+						<button class="button" [disabled]="currentMessage !== ''">senden</button>
+					</form>
 				</div>
 			</div>
 		</div>

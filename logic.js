@@ -15,8 +15,6 @@ const oBlockInterface = {
 	m: "", // m - merkle root
 	t: 0, // t - time
 	n: 0, // n - nonce
-	no: 0, // no - number of transactions
-	s: 0, // s - size
 	b: 0, // b - block_index
 	r: "", // r - miner
 	l: [] // l - list of transactions
@@ -200,12 +198,10 @@ oNickNames[publicAddress] = sUserNickName;
 log(privateKey + " [ private key ]");
 
 b.on("seen", function (address) {
-
-	fnScope.activeConversations.push(getNickname(address));
-	fnScope.feedNews.push({
-		'type': '+',
-		'actor': getNickname(address)
-	});
+	// wait until nickname has arrived
+	setTimeout(() => {
+		fnScope.newParticipant(getNickname(address));
+	}, 1500);
 
 	// send the nickname dicitonary as well
 	b.send("S" + JSON.stringify(oNickNames));
@@ -220,21 +216,20 @@ b.on("seen", function (address) {
 });
 
 b.on("left", function (address) {
-	fnScope.activeConversations.remove(getNickname(address));
-	fnScope.feedNews.push({
-		'type': '-',
-		'actor': getNickname(address)
-	});
+	fnScope.participantLeft(getNickname(address));
 
 	delete oNickNames[address];
 });
 
 b.on("message", function (address, message) {
+	console.log(message);
+
 	// check what message came in
 	var sFirstLetter = message.substr(0, 1);
 	if (sFirstLetter === "A") {
 		// new unconfirmed transaction arrived
-		log(getNickname(address) + ": [unconfirmed message]");
+		fnScope.newMessage(getNickname(address));
+		//log(getNickname(address) + ": [unconfirmed message]");
 
 		var oTx = JSON.parse(message.substr(1));
 		if (oTx.s === address) {
@@ -248,20 +243,15 @@ b.on("message", function (address, message) {
 		// new block arrived
 		var oFoundBlock = JSON.parse(message.substr(1));
 		if (verifyBlock(oFoundBlock)) {
-			fnScope.feedNews.push({
-				'type': 'B',
-				'actor': getNickname(address),
-				'n': oFoundBlock.l.length
-			});
-
+			
 			// TODO: add it to the blockchain
 			oFoundBlock.l.forEach((oTx) => log(getNickname(oTx.s) + ": " + oTx.m));
 			if (oMiningIntervalCaller !== null) {
 				clearInterval(oMiningIntervalCaller);
 			}
 			aBlockchain.push(oFoundBlock);
+			fnScope.blockFound(getNickname(address), getNickname(address) === sUserNickName, oFoundBlock.l.length, oFoundBlock.n);
 			startNewBlock();
-			console.log(oBlock);
 		}
 	} else if (sFirstLetter === "C") {
 		// the new blockchain is there
@@ -299,6 +289,20 @@ b.on("message", function (address, message) {
 		log(getNickname(address) + ": " + message);
 	}
 });
+
+const sendMessage = (sMessage) => {
+	var oChat = Object.assign({}, oChatInterface);
+	oChat.s = publicAddress;
+	oChat.r = "all";
+	oChat.m = sMessage;
+	oChat.c = 10;
+
+	var oTx = createTxHash(oChat, privateKey);
+	console.log(oTx);
+	b.send("A" + JSON.stringify(createTxHash(oChat, privateKey)));
+
+	proofOfWorkMining(2);
+}
 
 /*
 document.getElementById("input").onkeydown = function (ev) {
