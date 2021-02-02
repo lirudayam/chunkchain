@@ -91,6 +91,7 @@
 					'type': 'MSG',
 					'actor': sNickname
 				});
+				$scope.msgArrived();
 			};
 			$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
 				if (bSelfFlag) {
@@ -106,6 +107,9 @@
 						'n': iMessages
 					});
 				}
+				$scope.msgArrived();
+			};
+			$scope.msgArrived = function () {
 				$scope.messagesList = aBlockchain.map(block => block.l)
 										.flat().filter(tx => tx.r === $scope.selectedConversation)
 										.map(tx => {
@@ -113,9 +117,18 @@
 												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
 												'm': tx.m
 											}
-										});
-			};
-			$scope.onEnter = function () {
+										}).concat(
+											oBlock.l.filter(tx => tx.r === $scope.selectedConversation)
+											.map(tx => {
+												return {
+													'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+													'u': true
+												}
+											})
+										);
+			}
+			$scope.onEnter = function (e) {
+				e.preventDefault();
 				sendMessage($scope.currentMessage);
 				$scope.currentMessage = "";
 			};
@@ -204,7 +217,7 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<input type="number" size="2" maxlength="2" ng-model="tokenPerMessage" />
 					Token
 					<div class="flexible_grow"></div>
-					<form ng-submit="onEnter()">
+					<form ng-submit="onEnter($event)">
 						<input type="text" size="50" maxlength="300" placeholder="Nachricht..." ng-model="currentMessage" />
 						<button class="button" [disabled]="currentMessage !== ''">senden</button>
 					</form>

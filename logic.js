@@ -250,8 +250,8 @@ b.on("message", function (address, message) {
 				clearInterval(oMiningIntervalCaller);
 			}
 			aBlockchain.push(oFoundBlock);
-			fnScope.blockFound(getNickname(address), getNickname(address) === sUserNickName, oFoundBlock.l.length, oFoundBlock.n);
 			startNewBlock();
+			fnScope.blockFound(getNickname(address), getNickname(address) === sUserNickName, oFoundBlock.l.length, oFoundBlock.n);
 		}
 	} else if (sFirstLetter === "C") {
 		// the new blockchain is there
