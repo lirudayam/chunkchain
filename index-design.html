@@ -26,27 +26,11 @@
 			$scope.activityIndicator = true;
 			$scope.selectedConversation = 'all';
 			$scope.activeConversations = [
-				'all',
-				//'kürbis_123',
-				//'minion99'
+				'all'
 			]
 			$scope.tokenPerMessage = 1;
 			$scope.currentMessage = "";
-			$scope.feedNews = [
-				/*{
-					'type': '+',
-					'actor': 'minion99'
-				},
-				{
-					'type': 'M+',
-					'actor': 'kürbis_123'
-				},
-				{
-					'type': 'B',
-					'actor': 'minion99',
-					'n': 5
-				}*/
-			];
+			$scope.feedNews = [];
 			$scope.messagesList = [
 				/*{
 					'd': 'r', // direction - recieving
@@ -75,36 +59,43 @@
 				$scope.activeConversations.push(sNickname);
 				$scope.feedNews.push({
 					'type': '+',
-					'actor': sNickname
+					'actor': sNickname,
+					'time': moment().format("hh:mm:ss")
 				});
+				
 			};
 			$scope.participantLeft = function (sNickname) {
 				$scope.activeConversations.remove(sNickname);
 				$scope.feedNews.push({
 					'type': '-',
-					'actor': sNickname
+					'actor': sNickname,
+					'time': moment().format("hh:mm:ss")
 				});
+				
 			};
 			$scope.newMessage = function (sNickname) {
-				$scope.activeConversations.push(sNickname);
 				$scope.feedNews.push({
 					'type': 'MSG',
-					'actor': sNickname
+					'actor': sNickname,
+					'time': moment().format("hh:mm:ss")
 				});
 				$scope.msgArrived();
+				
 			};
 			$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
 				if (bSelfFlag) {
 					$scope.feedNews.push({
 						'type': 'S',
-						'nonce': sNonce
+						'nonce': sNonce,
+						'time': moment().format("hh:mm:ss")
 					});
 				}
 				else {
 					$scope.feedNews.push({
 						'type': 'B',
 						'actor': sNickname,
-						'n': iMessages
+						'n': iMessages,
+						'time': moment().format("hh:mm:ss")
 					});
 				}
 				$scope.msgArrived();
@@ -115,21 +106,24 @@
 										.map(tx => {
 											return {
 												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
-												'm': tx.m
+												'm': tx.m,
+												't': tx.t
 											}
 										}).concat(
 											oBlock.l.filter(tx => tx.r === $scope.selectedConversation)
 											.map(tx => {
 												return {
 													'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
-													'u': true
+													'u': true,
+													't': tx.t
 												}
 											})
 										);
+				
 			}
 			$scope.onEnter = function (e) {
 				e.preventDefault();
-				sendMessage($scope.currentMessage);
+				sendMessage($scope.currentMessage, $scope.selectedConversation, $scope.tokenPerMessage);
 				$scope.currentMessage = "";
 			};
 			fnScope = $scope;
@@ -162,12 +156,12 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
         <div class="chat_container">
             <div class="chat_window">
                 <div class="conversations_container">
-					<p ng-repeat="convo in activeConversations" class="conversation {{ convo === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo)">
+					<p ng-repeat="convo in activeConversations track by $index" class="conversation {{ convo === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo)">
 						{{ convo }}
 					</p>
 				</div>
 				<div class="messages_container">
-					<div ng-repeat="message in messagesList" class="message {{ message.d === 's' ? 'sent' : '' }} {{ message.u ? 'unspend' : '' }}">
+					<div ng-repeat="message in messagesList track by $index" class="message {{ message.d === 's' ? 'sent' : '' }} {{ message.u ? 'unspend' : '' }}">
 						{{ message.u ? "warten auf Nachricht..." : message.m }}
 					</div>
 				</div>
@@ -183,27 +177,27 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
 				</div>
 				<div class="activity_feed">
-					<div class="activity_item" ng-repeat="feedItem in feedNews.reverse()" ng-click="feedItemSelected(feedItem)">
+					<div class="activity_item" ng-repeat="feedItem in feedNews.reverse() track by feedItem.time" ng-click="feedItemSelected(feedItem)">
 						<div ng-if="feedItem.type == '+' ">
-							<b>{{ feedItem.actor }}</b> ist dem Netzwerk beigetreten.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> ist dem Netzwerk beigetreten.
 						</div>
 						<div ng-if="feedItem.type == '-' ">
-							<b>{{ feedItem.actor }}</b> hat das Netzwerk verlassen.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das Netzwerk verlassen.
 						</div>
 						<div ng-if="feedItem.type == 'M+' ">
-							<b>{{ feedItem.actor }}</b> sucht jetzt auch nach Blöcken (mining).
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> sucht jetzt auch nach Blöcken (mining).
 						</div>
 						<div ng-if="feedItem.type == 'M-' ">
-							<b>{{ feedItem.actor }}</b> hat die Suche nach Blöcken aufgegeben.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat die Suche nach Blöcken aufgegeben.
 						</div>
 						<div ng-if="feedItem.type == 'B' ">
-							<b>{{ feedItem.actor }}</b> hat einen neuen Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen neuen Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
 						</div>
 						<div ng-if="feedItem.type == 'S' ">
-							Du hast einen Block gefunden. <b>{{ feedItem.nonce }}</b> ist die Lösung
+							<span class="time">{{ feedItem.time }}</span>Du hast einen Block gefunden. <b>{{ feedItem.nonce }}</b> ist die Lösung
 						</div>
 						<div ng-if="feedItem.type == 'MSG' ">
-							<b>{{ feedItem.actor }}</b> hat eine Nachricht geschrieben.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat eine Nachricht geschrieben.
 						</div>
 					</div>
 				</div>

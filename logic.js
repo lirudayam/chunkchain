@@ -178,7 +178,12 @@ function stopMining(b) {
 }
 
 // Get connected with our peers via torrent server
-var b = Bugout("chunkchain");
+var b = Bugout("chunkchain", {
+	announce: [
+		'wss://hub.bugout.link',
+  		'wss://tracker.openwebtorrent.com'
+	]
+});
 
 // Register critical information
 const publicAddress = b.address();
@@ -290,12 +295,17 @@ b.on("message", function (address, message) {
 	}
 });
 
-const sendMessage = (sMessage) => {
+const sendMessage = (sMessage, sRecipient, sToken) => {
 	var oChat = Object.assign({}, oChatInterface);
 	oChat.s = publicAddress;
-	oChat.r = "all";
+	if (sRecipient === "all") {
+		oChat.r = "all";
+	}
+	else {
+		oChat.r = Object.keys(oNickNames).find(key => oNickNames[key] === sRecipient);
+	}	
 	oChat.m = sMessage;
-	oChat.c = 10;
+	oChat.c = parseInt(sToken, 10);
 
 	var oTx = createTxHash(oChat, privateKey);
 	console.log(oTx);

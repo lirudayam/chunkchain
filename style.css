@@ -505,3 +505,11 @@ select option {
     display: inline-block;
     color: #00B9F2;
 }
+
+.time {
+    font-size: 0.7rem;
+    font-weight: lighter;
+    color: #CCC;
+    width: 60px;
+    display: inline-block;
+}
