@@ -73,14 +73,13 @@
 				});
 				
 			};
-			$scope.newMessage = function (sNickname) {
+			$scope.newMessage = function (sNickname, oTimestamp) {
 				$scope.feedNews.push({
 					'type': 'MSG',
 					'actor': sNickname,
 					'time': moment().format("hh:mm:ss")
 				});
-				$scope.msgArrived();
-				
+				$scope.msgArrived(false, oTimestamp);
 			};
 			$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
 				if (bSelfFlag) {
@@ -98,10 +97,12 @@
 						'time': moment().format("hh:mm:ss")
 					});
 				}
-				$scope.msgArrived();
+				$scope.msgArrived(true);
 			};
-			$scope.msgArrived = function () {
-				$scope.messagesList = aBlockchain.map(block => block.l)
+			$scope.msgArrived = function (bEntireRefresh, oTimestamp) {
+				// TODO: avoid the generation of new arrays
+				if (bEntireRefresh) {
+					$scope.messagesList = aBlockchain.map(block => block.l)
 										.flat().filter(tx => tx.r === $scope.selectedConversation)
 										.map(tx => {
 											return {
@@ -119,6 +120,19 @@
 												}
 											})
 										);
+				}
+				else {
+					oBlock.l.filter(tx => tx.r === $scope.selectedConversation && tx.t === oTimestamp)
+											.map(tx => {
+												return {
+													'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+													'u': true,
+													't': tx.t
+												}
+											}).forEach(
+												item => $scope.messagesList.push(item)
+											);
+				}
 				
 			}
 			$scope.onEnter = function (e) {
@@ -177,7 +191,7 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
 				</div>
 				<div class="activity_feed">
-					<div class="activity_item" ng-repeat="feedItem in feedNews.reverse() track by feedItem.time" ng-click="feedItemSelected(feedItem)">
+					<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by feedItem.time" ng-click="feedItemSelected(feedItem)">
 						<div ng-if="feedItem.type == '+' ">
 							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> ist dem Netzwerk beigetreten.
 						</div>

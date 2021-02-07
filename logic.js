@@ -232,12 +232,12 @@ b.on("message", function (address, message) {
 	// check what message came in
 	var sFirstLetter = message.substr(0, 1);
 	if (sFirstLetter === "A") {
-		// new unconfirmed transaction arrived
-		fnScope.newMessage(getNickname(address));
-		//log(getNickname(address) + ": [unconfirmed message]");
 
 		var oTx = JSON.parse(message.substr(1));
 		if (oTx.s === address) {
+			// new unconfirmed transaction arrived
+			fnScope.newMessage(getNickname(address), oTx.t);
+
 			oBlock.l.push(oTx);
 
 			proofOfWorkMining(2);
