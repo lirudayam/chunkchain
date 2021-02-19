@@ -44,7 +44,7 @@ button {
     appearance: none;
     font-weight: normal;
     margin: 0 auto;
-    padding: 8px;
+    padding: 8px 5px;
 }
 
 button:disabled,
@@ -133,6 +133,7 @@ td {
     grid-template-columns: 25fr 75fr;
     margin-top: -1px;
     height: 60px;
+    overflow: hidden;
 }
 
 
@@ -146,8 +147,11 @@ td {
 }
 
 .chat_window_footer_new_chat_container {
-    padding: 10px 10px 10px 90px;
     border-right: 1px solid #B3B3B3;
+}
+
+.chat_window_footer_new_chat_container button {
+    margin: 10px 20px;
 }
 
 .chat_window_footer_message {

@@ -236,9 +236,8 @@ b.on("message", function (address, message) {
 		var oTx = JSON.parse(message.substr(1));
 		if (oTx.s === address) {
 			// new unconfirmed transaction arrived
-			fnScope.newMessage(getNickname(address), oTx.t);
-
 			oBlock.l.push(oTx);
+			fnScope.newMessage(getNickname(address), oTx.t);
 
 			proofOfWorkMining(2);
 		}

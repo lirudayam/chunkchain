@@ -77,7 +77,7 @@
 				$scope.feedNews.push({
 					'type': 'MSG',
 					'actor': sNickname,
-					'time': moment().format("hh:mm:ss")
+					'time': moment(oTimestamp).format("hh:mm:ss")
 				});
 				$scope.msgArrived(false, oTimestamp);
 			};
@@ -122,16 +122,16 @@
 										);
 				}
 				else {
-					oBlock.l.filter(tx => tx.r === $scope.selectedConversation && tx.t === oTimestamp)
+					var sRecipient = Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
+					var aMessages = oBlock.l.filter(tx => tx.r === sRecipient && tx.t === oTimestamp)
 											.map(tx => {
 												return {
 													'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
 													'u': true,
 													't': tx.t
 												}
-											}).forEach(
-												item => $scope.messagesList.push(item)
-											);
+											});
+					aMessages.forEach(item => $scope.messagesList.push(aMessages));
 				}
 				
 			}
@@ -140,6 +140,11 @@
 				sendMessage($scope.currentMessage, $scope.selectedConversation, $scope.tokenPerMessage);
 				$scope.currentMessage = "";
 			};
+
+			setInterval(function() {
+				$scope.$apply() 
+			}, 400);
+
 			fnScope = $scope;
 		  }]);
 
@@ -222,11 +227,11 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<button class="button">neuer Chat</button>
 				</div>
 				<div class="chat_window_footer_message">
-					<input type="number" size="2" maxlength="2" ng-model="tokenPerMessage" />
+					<input type="number" size="1" maxlength="2" ng-model="tokenPerMessage" />
 					Token
 					<div class="flexible_grow"></div>
 					<form ng-submit="onEnter($event)">
-						<input type="text" size="50" maxlength="300" placeholder="Nachricht..." ng-model="currentMessage" />
+						<input type="text" size="40" maxlength="300" placeholder="Nachricht..." ng-model="currentMessage" />
 						<button class="button" [disabled]="currentMessage !== ''">senden</button>
 					</form>
 				</div>
