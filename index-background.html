@@ -65,6 +65,49 @@
 			$scope.publicKey = "6c157587185fd2";
 			$scope.privateKey = "6c157587185fd2";
 
+			$scope.selectedBlock = {
+				h: "6c157587185fd2", // h - hash
+				p: "6c157587185fa3", // p - previous block
+				t: 1614164551, // t - time
+				n: 1234, // n - nonce
+				b: 12, // b - block_index
+				r: "abc", // r - miner
+				l: [
+					{
+						c: 1,
+						h: "U2FsdGVkX187vuFZEYVK9oiJScxLLF5xy3oXTh0CYg8BMeMfnkN+u+0joDa/VUB1P6BaZ6Y0gza7wPIOtP8yUA==",
+						m: "abc",
+						r: "all",
+						s: "bQfr1YkzJUmDfWcYw4mVBrfqhYYBrBZGFU",
+						t: 1614164098394
+					},
+					{
+						c: 1,
+						h: "U2FsdGVkX1+6pT9PvXLhnoG7asbQOA0k+z9bg93vz9jz8VQzQf9GM/m5/wXlTaUBIBp/2Fkr9RTIfHwH3opDyA==",
+						m: "Hallo",
+						r: "all",
+						s: "bQfr1YkzJUmDfWcYw4mVBrfqhYYBrBZGFU",
+						t: 1614164095076
+					},
+					{
+						c: 1,
+						h: "U2FsdGVkX19O9lgRwVgi0LzdW4tUFtPu37e4EBPe3FUlig3B036z4Ed+oelLKqtWrrSpUMXSSFiLY2e65/wfXA==",
+						m: "tttggg",
+						r: "all",
+						s: "bQfr1YkzJUmDfWcYw4mVBrfqhYYBrBZGFU",
+						t: 1614164200647
+					},
+					{
+						c: 1,
+						h: "U2FsdGVkX183BIsk6Ib0gq4bh9V2Blqx/UXSk9K02iFVhnoXdAYjMN41Q7l6q2k893j3jGr/ns2bvX+Q92QBOg==",
+						m: "t2",
+						r: "all",
+						s: "bVNNaMSw86LwqszABuR9WNeaKzkoPKLFEY",
+						t: 1614164168352
+					}
+				] // l - list of transactions
+			};
+
 			$scope.missionSelected = function(sSelectedItem) {
 				$scope.selectedMission = sSelectedItem;
 			};
@@ -414,6 +457,30 @@
 									<!--
 										Place here real block
 									-->
+									<div class="block_cover">
+										Blockhash: {{ selectedBlock.h }}
+
+										<div class="block_header">
+											Blocknummer: {{ selectedBlock.r }} <br />
+											Anzahl an Transaktionen: {{ selectedBlock.l.length }} <br /><br />
+											gefunden von: {{ selectedBlock.r }} <br />
+											gefunden um: {{ selectedBlock.t }} <br />
+											Vorheriger Blockhash: {{ selectedBlock.p }}
+										</div>
+
+										<div class="block_body">
+											<div ng-repeat="message in selectedBlock.l" class="block_body_item">
+												<div>
+													<span class="msg_sender">{{ message.s }} &#x2192; {{ message.r }}</span> <br />
+													{{ message.m }}
+												</div>
+												<div style="display:right">
+													<span class="msg_infos">{{ message.c }} Coins</span> <br />
+													<span class="msg_infos">{{ message.t }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
 								</td>
 							</tr>
 						</table>

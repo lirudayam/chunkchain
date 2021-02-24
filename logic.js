@@ -12,7 +12,6 @@ const oChatInterface = {
 const oBlockInterface = {
 	h: "", // h - hash
 	p: "", // p - previous block
-	m: "", // m - merkle root
 	t: 0, // t - time
 	n: 0, // n - nonce
 	b: 0, // b - block_index
