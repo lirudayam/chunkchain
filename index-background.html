@@ -489,6 +489,71 @@
 						
 					</p>
 				</div>
+				<div ng-if="selectedMission == 'Wie entsteht ein Block?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Jede Transaktion (Nachricht) wird direkt im gesamten Netzwerk geteilt. <br />
+									Jeder Teilnehmer kann hierbei prüfen, ob die Transaktion gültig ist. <br />
+									Wenn dies der Fall sein sollte, landen die Transaktionen in einem Pool (unconfirmed transaction pool). <br /><br />
+
+									Jetzt muss sich jemand der Aufgabe stellen, einen Block zu finden.<br />
+									Dabei sucht die Person die Lösung (Nonce) einer kryptographischen Challenge. <br /><br />
+
+									Jede Transaktion hat einen Hash. Nun kann die Hashes von Transaktionen aus einem Pool wiederrum zusammenhashen.<br />
+									Dabei entsteht der sogenannte Merkle-Root (Hash der Hashes).<br /><br />
+
+									Mit dem Merkle-Root zusammen werden einige Informationen aus dem <b>block header</b> weiter gehasht.<br />
+									Darunter sind vorallem der Blockhash des vorherigen Blocks und Zeitstempel.<br /><br />
+
+									Die kryptographische Challenge liegt darin eine einen Hash zu finden, der mit Nullen beginn.<br />
+									Wie du vorhin gesehen hast, verändert ein Buchstabe einen Hash komplett. <br />
+									Jetzt muss jemand eine x-beliebige Zeichenfolge zu den bestehenden Daten zu finden, sodass der Hash mit x Nullen beginnt. <br />
+									Je mehr Nullen am Anfang gefordert sind, desto schwieriger wird es. <br /><br />
+
+									Einfaches Beispiel: <br />
+									Wenn ein Blockhash mit einer Null beginnen soll, braucht man ca. 16 Versuche. <br />
+									Wenn ein Blockhash mit drei Nullen beginnen soll, braucht man ca. 4096 Versuche. <br />
+									Bei sechs Nullen, sind es schon über 16 Millionen. <br />
+									Das Bitcoin-Netzwerk verlangt aktuell 19 Nullen am Anfang!
+								</td>
+								<td class="center_image">
+									<!--
+										Place here real block
+									-->
+									<div class="block_cover">
+										Blockhash: {{ calcBlockHash }}
+
+										<div class="block_header">
+											Blocknummer: {{ currentBlock.b }} <br />
+											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br /><br />
+											
+											Vorheriger Blockhash: {{ selectedBlock.p }} <br />
+											Nonce: <input type="text" size="40" placeholder="Probier es aus..." ng-model="nonceInput" />
+										</div>
+
+										<div class="block_body">
+											<div ng-repeat="message in currentBlock.l" class="block_body_item">
+												<div>
+													<span class="msg_sender">{{ message.s }} &#x2192; {{ message.r }}</span> <br />
+													{{ message.m }}
+												</div>
+												<div style="display:right">
+													<span class="msg_infos">Hash: </span> <br />
+													<span class="msg_infos">{{ message.h }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
 			</div>
 		</div>
 
