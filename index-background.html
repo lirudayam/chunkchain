@@ -554,6 +554,125 @@
 						
 					</p>
 				</div>
+				<!-- TODO: blocks -->
+
+				<div ng-if="selectedMission == 'Wie kann ich verschlüsseln?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Das ist eine gute Frage. <br />
+									Wir nutzen eine public blockchain, also jeder kann teilnehmen.<br /><br />
+
+									Das heisst auch, dass jeder die gesamte Historie sehen kann.<br />
+									Da deine Nachrichten bisher in Klartext verschickt worden, kann jeder deine Nachrichten lesen.<br />
+									Nun können wir uns den Trick der asymmetrischen Verschlüsselung zu nutze machen.<br /><br />
+
+									Statt dass du selbst deinen private Key zum Verschlüsseln nimmst, nimmst du jemand anders sein Key.<br />
+									Genauer gesagt, den public key deines Empfängers.<br />
+									Denn damit kann nur er mit seinem private key deine Nachricht entschlüsseln.
+								</td>
+								<td class="center_image">
+									<img src="./assets/Encryption.svg" />
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Soll ich Blöcke suchen?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Auch das ist wieder eine fantastische Frage. <br />
+									Blöcke suchen, heisst diesen Nonce zu finden.<br /><br />
+
+									Wir sprechen hier vom sogenannten <b>Mining</b>.<br />
+									Du probierst x-beliebige random Zeichenfolgen, um den Nonce zu finden.<br />
+									Das ist aber auch wahnsinnig rechenintensiv.<br /><br />
+
+									Denn je Power du hast, desto wahrscheinlicher ist es, dass du einen Block findest.<br />
+									Dafür bekommst du natürlich auch eine Belohnung.<br />
+									Im Bitcoin-Netzwerk würdest du über 6 Bitcoin pro Block bekommen.<br /><br />
+
+									Du musst das jetzt aber deinen Kosten gegenüber stellen (Strom + Hardware).<br />
+									Das kann sehr schnell, verdammt teuer werden und sich für dich nicht mehr lohnen.<br /><br />
+
+									Das Bitcoin-Netzwerk verbraucht nur durch Mining soviel Strom wie die gesamten Niederlande!<br />
+									Klimatechnisch eine reinste Katastrophe.
+								</td>
+								<td class="center_image">
+									<div class="block_cover">
+										Blockhash: {{ calcBlockHash }}
+
+										<div class="block_header">
+											Blocknummer: {{ currentBlock.b }} <br />
+											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br /><br />
+											
+											Vorheriger Blockhash: {{ selectedBlock.p }} <br />
+											Nonce: <input type="text" size="40" placeholder="Probier es aus..." ng-model="nonceInput" />
+										</div>
+
+										<div class="block_body">
+											<div ng-repeat="message in currentBlock.l" class="block_body_item">
+												<div>
+													<span class="msg_sender">{{ message.s }} &#x2192; {{ message.r }}</span> <br />
+													{{ message.m }}
+												</div>
+												<div style="display:right">
+													<span class="msg_infos">Hash: </span> <br />
+													<span class="msg_infos">{{ message.h }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Kann ich löschen?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Die Frage darfst du dir selbst beantworten.<br />
+									Denn das ist gar nicht so trivial und viele vergessen das.<br /><br />
+									
+									Blockchains haben folgende Eigenschaften:
+									<ul>
+										<li>Die Daten liegen bei allen Teilnehmern</li>
+										<li>Jedes kleine Stück Daten kann über Hashes verifiziert werden</li>
+										<li>Dadurch kannst du nichts aus der Vergangenheit ändern</li>
+										<li>Nichts ändern heisst du kannst nicht mal ein Zeichen verändern</li>
+									</ul>
+								</td>
+								<td>
+									Denkst du, du kannst die Frage beantworten<br /><br />
+
+									Kann ich löschen:<br />
+									<select ng-model="deleteChoice">
+										<option value="-">-</option>
+										<option value="y">ja</option>
+										<option value="n">nein</option>
+									</select><br /><br />
+
+									Deine Antwort ist: {{ deleteChoice === 'y' ? 'richtig' : 'falsch' }} <br />
+									{{ deleteChoice === 'y' ? 'Das sollte dir gut bewusst sein. Jede deiner Nachrichten wird für immer bleiben.' : '' }}
+								</td>
+							</tr>
+						</table>
+						
+						<br />
+						
+					</p>
+				</div>
 			</div>
 		</div>
 
