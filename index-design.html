@@ -17,155 +17,164 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
   <script src="https://momentjs.com/downloads/moment.js"></script>
   <script src="./logic.js"></script>
-  
-</head>
-<body ng-app="chunkchain">
-	<script>
-		angular.module('chunkchain', [])
-		  .controller('ChatController', ['$scope', function($scope) {
-			$scope.activityIndicator = true;
-			$scope.selectedConversation = 'all';
-			$scope.activeConversations = [
-				'all'
-			]
-			$scope.tokenPerMessage = 1;
-			$scope.currentMessage = "";
-			$scope.feedNews = [];
-			$scope.messagesList = [
-				/*{
-					'd': 'r', // direction - recieving
-					'm': 'Hallo, wie geht\'s dir?'
-				},
-				{
-					'd': 's', // direction - sending
-					'm': 'Soweit, ganz gut. Und selber?'
-				},
-				{
-					'd': 'r', // direction - recieving
-					'u': true // unspend transaction
-				},*/
-			];
-			$scope.activityHasChanged = function() {
-			  	console.log($scope.activityIndicator);
-			};
-			$scope.conversationSelected = function(sSelectedItem) {
-				console.log(sSelectedItem);
-				$scope.selectedConversation = sSelectedItem;
-			};
-			$scope.feedItemSelected = function (sFeedItem) {
+  <script>
+	angular.module('chunkchain', [])
+	  .controller('ChatController', ['$scope', function($scope) {
+		$scope.activityIndicator = true;
+		$scope.selectedConversation = 'all';
+		$scope.activeConversations = [
+			'all'
+		]
+		$scope.tokenPerMessage = 1;
+		$scope.currentMessage = "";
+		$scope.feedNews = [];
+		$scope.messagesList = [
+			/*{
+				'd': 'r', // direction - recieving
+				'm': 'Hallo, wie geht\'s dir?'
+			},
+			{
+				'd': 's', // direction - sending
+				'm': 'Soweit, ganz gut. Und selber?'
+			},
+			{
+				'd': 'r', // direction - recieving
+				'u': true // unspend transaction
+			},*/
+		];
+		$scope.token = 100;
+		$scope.activityHasChanged = function() {
+			  console.log($scope.activityIndicator);
+		};
+		$scope.conversationSelected = function(sSelectedItem) {
+			console.log(sSelectedItem);
+			$scope.selectedConversation = sSelectedItem;
+		};
+		$scope.feedItemSelected = function (sFeedItem) {
 
-			};
-			$scope.newParticipant = function (sNickname) {
-				$scope.activeConversations.push(sNickname);
+		};
+		$scope.newParticipant = function (sNickname) {
+			$scope.activeConversations.push(sNickname);
+			$scope.feedNews.push({
+				'type': '+',
+				'actor': sNickname,
+				'time': moment().format("hh:mm:ss")
+			});
+			
+		};
+		$scope.participantLeft = function (sNickname) {
+			$scope.activeConversations.remove(sNickname);
+			$scope.feedNews.push({
+				'type': '-',
+				'actor': sNickname,
+				'time': moment().format("hh:mm:ss")
+			});
+			
+		};
+		$scope.newMessage = function (sNickname, oTimestamp) {
+			$scope.feedNews.push({
+				'type': 'MSG',
+				'actor': sNickname,
+				'time': moment(oTimestamp).format("hh:mm:ss")
+			});
+			$scope.msgArrived(false, oTimestamp);
+		};
+		$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
+			if (bSelfFlag) {
 				$scope.feedNews.push({
-					'type': '+',
-					'actor': sNickname,
+					'type': 'S',
+					'nonce': sNonce,
 					'time': moment().format("hh:mm:ss")
 				});
-				
-			};
-			$scope.participantLeft = function (sNickname) {
-				$scope.activeConversations.remove(sNickname);
+			}
+			else {
 				$scope.feedNews.push({
-					'type': '-',
+					'type': 'B',
 					'actor': sNickname,
+					'n': iMessages,
 					'time': moment().format("hh:mm:ss")
 				});
-				
-			};
-			$scope.newMessage = function (sNickname, oTimestamp) {
-				$scope.feedNews.push({
-					'type': 'MSG',
-					'actor': sNickname,
-					'time': moment(oTimestamp).format("hh:mm:ss")
-				});
-				$scope.msgArrived(false, oTimestamp);
-			};
-			$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
-				if (bSelfFlag) {
-					$scope.feedNews.push({
-						'type': 'S',
-						'nonce': sNonce,
-						'time': moment().format("hh:mm:ss")
-					});
-				}
-				else {
-					$scope.feedNews.push({
-						'type': 'B',
-						'actor': sNickname,
-						'n': iMessages,
-						'time': moment().format("hh:mm:ss")
-					});
-				}
-				$scope.msgArrived(true);
-			};
-			$scope.msgArrived = function (bEntireRefresh, oTimestamp) {
-				// TODO: avoid the generation of new arrays
-				if (bEntireRefresh) {
-					$scope.messagesList = aBlockchain.map(block => block.l)
-										.flat().filter(tx => tx.r === $scope.selectedConversation)
+			}
+			$scope.msgArrived(true);
+		};
+		$scope.msgArrived = function (bEntireRefresh, oTimestamp) {
+			// TODO: avoid the generation of new arrays
+			var sRecipient = ($scope.selectedConversation === "all") ? "all" : Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
+			if (bEntireRefresh) {
+				$scope.messagesList = aBlockchain.map(block => block.l)
+									.flat().filter(tx => tx.r === $scope.selectedConversation)
+									.map(tx => {
+										return {
+											'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+											'm': tx.m,
+											't': tx.t
+										}
+									}).concat(
+										oBlock.l.filter(tx => tx.r === sRecipient)
 										.map(tx => {
 											return {
 												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
-												'm': tx.m,
+												'u': true,
 												't': tx.t
 											}
-										}).concat(
-											oBlock.l.filter(tx => tx.r === $scope.selectedConversation)
-											.map(tx => {
-												return {
-													'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
-													'u': true,
-													't': tx.t
-												}
-											})
-										);
-				}
-				else {
-					var sRecipient = ($scope.selectedConversation === "all") ? "all" : Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
-					var aMessages = oBlock.l.filter(tx => tx.r === sRecipient && tx.t === oTimestamp)
-											.map(tx => {
-												return {
-													'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
-													'u': true,
-													't': tx.t
-												}
-											});
-					aMessages.forEach(item => $scope.messagesList.push(aMessages));
-				}
-				
+										})
+									);
 			}
-			$scope.onEnter = function (e) {
-				e.preventDefault();
+			else {
+				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp && tx.r === sRecipient)
+										.map(tx => {
+											return {
+												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+												'u': true,
+												't': tx.t
+											}
+										});
+				aMessages.forEach(item => $scope.messagesList.push(aMessages));
+				console.log($scope.messagesList);
+			}
+			
+		}
+		$scope.onEnter = function (e) {
+			e.preventDefault();
+			if ($scope.token > $scope.tokenPerMessage) {
 				sendMessage($scope.currentMessage, $scope.selectedConversation, $scope.tokenPerMessage);
 				$scope.currentMessage = "";
-			};
+				$scope.token -= $scope.tokenPerMessage;
+			}
+			else {
+				// Error-Token
+			}
+		};
 
-			setInterval(function() {
-				$scope.$apply() 
-			}, 400);
+		setInterval(function() {
+			$scope.$apply() 
+		}, 400);
 
-			fnScope = $scope;
-		  }]);
+		fnScope = $scope;
+	  }]);
 
-		  window.onload = () => {
-			//const oAngularScope = angular.element(document.body).scope();
-			console.log(fnScope);
-			console.log(fnScope.activeConversations);
-		  }
+	  window.onload = () => {
+		//const oAngularScope = angular.element(document.body).scope();
+		console.log(fnScope);
+		console.log(fnScope.activeConversations);
+	  }
 
 
-	  </script>
+  </script>
+  
+</head>
+<body ng-app="chunkchain" ng-controller="ChatController">
+
     <div class="header">
         <img src="assets/ChunkChain_Logo.svg" width="200px" />
 
         <div class="header_items">
             <a>zur Blockchain-Ansicht</a>
-            <span>dein Kontostand: <b>100 Token</b></span>
+            <span>dein Kontostand: <b>{{ token }} Token</b></span>
         </div>
     </div>
 
-    <div class="main_body" ng-controller="ChatController">
+    <div class="main_body">
         <h1 class="page_title">Chat</h1>
         <p class="introduction_section">
 Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern <b>on-chain</b> (alle Daten in der Blockchain). <br />
