@@ -180,9 +180,14 @@ function stopMining(b) {
 var b = Bugout("chunkchain", {
 	announce: [
 		'wss://hub.bugout.link',
-  		'wss://tracker.openwebtorrent.com'
-	]
+  		'wss://tracker.openwebtorrent.com',
+		'wss://tracker.webtorrent.io',
+		'ws://tracker.sloppyta.co',
+		'wss://tracker.files.fm'
+	],
+	seed: localStorage["bugout-demo-seed"]
 });
+localStorage["bugout-demo-seed"] = b.seed;
 
 // Register critical information
 const publicAddress = b.address();
