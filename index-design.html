@@ -43,6 +43,7 @@
 			},*/
 		];
 		$scope.token = 100;
+		$scope.noOfNewMessages = 1;
 		$scope.activityHasChanged = function() {
 			  console.log($scope.activityIndicator);
 		};
@@ -161,7 +162,7 @@
 
 
   </script>
-  
+
 </head>
 <body ng-app="chunkchain" ng-controller="ChatController">
 
@@ -169,7 +170,9 @@
         <img src="assets/ChunkChain_Logo.svg" width="200px" />
 
         <div class="header_items">
-            <a>zur Blockchain-Ansicht</a>
+            <a>zur Blockchain-Ansicht
+				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}">{{ noOfNewMessages }}</span>
+			</a>
             <span>dein Kontostand: <b>{{ token }} Token</b></span>
         </div>
     </div>
