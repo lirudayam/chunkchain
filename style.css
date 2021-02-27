@@ -45,14 +45,15 @@ button {
     background-color: #fa3e3e;
     border-radius: 2px;
     color: white;
-   
+
     padding: 1px 3px;
     font-size: 10px;
-    
-    position: absolute; /* Position the badge within the relatively positioned button */
+
+    position: absolute;
+    /* Position the badge within the relatively positioned button */
     top: -5px;
     right: -5px;
-  }
+}
 
 button {
     appearance: none;
@@ -492,9 +493,11 @@ select option {
     right: -50px;
     transform: translateY(-50%);
 }
+
 .flow input {
     padding: 3px;
 }
+
 .flow li:last-child {
     border: none;
     vertical-align: center;
@@ -514,11 +517,11 @@ select option {
     color: #00B9F2;
 }
 
-.cut-text { 
+.cut-text {
     text-overflow: ellipsis;
-    overflow: hidden; 
-    width: 160px; 
-    height: 1.2em; 
+    overflow: hidden;
+    width: 160px;
+    height: 1.2em;
     white-space: nowrap;
     display: inline-block;
     color: #00B9F2;
@@ -584,4 +587,52 @@ select option {
     font-style: normal;
     color: #666;
     text-align: right;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%;
+    /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }

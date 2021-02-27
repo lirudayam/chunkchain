@@ -48,8 +48,8 @@
 			  console.log($scope.activityIndicator);
 		};
 		$scope.conversationSelected = function(sSelectedItem) {
-			console.log(sSelectedItem);
 			$scope.selectedConversation = sSelectedItem;
+			$scope.msgArrived(true, null);
 		};
 		$scope.feedItemSelected = function (sFeedItem) {
 
@@ -72,6 +72,10 @@
 			});
 			
 		};
+		$scope.newConvo = function () {
+			var modal = document.getElementById("myModal");
+			modal.style.display = "block";
+		}
 		$scope.newMessage = function (sNickname, oTimestamp) {
 			$scope.feedNews.push({
 				'type': 'MSG',
@@ -149,12 +153,33 @@
 				// Error-Token
 			}
 		};
+		$scope.getNonConvoParticipants = function () {
+			var aParticipants = Object.values(oNickNames);
+			return (aParticipants.filter(n => !$scope.activeConversations.includes(n)) && n !== sNickname);
+		}
+		$scope.newConvoSelected = function (sName) {
+			$scope.activeConversations.push(sName);
+			var modal = document.getElementById("myModal");
+			modal.style.display = "none";
+		}
 
 		setInterval(function() {
 			$scope.$apply() 
 		}, 400);
 
 		fnScope = $scope;
+
+		var modal = document.getElementById("myModal");
+		var span = document.getElementsByClassName("close")[0];
+
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		};
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
 	  }]);
 
   </script>
@@ -232,7 +257,7 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 			</div>
 			<div class="chat_window_footer">
 				<div class="chat_window_footer_new_chat_container">
-					<button class="button">neuer Chat</button>
+					<button class="button" ng-click="newConvo()">neuer Chat</button>
 				</div>
 				<div class="chat_window_footer_message">
 					<input type="number" size="1" maxlength="2" ng-model="tokenPerMessage" />
@@ -247,6 +272,24 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 		</div>
 		
     </div>
+
+	<!-- The Modal -->
+	<div id="myModal" class="modal">
+
+		<!-- Modal content -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h1 class="page_title">Neue Konversation mit</h1>
+			<div class="activity_feed">
+				<div class="activity_item" ng-repeat="participant in getNonConvoParticipants() track by participant" ng-click="newConvoSelected(participant)">
+					<div>
+						<b>{{ participant }}</b>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+	</div>
 
 </body>
 </html>

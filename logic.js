@@ -214,7 +214,7 @@ b.on("seen", function (address) {
 	}, 1500);
 
 	// send the nickname dicitonary as well
-	b.send("S" + JSON.stringify(oNickNames));
+	b.send(address, "S" + JSON.stringify(oNickNames));
 
 });
 
