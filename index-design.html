@@ -107,7 +107,7 @@
 			var sRecipient = ($scope.selectedConversation === "all") ? "all" : Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
 			if (bEntireRefresh) {
 				$scope.messagesList = aBlockchain.map(block => block.l)
-									.flat().filter(tx => tx.r === sRecipient)
+									.flat().filter(tx => (tx.r === sUserNickName && tx.s === sRecipient))
 									.map(tx => {
 										return {
 											'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
@@ -116,7 +116,7 @@
 											'u': false
 										}
 									}).concat(
-										oBlock.l.filter(tx => tx.r === sRecipient)
+										oBlock.l.filter(tx => (tx.r === sUserNickName && tx.s === sRecipient))
 										.map(tx => {
 											return {
 												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
@@ -128,7 +128,7 @@
 									);
 			}
 			else {
-				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp && tx.r === sRecipient)
+				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp && (tx.r === sUserNickName && tx.s === sRecipient))
 										.map(tx => {
 											return {
 												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
@@ -155,7 +155,7 @@
 		};
 		$scope.getNonConvoParticipants = function () {
 			var aParticipants = Object.values(oNickNames);
-			return (aParticipants.filter(n => !$scope.activeConversations.includes(n)) && n !== sNickname);
+			return (aParticipants.filter(n => !$scope.activeConversations.includes(n) && n !== sUserNickName));
 		}
 		$scope.newConvoSelected = function (sName) {
 			$scope.activeConversations.push(sName);
