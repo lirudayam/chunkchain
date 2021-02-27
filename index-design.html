@@ -55,7 +55,7 @@
 
 		};
 		$scope.newParticipant = function (sNickname) {
-			$scope.activeConversations.push(sNickname);
+			//$scope.activeConversations.push(sNickname);
 			$scope.feedNews.push({
 				'type': '+',
 				'actor': sNickname,
@@ -156,13 +156,6 @@
 
 		fnScope = $scope;
 	  }]);
-
-	  window.onload = () => {
-		//const oAngularScope = angular.element(document.body).scope();
-		console.log(fnScope);
-		console.log(fnScope.activeConversations);
-	  }
-
 
   </script>
 
