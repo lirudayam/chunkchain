@@ -107,19 +107,19 @@
 			var sRecipient = ($scope.selectedConversation === "all") ? "all" : Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
 			if (bEntireRefresh) {
 				$scope.messagesList = aBlockchain.map(block => block.l)
-									.flat().filter(tx => (tx.r === sUserNickName && tx.s === sRecipient))
+									.flat().filter(tx => (tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient))
 									.map(tx => {
 										return {
-											'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+											'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
 											'm': tx.m,
 											't': tx.t,
 											'u': false
 										}
 									}).concat(
-										oBlock.l.filter(tx => (tx.r === sUserNickName && tx.s === sRecipient))
+										oBlock.l.filter(tx => (tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient))
 										.map(tx => {
 											return {
-												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+												'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
 												'u': true,
 												't': tx.t,
 												'm': ""
@@ -128,10 +128,10 @@
 									);
 			}
 			else {
-				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp && (tx.r === sUserNickName && tx.s === sRecipient))
+				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp && ((tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient)))
 										.map(tx => {
 											return {
-												'd': (getNickname(tx.s) === sUserNickName) ? 's' : 'r', // direction - recieving
+												'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
 												'u': true,
 												't': tx.t,
 												'm': ""

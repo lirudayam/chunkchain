@@ -253,7 +253,7 @@ b.on("message", function (address, message) {
 			oBlock.l.push(oTx);
 			fnScope.newMessage(getNickname(address), oTx.t);
 
-			if (oTx.r === sUserNickName && !fnScope.activeConversations.includes(getNickname(address))) {
+			if (oTx.r === publicAddress && !fnScope.activeConversations.includes(getNickname(address))) {
 				fnScope.activeConversations.push(getNickname(address));
 			}
 
