@@ -159,6 +159,7 @@
 		}
 		$scope.newConvoSelected = function (sName) {
 			$scope.activeConversations.push(sName);
+			$scope.selectedConversation = sName;
 			var modal = document.getElementById("myModal");
 			modal.style.display = "none";
 		}
