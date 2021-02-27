@@ -179,6 +179,7 @@ function stopMining(b) {
 // Get connected with our peers via torrent server
 var b = Bugout("chunkchain", {
 	announce: [
+		'ws://192.168.178.71:8000',
 		'wss://hub.bugout.link',
   		'wss://tracker.openwebtorrent.com',
 		'wss://tracker.webtorrent.io',
@@ -215,14 +216,23 @@ b.on("seen", function (address) {
 	// send the nickname dicitonary as well
 	b.send("S" + JSON.stringify(oNickNames));
 
-	if (aBlockchain.length > 0) {
-		// whenever a new participant joins the entire blockchain will be send
-		b.send("C" + JSON.stringify({
-			b: aBlockchain,
-			n: iNumberOfMiners
-		}));
-	}
 });
+
+var previousConnections = 0;
+
+b.on("connections", function (iConnections) {
+	// added new connection
+	if (iConnections > previousConnections) {
+		if (aBlockchain.length > 0) {
+			// whenever a new participant joins the entire blockchain will be send
+			b.send("C" + JSON.stringify({
+				b: aBlockchain,
+				n: iNumberOfMiners
+			}));
+		}
+	}
+	previousConnections = iConnections;
+})
 
 b.on("left", function (address) {
 	fnScope.participantLeft(getNickname(address));
@@ -269,6 +279,7 @@ b.on("message", function (address, message) {
 			if (!(aRecievedBlockchain.b.some(block => !verifyBlock(block)))) {
 				// all blocks are standalone valid
 				aBlockchain = aRecievedBlockchain.b;
+				fnScope.msgArrived(true, null);
 			}
 
 			// recieved number of miners has changes
@@ -285,6 +296,17 @@ b.on("message", function (address, message) {
 		// a list of new nicknames arrived
 		var oNickNameDirectory = JSON.parse(message.substr(1));
 		for (const [sAddress, sRelatedNickName] of Object.entries(oNickNameDirectory)) {
+			if (!oNickNames.hasOwnProperty(sAddress)) {
+				// new participant
+				if (aBlockchain.length > 0) {
+					// whenever a new participant joins the entire blockchain will be send
+					b.send(sAddress, "C" + JSON.stringify({
+						b: aBlockchain,
+						n: iNumberOfMiners
+					}));
+				}
+			}
+
 			oNickNames[sAddress] = sRelatedNickName;
 		}
 	} else if (message.substr(0, 2) === "M+") {
@@ -316,25 +338,3 @@ const sendMessage = (sMessage, sRecipient, sToken) => {
 
 	proofOfWorkMining(2);
 }
-
-/*
-document.getElementById("input").onkeydown = function (ev) {
-	if (ev.keyCode == 13) {
-		if (b.lastwirecount) {
-
-			var oChat = Object.assign({}, oChatInterface);
-			oChat.s = publicAddress;
-			oChat.r = "all";
-			oChat.m = ev.target.textContent;
-			oChat.c = 10;
-
-			var oTx = createTxHash(oChat, privateKey);
-			console.log(oTx);
-			b.send("A" + JSON.stringify(createTxHash(oChat, privateKey)));
-
-			proofOfWorkMining(2);
-			ev.target.textContent = "";
-		}
-		ev.preventDefault();
-	}
-}*/

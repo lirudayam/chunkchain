@@ -322,7 +322,7 @@ input:checked+.slider:before {
 .activity_feed {
     width: 100%;
     padding: 10px;
-    height: 80%;
+    max-height: 320px;
     overflow-y: auto;
 }
 
