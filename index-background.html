@@ -15,10 +15,10 @@
   <script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
   <script src="https://momentjs.com/downloads/moment.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/gh/mathusummut/confetti.js/confetti.min.js"></script>
   
 </head>
-<body ng-app="chunkchain">
+<body ng-app="chunkchain" ng-controller="ChatController">
 	<script>
 		let fnScope = null;
 		angular.module('chunkchain', [])
@@ -64,6 +64,7 @@
 			$scope.coins = 1;
 			$scope.publicKey = "6c157587185fd2";
 			$scope.privateKey = "6c157587185fd2";
+			$scope.token = 100;
 
 			$scope.selectedBlock = {
 				h: "6c157587185fd2", // h - hash
@@ -144,6 +145,33 @@
 			$scope.hashTxSigned = function () {
 				return CryptoJS.AES.encrypt($scope.hashTx(), $scope.privateKey).toString();
 			}
+			$scope.missionCompleted = function () {
+				
+				var aArray = $scope.levelList[$scope.selectedLevel];
+				var iPos = aArray.indexOf($scope.selectedMission);
+				if (iPos + 1 >= aArray.length) {
+					// end of level
+					var aLevels = Object.keys($scope.levelList);
+					var iLevelPos = aLevels.indexOf($scope.selectedLevel);
+
+					if (iLevelPos + 1 >= aLevels.length) {
+						// complete finished
+						confetti.start(5000, 700);
+					}
+					else {
+						$scope.selectedLevel = aLevels[iLevelPos + 1];
+						$scope.selectedMission = $scope.levelList[$scope.selectedLevel][0];
+
+						$scope.token += 10;
+						confetti.start(2000, 200);
+					}
+				}
+				else {
+					$scope.selectedMission = $scope.levelList[$scope.selectedLevel][iPos + 1];
+					$scope.token += 5;
+					confetti.start(1000, 50);
+				}
+			}
 			
 			fnScope = $scope;
 		  }]);
@@ -161,11 +189,11 @@
 
         <div class="header_items">
             <a>zur Chat-Ansicht</a>
-            <span>dein Kontostand: <b>100 Token</b></span>
+            <span>dein Kontostand: <b>{{ token }} Token</span>
         </div>
     </div>
 
-    <div class="main_body" ng-controller="ChatController">
+    <div class="main_body">
         <div class="background_container">
 			<div class="level_container">
 				<select ng-options="level as level for (level, data) in levelList" ng-model="selectedLevel"></select>
@@ -672,6 +700,10 @@
 						<br />
 						
 					</p>
+				</div>
+
+				<div class="floating_confirm">
+					<button class="button" ng-click="missionCompleted()">nächste Mission</button>
 				</div>
 			</div>
 		</div>

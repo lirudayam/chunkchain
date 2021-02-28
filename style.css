@@ -636,3 +636,11 @@ select option {
     text-decoration: none;
     cursor: pointer;
 }
+
+.floating_confirm {
+    position: absolute;
+    bottom: 5%;
+    width: 150px;
+    left: calc(50% - 75px);
+    z-index: 100;
+}
