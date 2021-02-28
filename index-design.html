@@ -197,7 +197,25 @@
 		span.onclick = function() {
 			modal.style.display = "none";
 		}
-	  }]);
+	  }])
+	  .directive('scrollToBottom', function($timeout, $window) {
+			return {
+				scope: {
+					scrollToBottom: "="
+				},
+				restrict: 'A',
+				link: function(scope, element, attr) {
+					scope.$watchCollection('scrollToBottom', function(newVal) {
+						if (newVal) {
+							$timeout(function() {
+								element[0].scrollTop =  element[0].scrollHeight;
+							}, 0);
+						}
+
+					});
+				}
+			};
+		});
 
   </script>
 
@@ -229,7 +247,7 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 						{{ convo }}
 					</p>
 				</div>
-				<div class="messages_container" style="overflow: scroll; height: xyz;" #scrollMe [scrollTop]="scrollMe.scrollHeight">
+				<div class="messages_container" style="overflow: scroll; height: 500px;" scroll-to-bottom="messagesList">
 					<div ng-repeat="message in messagesList track by $index" class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}">
 						<span ng-if="selectedConversation === 'all' && message.d === 'r' " class="sender">{{ getNickname(message.s) }}</span>
 						{{ message.u ? 'warten auf Nachricht...' : message.m }} <span class="message_time">{{ formatTime(message.t) }}</span>
