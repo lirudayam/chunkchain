@@ -104,22 +104,31 @@
 		};
 		$scope.msgArrived = function (bEntireRefresh, oTimestamp) {
 			// TODO: avoid the generation of new arrays
-			var sRecipient = ($scope.selectedConversation === "all") ? "all" : Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
+			var fnFilter;
+			if ($scope.selectedConversation === "all") {
+				fnFilter = (tx) => tx.r === "all";
+			} 
+			else {
+				var sRecipient = Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
+				fnFilter = (tx) => (tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient);
+			}
 			if (bEntireRefresh) {
 				$scope.messagesList = aBlockchain.map(block => block.l)
-									.flat().filter(tx => (tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient))
+									.flat().filter(fnFilter)
 									.map(tx => {
 										return {
 											'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
+											's': tx.s,
 											'm': tx.m,
 											't': tx.t,
 											'u': false
 										}
 									}).concat(
-										oBlock.l.filter(tx => (tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient))
+										oBlock.l.filter(fnFilter)
 										.map(tx => {
 											return {
 												'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
+												's': tx.s,
 												'u': true,
 												't': tx.t,
 												'm': ""
@@ -128,10 +137,11 @@
 									);
 			}
 			else {
-				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp && ((tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient)))
+				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp).filter(fnFilter)
 										.map(tx => {
 											return {
 												'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
+												's': tx.s,
 												'u': true,
 												't': tx.t,
 												'm': ""
@@ -163,10 +173,16 @@
 			var modal = document.getElementById("myModal");
 			modal.style.display = "none";
 		}
+		$scope.formatTime = function (iTimestamp) {
+			return moment(iTimestamp).format('LTS');
+		}
+		$scope.getNickname = function (sAddress) {
+			return getNickname(sAddress);
+		}
 
 		setInterval(function() {
 			$scope.$apply() 
-		}, 400);
+		}, 1000);
 
 		fnScope = $scope;
 
@@ -215,7 +231,8 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 				</div>
 				<div class="messages_container" style="overflow: scroll; height: xyz;" #scrollMe [scrollTop]="scrollMe.scrollHeight">
 					<div ng-repeat="message in messagesList track by $index" class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}">
-						{{ message.u ? 'warten auf Nachricht...' : message.m }}
+						<span ng-if="selectedConversation === 'all' && message.d === 'r' " class="sender">{{ getNickname(message.s) }}</span>
+						{{ message.u ? 'warten auf Nachricht...' : message.m }} <span class="message_time">{{ formatTime(message.t) }}</span>
 					</div>
 				</div>
             </div>

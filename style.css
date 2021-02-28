@@ -363,6 +363,16 @@ input:checked+.slider:before {
     font-style: italic;
 }
 
+.message_time {
+    font-size: 0.6rem;
+    color: #CCC;
+}
+
+.sender {
+    font-weight: bold;
+    display: block;
+}
+
 .background_container {
     width: 100%;
 }
