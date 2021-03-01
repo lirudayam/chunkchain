@@ -23,7 +23,11 @@
 		$scope.activityIndicator = true;
 		$scope.selectedConversation = 'all';
 		$scope.activeConversations = [
-			'all'
+			{
+				name: 'all',
+				lastMsg: 1614584104
+			}
+			
 		]
 		$scope.tokenPerMessage = 1;
 		$scope.currentMessage = "";
@@ -55,7 +59,6 @@
 
 		};
 		$scope.newParticipant = function (sNickname) {
-			//$scope.activeConversations.push(sNickname);
 			$scope.feedNews.push({
 				'type': '+',
 				'actor': sNickname,
@@ -64,7 +67,7 @@
 			
 		};
 		$scope.participantLeft = function (sNickname) {
-			$scope.activeConversations.remove(sNickname);
+			$scope.activeConversations = $scope.activeConversations.filter(convo => convo.name !== sNickname)
 			$scope.feedNews.push({
 				'type': '-',
 				'actor': sNickname,
@@ -158,6 +161,7 @@
 				sendMessage($scope.currentMessage, $scope.selectedConversation, $scope.tokenPerMessage);
 				$scope.currentMessage = "";
 				$scope.token -= $scope.tokenPerMessage;
+				$scope.activeConversations.filter(convo => convo.name === $scope.selectedConversation).lastMsg = moment().unix();
 			}
 			else {
 				// Error-Token
@@ -165,10 +169,13 @@
 		};
 		$scope.getNonConvoParticipants = function () {
 			var aParticipants = Object.values(oNickNames);
-			return (aParticipants.filter(n => !$scope.activeConversations.includes(n) && n !== sUserNickName));
+			return (aParticipants.filter(n => !$scope.activeConversations.map(convo => convo.name).includes(n) && n !== sUserNickName));
 		}
 		$scope.newConvoSelected = function (sName) {
-			$scope.activeConversations.push(sName);
+			$scope.activeConversations.push({
+				name: sName,
+				lastMsg: moment().unix()
+			});
 			$scope.selectedConversation = sName;
 			var modal = document.getElementById("myModal");
 			modal.style.display = "none";
@@ -243,8 +250,8 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
         <div class="chat_container">
             <div class="chat_window">
                 <div class="conversations_container">
-					<p ng-repeat="convo in activeConversations track by $index" class="conversation {{ convo === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo)">
-						{{ convo }}
+					<p ng-repeat="convo in activeConversations | orderBy : '-lastMsg'" class="conversation {{ convo.name === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo.name)">
+						{{ convo.name }}
 					</p>
 				</div>
 				<div class="messages_container" style="overflow: scroll; height: 500px;" scroll-to-bottom="messagesList">

@@ -253,8 +253,19 @@ b.on("message", function (address, message) {
 			oBlock.l.push(oTx);
 			fnScope.newMessage(getNickname(address), oTx.t);
 
-			if (oTx.r === publicAddress && !fnScope.activeConversations.includes(getNickname(address))) {
-				fnScope.activeConversations.push(getNickname(address));
+			if (oTx.r === publicAddress) {
+				if (!fnScope.activeConversations.map(convo => convo.name).includes(getNickname(address))) {
+					fnScope.activeConversations.push({
+						name: getNickname(address),
+						lastMsg: moment().unix()
+					});
+				}
+				var foundIndex = fnScope.activeConversations.findIndex(convo => convo.name === getNickname(address));
+				fnScope.activeConversations[foundIndex].lastMsg = moment().unix();
+			}
+			else if (oTx.r === "all") {
+				var foundIndex = fnScope.activeConversations.findIndex(convo => convo.name === "all");
+				fnScope.activeConversations[foundIndex].lastMsg = moment().unix();
 			}
 
 			proofOfWorkMining(2);
