@@ -98,7 +98,7 @@ function startNewBlock() {
 	oBlock = Object.assign({}, oBlockInterface);
 	oBlock.l = [];
 	oBlock.b = oBlock.length;
-	oBlock.p = oBlock[oBlock.length - 1].h;
+	oBlock.p = oBlock[aBlockchain.length - 1].h;
 	oBlock.r = publicAddress;
 }
 
