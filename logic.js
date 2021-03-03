@@ -276,7 +276,7 @@ b.on("message", function (address, message) {
 				else if (fnScope.selectedConversation !== getNickname(address)) {
 					fnScope.newMessages[getNickname(address)] = 1;
 				}
-				fnScope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b);
+				fnScope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b, 0);
 			}
 			else if (oTx.r === "all") {
 				var foundIndex = fnScope.activeConversations.findIndex(convo => convo.name === "all");
@@ -289,7 +289,7 @@ b.on("message", function (address, message) {
 				else if (fnScope.selectedConversation !== "all") {
 					fnScope.newMessages["all"] = 1;
 				}
-				fnScope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b);
+				fnScope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b, 0);
 			}
 
 			proofOfWorkMining(2);

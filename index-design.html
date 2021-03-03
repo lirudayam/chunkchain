@@ -106,7 +106,7 @@
 					$scope.selectedConversation = sSelectedItem;
 					$scope.msgArrived(true, null);
 					delete $scope.newMessages[sSelectedItem];
-					$scope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b);
+					$scope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b, 0);
 				};
 				$scope.feedItemSelected = function (sFeedItem) {
 
