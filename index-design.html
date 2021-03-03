@@ -1,252 +1,266 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <title>Chunkchain - Blockchain Try Out</title>
-  <link href="style.css" rel="stylesheet" />
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-  <script>
-	let fnScope = null;
-    function log(message) {
-		console.log(message);
-    }
-  </script>
-  <script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
-  <script src="https://momentjs.com/downloads/moment.js"></script>
-  <script src="./logic.js"></script>
-  <script>
-	angular.module('chunkchain', [])
-	  .controller('ChatController', ['$scope', function($scope) {
-		$scope.activityIndicator = true;
-		$scope.selectedConversation = 'all';
-		$scope.activeConversations = [
-			{
-				name: 'all',
-				lastMsg: 1614584104 // fallback date in the past
-			}
-		]
-		$scope.tokenPerMessage = 1;
-		$scope.currentMessage = "";
-		$scope.feedNews = [];
-		$scope.messagesList = [];
-		$scope.token = 100;
-		$scope.noOfNewMessages = 1;
-		$scope.activityHasChanged = function() {
-			  console.log($scope.activityIndicator);
-		};
-		$scope.conversationSelected = function(sSelectedItem) {
-			$scope.selectedConversation = sSelectedItem;
-			$scope.msgArrived(true, null);
-		};
-		$scope.feedItemSelected = function (sFeedItem) {
+	<meta charset="utf-8">
+	<meta content="width=device-width, initial-scale=1" name="viewport">
+	<title>Chunkchain - Blockchain Try Out</title>
+	<link href="style.css" rel="stylesheet" />
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+	<script>
+		let fnScope = null;
 
-		};
-		$scope.newParticipant = function (sNickname) {
-			$scope.feedNews.push({
-				'type': '+',
-				'actor': sNickname,
-				'time': moment().format("hh:mm:ss")
-			});
-			
-		};
-		$scope.participantLeft = function (sNickname) {
-			$scope.activeConversations = $scope.activeConversations.filter(convo => convo.name !== sNickname)
-			$scope.feedNews.push({
-				'type': '-',
-				'actor': sNickname,
-				'time': moment().format("hh:mm:ss")
-			});
-			
-		};
-		$scope.newConvo = function () {
-			var modal = document.getElementById("myModal");
-			modal.style.display = "block";
+		function log(message) {
+			console.log(message);
 		}
-		$scope.newMessage = function (sNickname, oTimestamp) {
-			$scope.feedNews.push({
-				'type': 'MSG',
-				'actor': sNickname,
-				'time': moment(oTimestamp).format("hh:mm:ss")
-			});
-			$scope.msgArrived(false, oTimestamp);
-		};
-		$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
-			if (bSelfFlag) {
-				$scope.feedNews.push({
-					'type': 'S',
-					'nonce': sNonce,
-					'time': moment().format("hh:mm:ss")
-				});
-			}
-			else {
-				$scope.feedNews.push({
-					'type': 'B',
-					'actor': sNickname,
-					'n': iMessages,
-					'time': moment().format("hh:mm:ss")
-				});
-			}
-			$scope.msgArrived(true);
-		};
-		$scope.msgArrived = function (bEntireRefresh, oTimestamp) {
-			// TODO: avoid the generation of new arrays
-			var fnFilter;
-			if ($scope.selectedConversation === "all") {
-				fnFilter = (tx) => tx.r === "all";
-			} 
-			else {
-				var sRecipient = Object.keys(oNickNames).find(key => oNickNames[key] === $scope.selectedConversation)
-				fnFilter = (tx) => (tx.r === publicAddress && tx.s === sRecipient) || (tx.s === publicAddress && tx.r === sRecipient);
-			}
-			if (bEntireRefresh) {
-				$scope.messagesList = aBlockchain.map(block => block.l)
-									.flat().filter(fnFilter)
-									.map(tx => {
-										return {
-											'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
-											's': tx.s,
-											'm': tx.m,
-											't': tx.t,
-											'u': false
-										}
-									}).concat(
-										oBlock.l.filter(fnFilter)
-										.map(tx => {
-											return {
-												'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
-												's': tx.s,
-												'u': true,
-												't': tx.t,
-												'm': ""
-											}
-										})
-									);
-			}
-			else {
-				var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp).filter(fnFilter)
-										.map(tx => {
-											return {
-												'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
-												's': tx.s,
-												'u': true,
-												't': tx.t,
-												'm': ""
-											}
-										});
-				aMessages.forEach(item => $scope.messagesList.push(item));
-				console.log($scope.messagesList);
-			}
-			
-		}
-		$scope.onEnter = function (e) {
-			e.preventDefault();
-			if ($scope.token > $scope.tokenPerMessage) {
-				sendMessage($scope.currentMessage, $scope.selectedConversation, $scope.tokenPerMessage);
+	</script>
+	<script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+	<script src="https://momentjs.com/downloads/moment.js"></script>
+	<script src="./logic.js"></script>
+	<!-- Production -->
+	<script src="https://unpkg.com/@popperjs/core@2"></script>
+	<script src="https://unpkg.com/tippy.js@6"></script>
+	<script>
+		angular.module('chunkchain', [])
+			.controller('ChatController', ['$scope', function ($scope) {
+				$scope.activityIndicator = true;
+				$scope.selectedConversation = 'all';
+				$scope.activeConversations = [{
+					name: 'all',
+					lastMsg: 1614584104 // fallback date in the past
+				}]
+				$scope.tokenPerMessage = 1;
 				$scope.currentMessage = "";
-				$scope.token -= $scope.tokenPerMessage;
-				$scope.activeConversations.filter(convo => convo.name === $scope.selectedConversation).lastMsg = moment().unix();
-			}
-			else {
-				// Error-Token
-			}
-		};
-		$scope.getNonConvoParticipants = function () {
-			var aParticipants = Object.values(oNickNames);
-			return (aParticipants.filter(n => !$scope.activeConversations.map(convo => convo.name).includes(n) && n !== sUserNickName));
-		}
-		$scope.newConvoSelected = function (sName) {
-			$scope.activeConversations.push({
-				name: sName,
-				lastMsg: moment().unix()
-			});
-			$scope.selectedConversation = sName;
-			var modal = document.getElementById("myModal");
-			modal.style.display = "none";
-		}
-		$scope.formatTime = function (iTimestamp) {
-			return moment(iTimestamp).format('LTS');
-		}
-		$scope.getNickname = function (sAddress) {
-			return getNickname(sAddress);
-		}
+				$scope.feedNews = [];
+				$scope.messagesList = [];
+				$scope.token = 100;
+				$scope.noOfNewMessages = 1;
+				$scope.activityHasChanged = function () {
+					console.log($scope.activityIndicator);
+				};
+				$scope.conversationSelected = function (sSelectedItem) {
+					$scope.selectedConversation = sSelectedItem;
+					$scope.msgArrived(true, null);
+				};
+				$scope.feedItemSelected = function (sFeedItem) {
 
-		setInterval(function() {
-			$scope.$apply() 
-		}, 1000);
-
-		fnScope = $scope;
-
-		var modal = document.getElementById("myModal");
-		var span = document.getElementsByClassName("close")[0];
-
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
-		};
-		span.onclick = function() {
-			modal.style.display = "none";
-		}
-	  }])
-	  .directive('scrollToBottom', function($timeout, $window) {
-			return {
-				scope: {
-					scrollToBottom: "="
-				},
-				restrict: 'A',
-				link: function(scope, element, attr) {
-					scope.$watchCollection('scrollToBottom', function(newVal) {
-						if (newVal) {
-							$timeout(function() {
-								element[0].scrollTop =  element[0].scrollHeight;
-							}, 0);
-						}
-
+				};
+				$scope.newParticipant = function (sNickname) {
+					$scope.feedNews.push({
+						'type': '+',
+						'actor': sNickname,
+						'time': moment().format("hh:mm:ss")
 					});
-				}
-			};
-		});
 
-  </script>
+				};
+				$scope.participantLeft = function (sNickname) {
+					$scope.activeConversations = $scope.activeConversations.filter(convo => convo.name !==
+						sNickname)
+					$scope.feedNews.push({
+						'type': '-',
+						'actor': sNickname,
+						'time': moment().format("hh:mm:ss")
+					});
+
+				};
+				$scope.newConvo = function () {
+					var modal = document.getElementById("myModal");
+					modal.style.display = "block";
+				}
+				$scope.newMessage = function (sNickname, oTimestamp) {
+					$scope.feedNews.push({
+						'type': 'MSG',
+						'actor': sNickname,
+						'time': moment(oTimestamp).format("hh:mm:ss")
+					});
+					$scope.msgArrived(false, oTimestamp);
+				};
+				$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
+					if (bSelfFlag) {
+						$scope.feedNews.push({
+							'type': 'S',
+							'nonce': sNonce,
+							'time': moment().format("hh:mm:ss")
+						});
+					} else {
+						$scope.feedNews.push({
+							'type': 'B',
+							'actor': sNickname,
+							'n': iMessages,
+							'time': moment().format("hh:mm:ss")
+						});
+					}
+					$scope.msgArrived(true);
+				};
+				$scope.msgArrived = function (bEntireRefresh, oTimestamp) {
+					// TODO: avoid the generation of new arrays
+					var fnFilter;
+					if ($scope.selectedConversation === "all") {
+						fnFilter = (tx) => tx.r === "all";
+					} else {
+						var sRecipient = Object.keys(oNickNames).find(key => oNickNames[key] === $scope
+							.selectedConversation)
+						fnFilter = (tx) => (tx.r === publicAddress && tx.s === sRecipient) || (tx.s ===
+							publicAddress && tx.r === sRecipient);
+					}
+					if (bEntireRefresh) {
+						$scope.messagesList = aBlockchain.map(block => block.l)
+							.flat().filter(fnFilter)
+							.map(tx => {
+								return {
+									'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
+									's': tx.s,
+									'm': tx.m,
+									't': tx.t,
+									'u': false
+								}
+							}).concat(
+								oBlock.l.filter(fnFilter)
+								.map(tx => {
+									return {
+										'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
+										's': tx.s,
+										'u': true,
+										't': tx.t,
+										'm': ""
+									}
+								})
+							);
+					} else {
+						var aMessages = oBlock.l.filter(tx => tx.t === oTimestamp).filter(fnFilter)
+							.map(tx => {
+								return {
+									'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
+									's': tx.s,
+									'u': true,
+									't': tx.t,
+									'm': ""
+								}
+							});
+						aMessages.forEach(item => $scope.messagesList.push(item));
+						console.log($scope.messagesList);
+					}
+
+				}
+				$scope.onEnter = function (e) {
+					e.preventDefault();
+					if ($scope.token > $scope.tokenPerMessage) {
+						sendMessage($scope.currentMessage, $scope.selectedConversation, $scope.tokenPerMessage);
+						$scope.currentMessage = "";
+						$scope.token -= $scope.tokenPerMessage;
+						$scope.activeConversations.filter(convo => convo.name === $scope.selectedConversation)
+							.lastMsg = moment().unix();
+					} else {
+						// Error-Token
+					}
+				};
+				$scope.getNonConvoParticipants = function () {
+					var aParticipants = Object.values(oNickNames);
+					return (aParticipants.filter(n => !$scope.activeConversations.map(convo => convo.name)
+						.includes(n) && n !== sUserNickName));
+				}
+				$scope.newConvoSelected = function (sName) {
+					$scope.activeConversations.push({
+						name: sName,
+						lastMsg: moment().unix()
+					});
+					$scope.selectedConversation = sName;
+					var modal = document.getElementById("myModal");
+					modal.style.display = "none";
+				}
+				$scope.formatTime = function (iTimestamp) {
+					return moment(iTimestamp).format('LTS');
+				}
+				$scope.getNickname = function (sAddress) {
+					return getNickname(sAddress);
+				}
+
+				setInterval(function () {
+					$scope.$apply()
+					tippy('[data-tippy-content]');
+				}, 1000);
+
+				fnScope = $scope;
+
+				var modal = document.getElementById("myModal");
+				var span = document.getElementsByClassName("close")[0];
+
+				window.onclick = function (event) {
+					if (event.target == modal) {
+						modal.style.display = "none";
+					}
+				};
+				span.onclick = function () {
+					modal.style.display = "none";
+				}
+			}])
+			.directive('scrollToBottom', function ($timeout, $window) {
+				return {
+					scope: {
+						scrollToBottom: "="
+					},
+					restrict: 'A',
+					link: function (scope, element, attr) {
+						scope.$watchCollection('scrollToBottom', function (newVal) {
+							if (newVal) {
+								$timeout(function () {
+									element[0].scrollTop = element[0].scrollHeight;
+								}, 0);
+							}
+
+						});
+					}
+				};
+			});
+	</script>
 
 </head>
+
 <body ng-app="chunkchain" ng-controller="ChatController">
 
-    <div class="header">
-        <img src="assets/ChunkChain_Logo.svg" width="200px" />
+	<div class="header">
+		<img src="assets/ChunkChain_Logo.svg" width="200px" />
 
-        <div class="header_items">
-            <a>zur Blockchain-Ansicht
+		<div class="header_items">
+			<a>zur Blockchain-Ansicht
 				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}">{{ noOfNewMessages }}</span>
 			</a>
-            <span>dein Kontostand: <b>{{ token }} Token</b></span>
-        </div>
-    </div>
+			<span>dein Kontostand: <b>{{ token }} Token</b></span>
+		</div>
+	</div>
 
-    <div class="main_body">
-        <h1 class="page_title">Chat</h1>
-        <p class="introduction_section">
-Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern <b>on-chain</b> (alle Daten in der Blockchain). <br />
-Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
-        </p>
+	<div class="main_body">
+		<h1 class="page_title">Chat</h1>
+		<p class="introduction_section">
+			Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern
+			<b>on-chain</b> (alle Daten in der Blockchain). <br />
+			Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
+		</p>
 
-        <div class="chat_container">
-            <div class="chat_window">
-                <div class="conversations_container">
-					<p ng-repeat="convo in activeConversations | orderBy : '-lastMsg'" class="conversation {{ convo.name === selectedConversation ? 'selected' : '' }}" data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}" ng-click="conversationSelected(convo.name)">
+		<div class="chat_container">
+			<div class="chat_window">
+				<div class="conversations_container">
+					<p ng-repeat="convo in activeConversations | orderBy : '-lastMsg'"
+						class="conversation {{ convo.name === selectedConversation ? 'selected' : '' }}"
+						data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}"
+						ng-click="conversationSelected(convo.name)">
 						{{ convo.name }}
 					</p>
 				</div>
-				<div class="messages_container" style="overflow: scroll; height: 500px;" scroll-to-bottom="messagesList">
-					<div ng-repeat="message in messagesList track by $index" class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}">
-						<span ng-if="selectedConversation === 'all' && message.d === 'r' " class="sender">{{ getNickname(message.s) }}</span>
-						{{ message.u ? 'warten auf Nachricht...' : message.m }} <span class="message_time">{{ formatTime(message.t) }}</span>
+				<div class="messages_container" style="overflow: scroll; height: 500px;"
+					scroll-to-bottom="messagesList">
+					<div ng-repeat="message in messagesList track by $index"
+						class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}" >
+						<!--data-tippy-content="{{ message.u ? 'Nachricht kann erst angezeigt werden, wenn ein entsprechender Block gefunden wird' : '' }}"-->
+						<span ng-if="selectedConversation === 'all' && message.d === 'r' "
+							class="sender">{{ getNickname(message.s) }}</span>
+						{{ message.u ? 'warten auf Nachricht...' : message.m }} <span
+							class="message_time">{{ formatTime(message.t) }}</span>
 					</div>
 				</div>
-            </div>
-            <div class="background_activity">
+			</div>
+			<div class="background_activity">
 				<h3 class="minor_title">Aktivitäten im Netzwerk</h3>
 				<div class="switch_container">
 					<span class="{{ !activityIndicator ? 'switch_selected' : '' }}">alle</span>
@@ -257,31 +271,39 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
 				</div>
 				<div class="activity_feed">
-					<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by ( feedItem.time + feedItem.type )" ng-click="feedItemSelected(feedItem)">
+					<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by $index"
+						ng-click="feedItemSelected(feedItem)">
 						<div ng-if="feedItem.type == '+' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> ist dem Netzwerk beigetreten.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> ist dem Netzwerk
+							beigetreten.
 						</div>
 						<div ng-if="feedItem.type == '-' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das Netzwerk verlassen.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das Netzwerk
+							verlassen.
 						</div>
 						<div ng-if="feedItem.type == 'M+' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> sucht jetzt auch nach Blöcken (mining).
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> sucht jetzt auch
+							nach Blöcken (mining).
 						</div>
 						<div ng-if="feedItem.type == 'M-' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat die Suche nach Blöcken aufgegeben.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat die Suche nach
+							Blöcken aufgegeben.
 						</div>
 						<div ng-if="feedItem.type == 'B' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen neuen Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen neuen
+							Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
 						</div>
 						<div ng-if="feedItem.type == 'S' ">
-							<span class="time">{{ feedItem.time }}</span>Du hast einen Block gefunden. <b>{{ feedItem.nonce }}</b> ist die Lösung
+							<span class="time">{{ feedItem.time }}</span>Du hast einen Block gefunden.
+							<b>{{ feedItem.nonce }}</b> ist die Lösung
 						</div>
 						<div ng-if="feedItem.type == 'MSG' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat eine Nachricht geschrieben.
+							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat eine Nachricht
+							geschrieben.
 						</div>
 					</div>
 				</div>
-				
+
 			</div>
 			<div class="chat_window_footer">
 				<div class="chat_window_footer_new_chat_container">
@@ -292,14 +314,15 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					Token
 					<div class="flexible_grow"></div>
 					<form ng-submit="onEnter($event)">
-						<input type="text" size="40" maxlength="300" placeholder="Nachricht..." ng-model="currentMessage" />
+						<input type="text" size="40" maxlength="300" placeholder="Nachricht..."
+							ng-model="currentMessage" />
 						<button class="button" [disabled]="currentMessage !== ''">senden</button>
 					</form>
 				</div>
 			</div>
 		</div>
-		
-    </div>
+
+	</div>
 
 	<!-- The Modal -->
 	<div id="myModal" class="modal">
@@ -309,15 +332,17 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 			<span class="close">&times;</span>
 			<h1 class="page_title">Neue Konversation mit</h1>
 			<div class="activity_feed">
-				<div class="activity_item" ng-repeat="participant in getNonConvoParticipants() track by participant" ng-click="newConvoSelected(participant)">
+				<div class="activity_item" ng-repeat="participant in getNonConvoParticipants() track by participant"
+					ng-click="newConvoSelected(participant)">
 					<div>
 						<b>{{ participant }}</b>
 					</div>
 				</div>
 			</div>
 		</div>
-	
+
 	</div>
 
 </body>
+
 </html>
