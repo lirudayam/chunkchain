@@ -274,7 +274,7 @@
 					<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by $index"
 						ng-click="feedItemSelected(feedItem)">
 						<div ng-if="feedItem.type == '+' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> ist dem Netzwerk
+							<span class="time">{{ feedItem.time }}</span><a ng-click="newConvoSelected(feedItem.actor)"><b>{{ feedItem.actor }}</b></a> ist dem Netzwerk
 							beigetreten.
 						</div>
 						<div ng-if="feedItem.type == '-' ">
