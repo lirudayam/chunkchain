@@ -172,6 +172,12 @@
 					confetti.start(1000, 50);
 				}
 			}
+			$scope.getBlocks = function () {
+				return aBlockchain.map(block => block.b);
+			}
+			$scope.setBlock = function (block) {
+				$scope.selectedBlock = aBlockchain[block];
+			}
 			
 			fnScope = $scope;
 		  }]);
@@ -485,6 +491,9 @@
 									<!--
 										Place here real block
 									-->
+									<select ng-model="selectedBlock" (change)="setBlock($event.target.value)">
+										<option *ngFor="let i of getBlocks()">{{i}}</option>
+									</select>
 									<div class="block_cover">
 										Blockhash: {{ selectedBlock.h }}
 
