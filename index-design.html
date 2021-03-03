@@ -222,11 +222,15 @@
 						.includes(n) && n !== sUserNickName));
 				}
 				$scope.newConvoSelected = function (sName) {
-					$scope.activeConversations.push({
-						name: sName,
-						lastMsg: moment().unix()
-					});
-					$scope.selectedConversation = sName;
+					if ($scope.activeConversations.filter(convo => convo.name === sName).length === 0) {
+						$scope.activeConversations.push({
+							name: sName,
+							lastMsg: moment().unix()
+						});
+						$scope.selectedConversation = sName;
+						$scope.msgArrived(true);
+					}
+
 					var modal = document.getElementById("myModal");
 					modal.style.display = "none";
 				}
