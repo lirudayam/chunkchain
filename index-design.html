@@ -10,7 +10,6 @@
 	let fnScope = null;
     function log(message) {
 		console.log(message);
-      //document.getElementById("log").textContent += message + "\n";
     }
   </script>
   <script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
@@ -25,27 +24,13 @@
 		$scope.activeConversations = [
 			{
 				name: 'all',
-				lastMsg: 1614584104
+				lastMsg: 1614584104 // fallback date in the past
 			}
-			
 		]
 		$scope.tokenPerMessage = 1;
 		$scope.currentMessage = "";
 		$scope.feedNews = [];
-		$scope.messagesList = [
-			/*{
-				'd': 'r', // direction - recieving
-				'm': 'Hallo, wie geht\'s dir?'
-			},
-			{
-				'd': 's', // direction - sending
-				'm': 'Soweit, ganz gut. Und selber?'
-			},
-			{
-				'd': 'r', // direction - recieving
-				'u': true // unspend transaction
-			},*/
-		];
+		$scope.messagesList = [];
 		$scope.token = 100;
 		$scope.noOfNewMessages = 1;
 		$scope.activityHasChanged = function() {
@@ -272,7 +257,7 @@ Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schi
 					<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
 				</div>
 				<div class="activity_feed">
-					<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by feedItem.time" ng-click="feedItemSelected(feedItem)">
+					<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by ( feedItem.time + feedItem.type )" ng-click="feedItemSelected(feedItem)">
 						<div ng-if="feedItem.type == '+' ">
 							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> ist dem Netzwerk beigetreten.
 						</div>

@@ -97,6 +97,9 @@ function startNewBlock() {
 	oBlock = null;
 	oBlock = Object.assign({}, oBlockInterface);
 	oBlock.l = [];
+	oBlock.b = oBlock.length;
+	oBlock.p = oBlock[oBlock.length - 1].h;
+	oBlock.r = publicAddress;
 }
 
 function verifyBlock(oBlock) {
@@ -105,6 +108,7 @@ function verifyBlock(oBlock) {
 	// replace this soon with the real previous block
 	sComboundString += oBlock.p;
 	sComboundString += oBlock.t;
+	sComboundString += oBlock.r;
 	sComboundString += oBlock.n;
 
 	return oBlock.h === CryptoJS.SHA1(sComboundString).toString();
@@ -116,6 +120,7 @@ function calculateBlockHash(oBlock, nonce) {
 	// replace this soon with the real previous block
 	sComboundString += oBlock.p;
 	sComboundString += oBlock.t;
+	sComboundString += oBlock.r;
 	sComboundString += nonce;
 	return CryptoJS.SHA1(sComboundString).toString();
 }
@@ -180,11 +185,12 @@ function stopMining(b) {
 var b = Bugout("chunkchain", {
 	announce: [
 		'ws://192.168.178.71:8000',
-		'wss://hub.bugout.link',
+		/*'wss://hub.bugout.link',
   		'wss://tracker.openwebtorrent.com',
 		'wss://tracker.webtorrent.io',
 		'ws://tracker.sloppyta.co',
-		'wss://tracker.files.fm'
+		'wss://tracker.files.fm'*/
+		//'wss://webrtc-tracker.cfapps.eu10.hana.ondemand.com:443'
 	],
 	seed: localStorage["bugout-demo-seed"]
 });
