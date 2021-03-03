@@ -659,3 +659,12 @@ select option {
     color: #00B9F2;
     cursor: pointer;
 }
+
+.dot {
+    height: 12px;
+    width: 12px;
+    background-color: #00B9F2;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 5px;
+}

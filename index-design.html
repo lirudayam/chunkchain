@@ -41,6 +41,8 @@
 				$scope.token = 100;
 				$scope.noOfNewMessages = 1;
 
+				$scope.newMessages = {};
+
 				// related to deep-dive
 				$scope.levelList = {
 					'Level 1: Einsteiger': [
@@ -103,6 +105,8 @@
 				$scope.conversationSelected = function (sSelectedItem) {
 					$scope.selectedConversation = sSelectedItem;
 					$scope.msgArrived(true, null);
+					delete $scope.newMessages[sSelectedItem];
+					$scope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b);
 				};
 				$scope.feedItemSelected = function (sFeedItem) {
 
@@ -367,10 +371,10 @@
 		<img src="assets/ChunkChain_Logo.svg" width="200px" />
 
 		<div class="header_items">
-			<a ng-show="chatVisible" ng-click="switchToBlockchain()">zur Blockchain-Ansicht
+			<a ng-show="chatVisible" ng-click="switchToBlockchain()">zur Blockchain-Ansicht</a>
+			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht 
 				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}">{{ noOfNewMessages }}</span>
 			</a>
-			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht</a>
 			<span>dein Kontostand: <b>{{ token }} Token</b></span>
 		</div>
 	</div>
@@ -392,6 +396,7 @@
 							data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}"
 							ng-click="conversationSelected(convo.name)">
 							{{ convo.name }}
+							<span class="{{ (newMessages[convo.name] && newMessages[convo.name] > 0) ? 'dot' : '' }}"></span>
 						</p>
 					</div>
 					<div class="messages_container" style="overflow: scroll; height: 500px;"

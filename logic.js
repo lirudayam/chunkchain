@@ -268,10 +268,28 @@ b.on("message", function (address, message) {
 				}
 				var foundIndex = fnScope.activeConversations.findIndex(convo => convo.name === getNickname(address));
 				fnScope.activeConversations[foundIndex].lastMsg = moment().unix();
+
+				// for the counter
+				if (fnScope.newMessages.hasOwnProperty(getNickname(address)) && fnScope.selectedConversation !== getNickname(address)) {
+					fnScope.newMessages[getNickname(address)] += 1;
+				}
+				else if (fnScope.selectedConversation !== getNickname(address)) {
+					fnScope.newMessages[getNickname(address)] = 1;
+				}
+				fnScope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b);
 			}
 			else if (oTx.r === "all") {
 				var foundIndex = fnScope.activeConversations.findIndex(convo => convo.name === "all");
 				fnScope.activeConversations[foundIndex].lastMsg = moment().unix();
+
+				// for the counter
+				if (fnScope.newMessages.hasOwnProperty("all") && fnScope.selectedConversation !== "all") {
+					fnScope.newMessages["all"] += 1;
+				}
+				else if (fnScope.selectedConversation !== "all") {
+					fnScope.newMessages["all"] = 1;
+				}
+				fnScope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b);
 			}
 
 			proofOfWorkMining(2);
