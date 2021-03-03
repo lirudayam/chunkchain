@@ -24,6 +24,10 @@
 	<script>
 		angular.module('chunkchain', [])
 			.controller('ChatController', ['$scope', function ($scope) {
+				$scope.chatVisible = true;
+				$scope.deepDiveVisible = false;
+
+				// related to chat functionality
 				$scope.activityIndicator = true;
 				$scope.selectedConversation = 'all';
 				$scope.activeConversations = [{
@@ -36,6 +40,63 @@
 				$scope.messagesList = [];
 				$scope.token = 100;
 				$scope.noOfNewMessages = 1;
+
+				// related to deep-dive
+				$scope.levelList = {
+					'Level 1: Einsteiger': [
+						'Überblick',
+						'Unser Netzwerk',
+						'Wo sind die Daten?',
+						'Sind die Daten echt?'
+					],
+					'Level 2: Anfänger': [
+						'Was ist ein Hash?',
+						'Was ist Verschlüsselung?',
+						'Was schicken wir uns?',
+						'Wo sind die Nachrichten?'
+					],
+					'Level 3: Fortgeschritten': [
+						'Was ist ein Block?',
+						'Wie sieht ein Block aus?',
+						'Wie entsteht ein Block?',
+						'Wie entsteht die Kette?'
+					],
+					'Level 4: Profi': [
+						'Wie kann ich verschlüsseln?',
+						'Soll ich Blöcke suchen?',
+						'Kann ich löschen?',
+						'Wie finden wir Konsens?'
+					],
+					'Level 5: Voll-Profi': [
+						'Wie wird die Blocksuche geregelt?',
+						'Was sind unbestätigte Nachrichten?',
+						'Kann ich Daten manipulieren?'
+					]
+				};
+				$scope.selectedLevel = 'Level 1: Einsteiger';
+				$scope.selectedMission = '';
+				$scope.symText = "Mein Text";
+				$scope.symKey = "Schlüssel";
+				$scope.symEncrypt = "";
+				$scope.symDecryptKey = $scope.symKey;
+
+				$scope.coins = 1;
+				$scope.publicKey = "6c157587185fd2";
+				$scope.privateKey = "6c157587185fd2";
+
+				$scope.selectedBlock = Object.assign({}, oBlockInterface);
+
+				// general functions
+				$scope.switchToBlockchain = function () {
+					$scope.chatVisible = false;
+					$scope.deepDiveVisible = true;
+				}
+				$scope.switchToChat = function () {
+					$scope.chatVisible = true;
+					$scope.deepDiveVisible = false;
+				}
+
+				// functions for chatting
 				$scope.activityHasChanged = function () {
 					console.log($scope.activityIndicator);
 				};
@@ -176,6 +237,85 @@
 					return getNickname(sAddress);
 				}
 
+				// functions for deep-dive
+				$scope.missionSelected = function (sSelectedItem) {
+					$scope.selectedMission = sSelectedItem;
+				};
+				$scope.hash = function (sInput) {
+					return CryptoJS.SHA1(sInput).toString();
+				};
+				$scope.encrypt = function (sInput, sKey) {
+					const encrypt = CryptoJS.AES.encrypt(sInput, CryptoJS.enc.Base64.parse(sKey), {
+						iv: CryptoJS.enc.Base64.parse("iv"),
+						padding: CryptoJS.pad.NoPadding
+					});
+					console.log(encrypt);
+					if ($scope.symEncrypt === "") {
+						$scope.symEncrypt = encrypt.toString(CryptoJS.format.Hex);
+					}
+					return encrypt.toString(CryptoJS.format.Hex);
+				};
+				$scope.decrypt = function (sInput, sKey) {
+					if (sInput !== "") {
+						const encryptedHex = CryptoJS.enc.Hex.parse(sInput);
+						const decrypt = CryptoJS.AES.decrypt({
+							ciphertext: encryptedHex
+						}, CryptoJS.enc.Base64.parse(sKey), {
+							iv: CryptoJS.enc.Base64.parse("iv"),
+							padding: CryptoJS.pad.NoPadding
+						});
+						//
+						console.log(decrypt); //CryptoJS.enc.Utf8
+						return decrypt.toString(); //TODO: fix it
+
+					}
+					return "";
+				}
+				$scope.timestamp = function () {
+					return moment().unix();
+				}
+				$scope.hashTx = function () {
+					const sComboundString = $scope.publicKey + "all" + $scope.messageSimulation + $scope.coins +
+						$scope.timestamp();
+					const sHashString = CryptoJS.enc.Hex.stringify(CryptoJS.SHA1(sComboundString.toString()));
+					return sHashString;
+				}
+				$scope.hashTxSigned = function () {
+					return CryptoJS.AES.encrypt($scope.hashTx(), $scope.privateKey).toString();
+				}
+				$scope.missionCompleted = function () {
+
+					var aArray = $scope.levelList[$scope.selectedLevel];
+					var iPos = aArray.indexOf($scope.selectedMission);
+					if (iPos + 1 >= aArray.length) {
+						// end of level
+						var aLevels = Object.keys($scope.levelList);
+						var iLevelPos = aLevels.indexOf($scope.selectedLevel);
+
+						if (iLevelPos + 1 >= aLevels.length) {
+							// complete finished
+							confetti.start(5000, 700);
+						} else {
+							$scope.selectedLevel = aLevels[iLevelPos + 1];
+							$scope.selectedMission = $scope.levelList[$scope.selectedLevel][0];
+
+							$scope.token += 10;
+							confetti.start(2000, 200);
+						}
+					} else {
+						$scope.selectedMission = $scope.levelList[$scope.selectedLevel][iPos + 1];
+						$scope.token += 5;
+						confetti.start(1000, 50);
+					}
+				}
+				$scope.getBlocks = function () {
+					return aBlockchain.map(block => block.b);
+				}
+				$scope.setBlock = function (block) {
+					$scope.selectedBlock = aBlockchain[block];
+				}
+
+				// overall refresh
 				setInterval(function () {
 					$scope.$apply()
 					tippy('[data-tippy-content]');
@@ -223,107 +363,699 @@
 		<img src="assets/ChunkChain_Logo.svg" width="200px" />
 
 		<div class="header_items">
-			<a>zur Blockchain-Ansicht
+			<a ng-show="chatVisible" ng-click="switchToBlockchain()">zur Blockchain-Ansicht
 				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}">{{ noOfNewMessages }}</span>
 			</a>
+			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht</a>
 			<span>dein Kontostand: <b>{{ token }} Token</b></span>
 		</div>
 	</div>
 
 	<div class="main_body">
-		<h1 class="page_title">Chat</h1>
-		<p class="introduction_section">
-			Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern
-			<b>on-chain</b> (alle Daten in der Blockchain). <br />
-			Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
-		</p>
+		<div ng-show="chatVisible">
+			<h1 class="page_title">Chat</h1>
+			<p class="introduction_section">
+				Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern
+				<b>on-chain</b> (alle Daten in der Blockchain). <br />
+				Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
+			</p>
 
-		<div class="chat_container">
-			<div class="chat_window">
-				<div class="conversations_container">
-					<p ng-repeat="convo in activeConversations | orderBy : '-lastMsg'"
-						class="conversation {{ convo.name === selectedConversation ? 'selected' : '' }}"
-						data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}"
-						ng-click="conversationSelected(convo.name)">
-						{{ convo.name }}
+			<div class="chat_container">
+				<div class="chat_window">
+					<div class="conversations_container">
+						<p ng-repeat="convo in activeConversations | orderBy : '-lastMsg'"
+							class="conversation {{ convo.name === selectedConversation ? 'selected' : '' }}"
+							data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}"
+							ng-click="conversationSelected(convo.name)">
+							{{ convo.name }}
+						</p>
+					</div>
+					<div class="messages_container" style="overflow: scroll; height: 500px;"
+						scroll-to-bottom="messagesList">
+						<div ng-repeat="message in messagesList track by $index"
+							class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}">
+							<!--data-tippy-content="{{ message.u ? 'Nachricht kann erst angezeigt werden, wenn ein entsprechender Block gefunden wird' : '' }}"-->
+							<span ng-if="selectedConversation === 'all' && message.d === 'r' "
+								class="sender">{{ getNickname(message.s) }}</span>
+							{{ message.u ? 'warten auf Nachricht...' : message.m }} <span
+								class="message_time">{{ formatTime(message.t) }}</span>
+						</div>
+					</div>
+				</div>
+				<div class="background_activity">
+					<h3 class="minor_title">Aktivitäten im Netzwerk</h3>
+					<div class="switch_container">
+						<span class="{{ !activityIndicator ? 'switch_selected' : '' }}">alle</span>
+						<label class="switch">
+							<input type="checkbox" ng-model="activityIndicator" ng-change="activityHasChanged()">
+							<span class="slider"></span>
+						</label>
+						<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
+					</div>
+					<div class="activity_feed">
+						<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by $index"
+							ng-click="feedItemSelected(feedItem)">
+							<div ng-if="feedItem.type == '+' ">
+								<span class="time">{{ feedItem.time }}</span><b
+									ng-click="newConvoSelected(feedItem.actor)"
+									class="hoverable">{{ feedItem.actor }}</b> ist dem Netzwerk
+								beigetreten.
+							</div>
+							<div ng-if="feedItem.type == '-' ">
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das
+								Netzwerk
+								verlassen.
+							</div>
+							<div ng-if="feedItem.type == 'M+' ">
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> sucht jetzt
+								auch
+								nach Blöcken (mining).
+							</div>
+							<div ng-if="feedItem.type == 'M-' ">
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat die Suche
+								nach
+								Blöcken aufgegeben.
+							</div>
+							<div ng-if="feedItem.type == 'B' ">
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen neuen
+								Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
+							</div>
+							<div ng-if="feedItem.type == 'S' ">
+								<span class="time">{{ feedItem.time }}</span>Du hast einen Block gefunden.
+								<b>{{ feedItem.nonce }}</b> ist die Lösung
+							</div>
+							<div ng-if="feedItem.type == 'MSG' ">
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat eine
+								Nachricht
+								geschrieben.
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="chat_window_footer">
+					<div class="chat_window_footer_new_chat_container">
+						<button class="button" ng-click="newConvo()">neuer Chat</button>
+					</div>
+					<div class="chat_window_footer_message">
+						<input type="number" size="1" maxlength="2" ng-model="tokenPerMessage" />
+						Token
+						<div class="flexible_grow"></div>
+						<form ng-submit="onEnter($event)">
+							<input type="text" size="40" maxlength="300" placeholder="Nachricht..."
+								ng-model="currentMessage" />
+							<button class="button" [disabled]="currentMessage !== ''">senden</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+
+		<div class="background_container" ng-show="deepDiveVisible">
+			<div class="level_container">
+				<select ng-options="level as level for (level, data) in levelList" ng-model="selectedLevel"></select>
+
+				<div class="mission_container">
+					<div ng-repeat="mission in levelList[selectedLevel]"
+						class="{{ mission === selectedMission ? 'selected_mission' : 'mission' }}"
+						ng-click="missionSelected(mission)">
+						{{ mission }}
+					</div>
+				</div>
+			</div>
+
+			<div class="info_container">
+				<h1 class="page_title">{{ selectedMission }}</h1>
+				<div ng-if="selectedMission == 'Unser Netzwerk' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Unser Chat basiert auf eine verteilten System. Aber was ist ein verteiltes
+									System?<br />
+									Unten siehst du unsere klassische Client-Server-Architektur wie du sie aus Chat-Apps
+									wie WhatsApp und Co kennst.<br />
+									Normalerweise schicken wir die Nachrichten an einen Server und dieser leitet sie
+									dann weiter.<br />
+								</td>
+								<td>
+									Bei uns sind das anders aus. Wie du siehst, gibt es kein Server. Jeder kommuniziert
+									direkt mit jedem.<br />
+									Da wir alle gleichwertig in diesem Netzwerk sind, reden wir gar nicht mehr von
+									Client oder Server, sondern von Peers.<br />
+									Wir sind alle Peers, weswegen uns das zu einem Peer-to-Peer Netzwerk macht aka
+									P2P.<br />
+								</td>
+							</tr>
+							<tr>
+								<td class="center_image">
+									<img src="./assets/Client_Server.svg" />
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network.svg" />
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
 					</p>
 				</div>
-				<div class="messages_container" style="overflow: scroll; height: 500px;"
-					scroll-to-bottom="messagesList">
-					<div ng-repeat="message in messagesList track by $index"
-						class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}" >
-						<!--data-tippy-content="{{ message.u ? 'Nachricht kann erst angezeigt werden, wenn ein entsprechender Block gefunden wird' : '' }}"-->
-						<span ng-if="selectedConversation === 'all' && message.d === 'r' "
-							class="sender">{{ getNickname(message.s) }}</span>
-						{{ message.u ? 'warten auf Nachricht...' : message.m }} <span
-							class="message_time">{{ formatTime(message.t) }}</span>
-					</div>
+				<div ng-if="selectedMission == 'Wo sind die Daten?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Tatsächlich ist das eine gute Frage und gar nicht so einfach.<br />
+									Schauen wir uns da nocheinmal die klassische Client-Server-Architektur an.<br />
+									Hier werden alle Daten auf dem Server in einer zentralen Datenbank
+									gespeichert.<br />
+								</td>
+								<td>
+									Und hier speichern wir tatsächlich <i>alle</i> Daten auf <i>allen</i>
+									Peer-Rechnern.<br />
+									Diese Redundanz ist bewusst erzeugt, um das System stabiler zu machen.<br />
+									Fällt ein Rechner aus, sind genug andere noch da. Doch das ganze System hat auch
+									Nachteile.<br />
+								</td>
+							</tr>
+							<tr>
+								<td class="center_image">
+									<img src="./assets/Client_Server_Data.svg" />
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
 				</div>
-			</div>
-			<div class="background_activity">
-				<h3 class="minor_title">Aktivitäten im Netzwerk</h3>
-				<div class="switch_container">
-					<span class="{{ !activityIndicator ? 'switch_selected' : '' }}">alle</span>
-					<label class="switch">
-						<input type="checkbox" ng-model="activityIndicator" ng-change="activityHasChanged()">
-						<span class="slider"></span>
-					</label>
-					<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
-				</div>
-				<div class="activity_feed">
-					<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by $index"
-						ng-click="feedItemSelected(feedItem)">
-						<div ng-if="feedItem.type == '+' ">
-							<span class="time">{{ feedItem.time }}</span><a ng-click="newConvoSelected(feedItem.actor)"><b>{{ feedItem.actor }}</b></a> ist dem Netzwerk
-							beigetreten.
-						</div>
-						<div ng-if="feedItem.type == '-' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das Netzwerk
-							verlassen.
-						</div>
-						<div ng-if="feedItem.type == 'M+' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> sucht jetzt auch
-							nach Blöcken (mining).
-						</div>
-						<div ng-if="feedItem.type == 'M-' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat die Suche nach
-							Blöcken aufgegeben.
-						</div>
-						<div ng-if="feedItem.type == 'B' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen neuen
-							Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
-						</div>
-						<div ng-if="feedItem.type == 'S' ">
-							<span class="time">{{ feedItem.time }}</span>Du hast einen Block gefunden.
-							<b>{{ feedItem.nonce }}</b> ist die Lösung
-						</div>
-						<div ng-if="feedItem.type == 'MSG' ">
-							<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat eine Nachricht
-							geschrieben.
-						</div>
-					</div>
+				<div ng-if="selectedMission == 'Sind die Daten echt?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Auch das ist eine sehr gute Frage.<br />
+									Bei klassischen Client-Server-Architektur, sind die Daten zentral auf dem
+									Server.<br />
+									Wir vertrauen also diesem Server, dass die Daten echt sind.<br />
+									Das machen wir sehr häufig. Wir vertrauen Services wie Amazon, PayPal, Instagram
+									tagtäglich.<br />
+								</td>
+								<td>
+									Was ist aber wenn wir keine zentrale Instanz haben, der wir vertrauen können?<br />
+									Das P2P Network erzeugt bewusst Redundanz, sodass wir nicht einer einzelnen Person
+									vertrauen müssen.<br />
+									Stattdessen vertrauen wir dem gesamten System und überprüfen uns gegenseitig.<br />
+									Das bedeutet aber auch, dass wir auf jede noch so kleine Information gemeinsam
+									einigen müssen.<br />
+								</td>
+							</tr>
+							<tr>
+								<td class="center_image">
+									<img src="./assets/Client_Server_Data.svg" />
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
 				</div>
 
-			</div>
-			<div class="chat_window_footer">
-				<div class="chat_window_footer_new_chat_container">
-					<button class="button" ng-click="newConvo()">neuer Chat</button>
+				<div ng-if="selectedMission == 'Was ist ein Hash?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Ein Hash ist eine Möglichkeit eine Zeichenkette (String) zu komprimieren.<br />
+									Wenn wir einen String hashen, bekommen wir immer einen neuen String einer fixen
+									Länge raus.<br />
+									Dabei ist egal, wie lang der anfängliche String ist, es kommt immer die gleiche
+									Länge vom Hash raus.<br /><br />
+
+									Hashes haben dabei drei wesentliche Eigenschaften:
+									<ul>
+										<li>Aus einem Hash ist es unmöglich den orginalen String zurückzubekommen</li>
+										<li>Es ist unmöglich aus einem String-Hash-Paar einen weiteren String mit dem
+											gleichen Hash zu finden</li>
+										<li>Es ist unmöglich zwei Strings zu finden, die den gleichen Hash haben</li>
+									</ul>
+								</td>
+								<td>
+									Der Vorteil ist, Hashes sind leicht zu speichern und man kann so Daten
+									überprüfen.<br />
+									Änderst du nur einen Buchstaben im orginalen String, sieht der Hash komplett anders
+									aus.<br /><br />
+
+									Willst du es ausprobieren, z.B. SHA1 (Secure Hash Algorithm):<br />
+									<input type="text" size="60" placeholder="Gib deinen Text ein..."
+										ng-model="hashInput" /> <br /><br />
+									Hash: <b>{{ hash(hashInput) }}</b>
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
 				</div>
-				<div class="chat_window_footer_message">
-					<input type="number" size="1" maxlength="2" ng-model="tokenPerMessage" />
-					Token
-					<div class="flexible_grow"></div>
-					<form ng-submit="onEnter($event)">
-						<input type="text" size="40" maxlength="300" placeholder="Nachricht..."
-							ng-model="currentMessage" />
-						<button class="button" [disabled]="currentMessage !== ''">senden</button>
-					</form>
+				<div ng-if="selectedMission == 'Was ist Verschlüsselung?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Die <b>symmetrische</b> Verschlüsselung nutzt das Prinzip, dass du eine Nachricht
+									mit dem gleichen Schlüssel verschlüsseln und entschlüsseln kannst.<br />
+									Das ist ähnlich wie bei einem Haustürschloss. Du kannst deinen Schlüssel nutzen, um
+									die Tür aufzumachen und abzuschliessen.<br /><br />
+								</td>
+								<td>
+									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen Schlüssel zum
+									Verschlüsseln (<b>private key</b>) und einen zum Entschlüsseln (<b>public
+										key</b>).<br />
+									Um ein solches Schlüssel-Paar zu erzeugen, generierst du einen private key und
+									leitest einen public key davon ab.<br />
+									Man kann von einem public key nie den dazugehörigen private key erraten. <br />
+									Du kannst natürlich auch private und public key andersherum einsetzen.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Ein Beispiel: <br />
+									<div class="form">
+										Nachricht: <input type="text" size="50" ng-model="symText" /> <br /><br />
+										Dein Schlüssel: <input type="text" size="50" ng-model="symKey" /> <br /><br />
+										Verschlüsselte Nachricht: <b>{{ encrypt(symText, symKey) }}</b>
+									</div>
+									<br />
+									<hr /><br />
+									Zum Entschlüsseln:
+									<div class="form">
+										Verschlüsselte Nachricht: <input type="text" size="50" ng-model="symEncrypt" />
+										<br /><br />
+										Dein Schlüssel: <input type="text" size="50" ng-model="symDecryptKey" />
+										<br /><br />
+										Entschlüsselte Nachricht: <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
+									</div>
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Was schicken wir uns?' ">
+					<p class="introduction_section">
+						Deine Nachricht wird als eine Transaktion geschickt. Dabei sieht die Struktur wie folgt aus:
+
+						<ul class="flow">
+							<li><b>Orginale Transaction</b> <br /><br />
+								{<br />
+								<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+								<span class="attribute">recipient:</span> "all",<br />
+								<span class="attribute">message:</span> "<input type="text" size="10"
+									ng-model="messageSimulation" />",<br />
+								<span class="attribute">coins:</span> {{ coins }}<br />
+								}<br />
+							</li>
+							<li><b>Zeitstempel dazu</b> <br /><br />
+								{<br />
+								<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+								<span class="attribute">recipient:</span> "all",<br />
+								<span class="attribute">message:</span> "{{ messageSimulation }}",<br />
+								<span class="attribute">coins:</span> {{ coins }}<br />
+								<span class="attribute">time:</span> <span
+									class="highlighted">{{ timestamp() }}</span><br />
+								}<br />
+							</li>
+							<li><b>Hash hinzufügen</b> <br /><br />
+								{<br />
+								<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+								<span class="attribute">recipient:</span> "all",<br />
+								<span class="attribute">message:</span> "{{ messageSimulation }}",<br />
+								<span class="attribute">coins:</span> {{ coins }}<br />
+								<span class="attribute">time:</span> {{ timestamp() }}<br />
+								<span class="attribute">hash:</span>
+								<div class="cut-text">{{ hashTx() }}</div><br />
+								}
+							</li>
+							<li><b>Hash signieren mit private key</b> <br /><br />
+								{<br />
+								<span class="attribute">sender:</span> "{{ publicKey }}",<br />
+								<span class="attribute">recipient:</span> "all",<br />
+								<span class="attribute">message:</span> "{{ messageSimulation }}",<br />
+								<span class="attribute">coins:</span> {{ coins }}<br />
+								<span class="attribute">time:</span> {{ timestamp() }}<br />
+								<span class="attribute">hash:</span>
+								<div class="cut-text">{{ hashTxSigned() }}</div><br />
+								}
+							</li>
+							<li><b>ins P2P-Netzwerk</b></li>
+						</ul>
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Wo sind die Nachrichten?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Dazu müssen wir uns nur unser P2P-Netzwerk anschauen.<br />
+									Wir haben hier extra Redundanz, sodass das System robuster wird.<br />
+									Also hat auch jeder eine vollständige Kopie der Daten.<br />
+									Das kann natürlich ziemlich schnell, ziemlich gross werden, weswegen es auch
+									off-chain Lösungen gibt.<br /><br />
+									In unserem Fall speichern wir jede Transaktion bei jedem Peer. <br />
+									Das heisst, du kannst auch immer sehen, wer wem geschrieben hat.
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+
+				<div ng-if="selectedMission == 'Was ist ein Block?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Bisher hast du einiges gelernt zu unserem P2P-Netzwerk und zu Hashes und
+									Verschlüsselung.<br />
+									Nachrichten sind immer Transaktionen und enthalten viele Informationen und den
+									signierten Hash.<br /><br />
+
+									Wie du ebenfalls zuvor gesehen hast, müssen wir uns in einem P2P-Netzwerk auf jede
+									Information einigen.<br />
+									Das würde sehr viel Abstimmung bedeuten.<br />
+									Stattdessen sammeln wir neue Daten einfach in einem Pool (<b>unconfirmed
+										transactions</b>).<br />
+									Nun kann sich jemand der Aufgabe stellen, einige dieser Transaktionen zu sammeln und
+									zur Abstimmung bringen.<br /><br />
+
+									Der Vorgang einen Block zur Abstimmung zu bringen, benötigt viel Aufwand.<br />
+									Das siehst du gleich.
+								</td>
+								<td class="center_image">
+									<img src="./assets/P2P_Network_Data.svg" />
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Wie sieht ein Block aus?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Ein Block ist eine Ansammlung an Transaktionen. <br />
+									Sobald ein Block bestätigt ist, hat jeder Teilnehmer im P2P-Netzwerk die Info, dass
+									dieser Block wahre Daten enthält. <br /><br />
+
+									Ein Block besteht dabei aus einem <b>block body</b> und <b>block header</b>.<br />
+									Der Body enthält nur die Liste der Transaktionen. <br /><br />
+
+									Bisher haben wir gelernt, dass wir mit einem Hash überprüfen können, ob ein String
+									verändert wurde.<br />
+									Wenn wir diesen Hash signieren, können wir sogar sicherstellen, dass niemand den
+									Hash ändern kann.<br />
+									Aber wie können wir feststellen, dass niemand einen Block ändern kann? <br /><br />
+
+									Dazu müssen wir von allen Transaktionshashes, einen grossen Hash (<b>block hash</b>)
+									bauen.<br />
+									Damit können wir super leicht feststellen, ob jetzt jemand auch nur irgendetwas
+									verändert hat.<br />
+									Diesen speichern wir im block header ab.<br /><br />
+
+									Wie wir jetzt aber sicherstellen können, dass niemand diesen block hash verändert,
+									siehst du in der nächsten Mission.<br />
+									Du kannst dir aber zuerst mal einen x-beliebigen Block anschauen.
+								</td>
+								<td class="center_image">
+									<!--
+								Place here real block
+							-->
+									<select ng-model="selectedBlock" (change)="setBlock($event.target.value)">
+										<option *ngFor="let i of getBlocks()">{{i}}</option>
+									</select>
+									<div class="block_cover">
+										Blockhash: {{ selectedBlock.h }}
+
+										<div class="block_header">
+											Blocknummer: {{ selectedBlock.r }} <br />
+											Anzahl an Transaktionen: {{ selectedBlock.l.length }} <br /><br />
+											gefunden von: {{ selectedBlock.r }} <br />
+											gefunden um: {{ selectedBlock.t }} <br />
+											Vorheriger Blockhash: {{ selectedBlock.p }}
+										</div>
+
+										<div class="block_body">
+											<div ng-repeat="message in selectedBlock.l" class="block_body_item">
+												<div>
+													<span class="msg_sender">{{ message.s }} &#x2192;
+														{{ message.r }}</span> <br />
+													{{ message.m }}
+												</div>
+												<div style="display:right">
+													<span class="msg_infos">{{ message.c }} Coins</span> <br />
+													<span class="msg_infos">{{ message.t }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Wie entsteht ein Block?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Jede Transaktion (Nachricht) wird direkt im gesamten Netzwerk geteilt. <br />
+									Jeder Teilnehmer kann hierbei prüfen, ob die Transaktion gültig ist. <br />
+									Wenn dies der Fall sein sollte, landen die Transaktionen in einem Pool (unconfirmed
+									transaction pool). <br /><br />
+
+									Jetzt muss sich jemand der Aufgabe stellen, einen Block zu finden.<br />
+									Dabei sucht die Person die Lösung (Nonce) einer kryptographischen Challenge.
+									<br /><br />
+
+									Jede Transaktion hat einen Hash. Nun kann die Hashes von Transaktionen aus einem
+									Pool wiederrum zusammenhashen.<br />
+									Dabei entsteht der sogenannte Merkle-Root (Hash der Hashes).<br /><br />
+
+									Mit dem Merkle-Root zusammen werden einige Informationen aus dem <b>block header</b>
+									weiter gehasht.<br />
+									Darunter sind vorallem der Blockhash des vorherigen Blocks und
+									Zeitstempel.<br /><br />
+
+									Die kryptographische Challenge liegt darin eine einen Hash zu finden, der mit Nullen
+									beginn.<br />
+									Wie du vorhin gesehen hast, verändert ein Buchstabe einen Hash komplett. <br />
+									Jetzt muss jemand eine x-beliebige Zeichenfolge zu den bestehenden Daten zu finden,
+									sodass der Hash mit x Nullen beginnt. <br />
+									Je mehr Nullen am Anfang gefordert sind, desto schwieriger wird es. <br /><br />
+
+									Einfaches Beispiel: <br />
+									Wenn ein Blockhash mit einer Null beginnen soll, braucht man ca. 16 Versuche. <br />
+									Wenn ein Blockhash mit drei Nullen beginnen soll, braucht man ca. 4096 Versuche.
+									<br />
+									Bei sechs Nullen, sind es schon über 16 Millionen. <br />
+									Das Bitcoin-Netzwerk verlangt aktuell 19 Nullen am Anfang!
+								</td>
+								<td class="center_image">
+									<!--
+								Place here real block
+							-->
+									<div class="block_cover">
+										Blockhash: {{ calcBlockHash }}
+
+										<div class="block_header">
+											Blocknummer: {{ currentBlock.b }} <br />
+											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br /><br />
+
+											Vorheriger Blockhash: {{ selectedBlock.p }} <br />
+											Nonce: <input type="text" size="40" placeholder="Probier es aus..."
+												ng-model="nonceInput" />
+										</div>
+
+										<div class="block_body">
+											<div ng-repeat="message in currentBlock.l" class="block_body_item">
+												<div>
+													<span class="msg_sender">{{ message.s }} &#x2192;
+														{{ message.r }}</span> <br />
+													{{ message.m }}
+												</div>
+												<div style="display:right">
+													<span class="msg_infos">Hash: </span> <br />
+													<span class="msg_infos">{{ message.h }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+				<!-- TODO: blocks -->
+
+				<div ng-if="selectedMission == 'Wie kann ich verschlüsseln?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Das ist eine gute Frage. <br />
+									Wir nutzen eine public blockchain, also jeder kann teilnehmen.<br /><br />
+
+									Das heisst auch, dass jeder die gesamte Historie sehen kann.<br />
+									Da deine Nachrichten bisher in Klartext verschickt worden, kann jeder deine
+									Nachrichten lesen.<br />
+									Nun können wir uns den Trick der asymmetrischen Verschlüsselung zu nutze
+									machen.<br /><br />
+
+									Statt dass du selbst deinen private Key zum Verschlüsseln nimmst, nimmst du jemand
+									anders sein Key.<br />
+									Genauer gesagt, den public key deines Empfängers.<br />
+									Denn damit kann nur er mit seinem private key deine Nachricht entschlüsseln.
+								</td>
+								<td class="center_image">
+									<img src="./assets/Encryption.svg" />
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Soll ich Blöcke suchen?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Auch das ist wieder eine fantastische Frage. <br />
+									Blöcke suchen, heisst diesen Nonce zu finden.<br /><br />
+
+									Wir sprechen hier vom sogenannten <b>Mining</b>.<br />
+									Du probierst x-beliebige random Zeichenfolgen, um den Nonce zu finden.<br />
+									Das ist aber auch wahnsinnig rechenintensiv.<br /><br />
+
+									Denn je Power du hast, desto wahrscheinlicher ist es, dass du einen Block
+									findest.<br />
+									Dafür bekommst du natürlich auch eine Belohnung.<br />
+									Im Bitcoin-Netzwerk würdest du über 6 Bitcoin pro Block bekommen.<br /><br />
+
+									Du musst das jetzt aber deinen Kosten gegenüber stellen (Strom + Hardware).<br />
+									Das kann sehr schnell, verdammt teuer werden und sich für dich nicht mehr
+									lohnen.<br /><br />
+
+									Das Bitcoin-Netzwerk verbraucht nur durch Mining soviel Strom wie die gesamten
+									Niederlande!<br />
+									Klimatechnisch eine reinste Katastrophe.
+								</td>
+								<td class="center_image">
+									<div class="block_cover">
+										Blockhash: {{ calcBlockHash }}
+
+										<div class="block_header">
+											Blocknummer: {{ currentBlock.b }} <br />
+											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br /><br />
+
+											Vorheriger Blockhash: {{ selectedBlock.p }} <br />
+											Nonce: <input type="text" size="40" placeholder="Probier es aus..."
+												ng-model="nonceInput" />
+										</div>
+
+										<div class="block_body">
+											<div ng-repeat="message in currentBlock.l" class="block_body_item">
+												<div>
+													<span class="msg_sender">{{ message.s }} &#x2192;
+														{{ message.r }}</span> <br />
+													{{ message.m }}
+												</div>
+												<div style="display:right">
+													<span class="msg_infos">Hash: </span> <br />
+													<span class="msg_infos">{{ message.h }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+				<div ng-if="selectedMission == 'Kann ich löschen?' ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Die Frage darfst du dir selbst beantworten.<br />
+									Denn das ist gar nicht so trivial und viele vergessen das.<br /><br />
+
+									Blockchains haben folgende Eigenschaften:
+									<ul>
+										<li>Die Daten liegen bei allen Teilnehmern</li>
+										<li>Jedes kleine Stück Daten kann über Hashes verifiziert werden</li>
+										<li>Dadurch kannst du nichts aus der Vergangenheit ändern</li>
+										<li>Nichts ändern heisst du kannst nicht mal ein Zeichen verändern</li>
+									</ul>
+								</td>
+								<td>
+									Denkst du, du kannst die Frage beantworten<br /><br />
+
+									Kann ich löschen:<br />
+									<select ng-model="deleteChoice">
+										<option value="-">-</option>
+										<option value="y">ja</option>
+										<option value="n">nein</option>
+									</select><br /><br />
+
+									Deine Antwort ist: {{ deleteChoice === 'y' ? 'richtig' : 'falsch' }} <br />
+									{{ deleteChoice === 'y' ? 'Das sollte dir gut bewusst sein. Jede deiner Nachrichten wird für immer bleiben.' : '' }}
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+
+				<div class="floating_confirm">
+					<button class="button" ng-click="missionCompleted()">Mission abschliessen</button>
 				</div>
 			</div>
 		</div>
-
 	</div>
-
 	<!-- The Modal -->
 	<div id="myModal" class="modal">
 
