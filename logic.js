@@ -102,6 +102,18 @@ function startNewBlock() {
 	oBlock.r = publicAddress;
 }
 
+function simulateBlockHashCalculation(oBlock) {
+	var sComboundString = oBlock.l.map((tx) => tx.h).join("");
+
+	// replace this soon with the real previous block
+	sComboundString += oBlock.p;
+	sComboundString += oBlock.t;
+	sComboundString += oBlock.r;
+	sComboundString += oBlock.n;
+
+	return CryptoJS.SHA1(sComboundString).toString();
+}
+
 function verifyBlock(oBlock) {
 	var sComboundString = oBlock.l.map((tx) => tx.h).join("");
 

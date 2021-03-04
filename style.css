@@ -668,3 +668,11 @@ select option {
     display: inline-block;
     margin-left: 5px;
 }
+
+.capped { 
+    text-overflow: ellipsis;
+    overflow: hidden; 
+    width: 130px; 
+    white-space: nowrap;
+    display: inline-block;
+}

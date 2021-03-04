@@ -89,6 +89,7 @@
 				$scope.selectedBlock = Object.assign({}, oBlockInterface);
 				$scope.availableBlocks = [0];
 				$scope.selectedBlockNumber = 0;
+				$scope.nonceInput = "";
 
 				// general functions
 				$scope.switchToBlockchain = function () {
@@ -333,10 +334,17 @@
 					$scope.chatVisible = false;
 					$scope.deepDiveVisible = true;
 				}
+				$scope.simulateBlockHashCalculation = function (oBlock) {
+					console.log($scope.nonceInput);
+					oBlock.n = $scope.nonceInput;
+					console.log(oBlock);
+					return simulateBlockHashCalculation(oBlock);
+				}
 
 				// overall refresh
 				setInterval(function () {
 					$scope.availableBlocks = aBlockchain.map(block => block.b).flat();
+					$scope.currentBlock = aBlockchain[aBlockchain.length - 1];
 					$scope.$apply();
 					tippy('[data-tippy-content]');
 				}, 1000);
@@ -912,13 +920,13 @@
 								Place here real block
 							-->
 									<div class="block_cover">
-										Blockhash: {{ calcBlockHash }}
+										Blockhash: {{ simulateBlockHashCalculation(currentBlock) }}
 
 										<div class="block_header">
 											Blocknummer: {{ currentBlock.b }} <br />
 											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br /><br />
 
-											Vorheriger Blockhash: {{ selectedBlock.p }} <br />
+											Vorheriger Blockhash: {{ currentBlock.p }} <br />
 											Nonce: <input type="text" size="40" placeholder="Probier es aus..."
 												ng-model="nonceInput" />
 										</div>
@@ -926,13 +934,13 @@
 										<div class="block_body">
 											<div ng-repeat="message in currentBlock.l" class="block_body_item">
 												<div>
-													<span class="msg_sender">{{ message.s }} &#x2192;
-														{{ message.r }}</span> <br />
+													<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
+														{{ getNickname(message.r) }}</span> <br />
 													{{ message.m }}
 												</div>
 												<div style="display:right">
 													<span class="msg_infos">Hash: </span> <br />
-													<span class="msg_infos">{{ message.h }}</span>
+													<span class="msg_infos capped">{{ message.h }}</span>
 												</div>
 											</div>
 										</div>
