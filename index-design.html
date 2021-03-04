@@ -87,6 +87,8 @@
 				$scope.privateKey = "6c157587185fd2";
 
 				$scope.selectedBlock = Object.assign({}, oBlockInterface);
+				$scope.availableBlocks = [0];
+				$scope.selectedBlockNumber = 0;
 
 				// general functions
 				$scope.switchToBlockchain = function () {
@@ -317,15 +319,17 @@
 					}
 				}
 				$scope.getBlocks = function () {
-					return aBlockchain.map(block => block.b);
+					return aBlockchain.map(block => block.b).flat();
 				}
-				$scope.setBlock = function (block) {
-					$scope.selectedBlock = aBlockchain[block];
+				$scope.setBlock = function (ev) {
+					console.log(ev);
+					$scope.selectedBlock = aBlockchain[$scope.selectedBlockNumber];
 				}
 
 				// overall refresh
 				setInterval(function () {
-					$scope.$apply()
+					$scope.availableBlocks = aBlockchain.map(block => block.b).flat();
+					$scope.$apply();
 					tippy('[data-tippy-content]');
 				}, 1000);
 
@@ -373,7 +377,7 @@
 		<div class="header_items">
 			<a ng-show="chatVisible" ng-click="switchToBlockchain()">zur Blockchain-Ansicht</a>
 			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht 
-				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}">{{ noOfNewMessages }}</span>
+				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}" ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
 			</a>
 			<span>dein Kontostand: <b>{{ token }} Token</b></span>
 		</div>
@@ -820,8 +824,10 @@
 									<!--
 								Place here real block
 							-->
-									<select ng-model="selectedBlock" (change)="setBlock($event.target.value)">
-										<option *ngFor="let i of getBlocks()">{{i}}</option>
+									<select ng-model="selectedBlockNumber" ng-change="setBlock($event)">
+										<option ng-repeat="item in availableBlocks" ng-selected="item == selectedBlockNumber" value="{{ item }}">
+											Block Nr. {{ item }}
+										</option>
 									</select>
 									<div class="block_cover">
 										Blockhash: {{ selectedBlock.h }}
