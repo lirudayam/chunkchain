@@ -140,11 +140,6 @@ function proofOfWorkMining(difficulty) {
 			hash = calculateBlockHash(oBlock, nonce);
 
 			if (hash.substr(0, difficulty) === Array(difficulty + 1).join("0")) {
-				fnScope.feedNews.push({
-					'type': 'S',
-					'nonce': nonce
-				});
-
 				oBlock.h = hash;
 				oBlock.n = nonce;
 
