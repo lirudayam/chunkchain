@@ -143,7 +143,7 @@
 					});
 					$scope.msgArrived(false, oTimestamp);
 				};
-				$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce) {
+				$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce, iBlockNumber) {
 					if (bSelfFlag) {
 						$scope.feedNews.push({
 							'type': 'S',
@@ -155,6 +155,7 @@
 							'type': 'B',
 							'actor': sNickname,
 							'n': iMessages,
+							'b': iBlockNumber,
 							'time': moment().format("hh:mm:ss")
 						});
 					}
@@ -321,9 +322,16 @@
 				$scope.getBlocks = function () {
 					return aBlockchain.map(block => block.b).flat();
 				}
-				$scope.setBlock = function (ev) {
-					console.log(ev);
+				$scope.setBlock = function ($event) {
+					console.log($event);
 					$scope.selectedBlock = aBlockchain[$scope.selectedBlockNumber];
+				}
+				$scope.clickOnBlock = function (blockId) {
+					$scope.selectedBlockNumber = aBlockchain[blockId];
+					$scope.selectedLevel = 'Level 3: Fortgeschritten';
+					$scope.selectedMission = 'Wie sieht ein Block aus?';
+					$scope.chatVisible = false;
+					$scope.deepDiveVisible = true;
 				}
 
 				// overall refresh
@@ -450,8 +458,8 @@
 								Blöcken aufgegeben.
 							</div>
 							<div ng-if="feedItem.type == 'B' ">
-								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen neuen
-								Block gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen <span class="hoverable" ng-click="clickOnBlock(feedItem.b)">neuen
+								Block</span> gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
 							</div>
 							<div ng-if="feedItem.type == 'S' ">
 								<span class="time">{{ feedItem.time }}</span>Du hast einen Block gefunden.
@@ -824,8 +832,8 @@
 									<!--
 								Place here real block
 							-->
-									<select ng-model="selectedBlockNumber" ng-change="setBlock($event)">
-										<option ng-repeat="item in availableBlocks" ng-selected="item == selectedBlockNumber" value="{{ item }}">
+									<select ng-change="setBlock(event)" ng-model="selectedBlockNumber"> <!--ng-model="selectedBlockNumber"-->
+										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber">
 											Block Nr. {{ item }}
 										</option>
 									</select>
@@ -833,23 +841,23 @@
 										Blockhash: {{ selectedBlock.h }}
 
 										<div class="block_header">
-											Blocknummer: {{ selectedBlock.r }} <br />
+											Blocknummer: {{ selectedBlock.b }} <br />
 											Anzahl an Transaktionen: {{ selectedBlock.l.length }} <br /><br />
-											gefunden von: {{ selectedBlock.r }} <br />
-											gefunden um: {{ selectedBlock.t }} <br />
+											gefunden von: {{ getNickname(selectedBlock.r) }} <br />
+											gefunden um: {{ formatTime(selectedBlock.t) }} <br />
 											Vorheriger Blockhash: {{ selectedBlock.p }}
 										</div>
 
 										<div class="block_body">
 											<div ng-repeat="message in selectedBlock.l" class="block_body_item">
 												<div>
-													<span class="msg_sender">{{ message.s }} &#x2192;
-														{{ message.r }}</span> <br />
+													<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
+														{{ getNickname(message.r) }}</span> <br />
 													{{ message.m }}
 												</div>
 												<div style="display:right">
 													<span class="msg_infos">{{ message.c }} Coins</span> <br />
-													<span class="msg_infos">{{ message.t }}</span>
+													<span class="msg_infos">{{ formatTime(message.t) }}</span>
 												</div>
 											</div>
 										</div>

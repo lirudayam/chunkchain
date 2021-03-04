@@ -303,7 +303,7 @@ b.on("message", function (address, message) {
 			}
 			aBlockchain.push(oFoundBlock);
 			startNewBlock();
-			fnScope.blockFound(getNickname(address), getNickname(address) === sUserNickName, oFoundBlock.l.length, oFoundBlock.n);
+			fnScope.blockFound(getNickname(address), getNickname(address) === sUserNickName, oFoundBlock.l.length, oFoundBlock.n, oFoundBlock.b);
 		}
 	} else if (sFirstLetter === "C") {
 		// the new blockchain is there
