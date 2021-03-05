@@ -21,6 +21,7 @@
 	<!-- Production -->
 	<script src="https://unpkg.com/@popperjs/core@2"></script>
 	<script src="https://unpkg.com/tippy.js@6"></script>
+	<script src="https://cdn.jsdelivr.net/gh/mathusummut/confetti.js/confetti.min.js"></script>
 	<script>
 		angular.module('chunkchain', [])
 			.controller('ChatController', ['$scope', function ($scope) {
@@ -45,38 +46,45 @@
 
 				// related to deep-dive
 				$scope.levelList = {
-					'Level 1: Einsteiger': [
-						'Überblick',
-						'Unser Netzwerk',
-						'Wo sind die Daten?',
-						'Sind die Daten echt?'
-					],
-					'Level 2: Anfänger': [
-						'Was ist ein Hash?',
-						'Was ist Verschlüsselung?',
-						'Was schicken wir uns?',
-						'Wo sind die Nachrichten?'
-					],
-					'Level 3: Fortgeschritten': [
-						'Was ist ein Block?',
-						'Wie sieht ein Block aus?',
-						'Wie entsteht ein Block?',
-						'Wie entsteht die Kette?'
-					],
-					'Level 4: Profi': [
-						'Wie kann ich verschlüsseln?',
-						'Soll ich Blöcke suchen?',
-						'Kann ich löschen?',
-						'Wie finden wir Konsens?'
-					],
-					'Level 5: Voll-Profi': [
-						'Wie wird die Blocksuche geregelt?',
-						'Was sind unbestätigte Nachrichten?',
-						'Kann ich Daten manipulieren?'
-					]
+					0: {
+						0: 'Überblick',
+						1: 'Unser Netzwerk',
+						2: 'Wo sind die Daten?',
+						3: 'Sind die Daten echt?'
+					},
+					1: {
+						0: 'Was ist ein Hash?',
+						1: 'Was ist Verschlüsselung?',
+						2: 'Was schicken wir uns?',
+						3: 'Wo sind die Nachrichten?'
+					},
+					2: {
+						0: 'Was ist ein Block?',
+						1: 'Wie sieht ein Block aus?',
+						2: 'Wie entsteht ein Block?',
+						3: 'Wie entsteht die Kette?'
+					},
+					3: {
+						0: 'Wie kann ich verschlüsseln?',
+						1: 'Soll ich Blöcke suchen?',
+						2: 'Kann ich löschen?',
+						3: 'Wie finden wir Konsens?'
+					},
+					4: {
+						0: 'Wie wird die Blocksuche geregelt?',
+						1: 'Was sind unbestätigte Nachrichten?',
+						2: 'Kann ich Daten manipulieren?'
+					}
 				};
-				$scope.selectedLevel = 'Level 1: Einsteiger';
-				$scope.selectedMission = '';
+				$scope.levelDesc = {
+					0: 'Level 1: Einsteiger',
+					1: 'Level 2: Anfänger',
+					2: 'Level 3: Fortgeschritten',
+					3: 'Level 4: Profi',
+					4: 'Level 5: Voll-Profi'
+				}
+				$scope.selectedLevel = 0;
+				$scope.selectedMission = 0;
 				$scope.symText = "Mein Text";
 				$scope.symKey = "Schlüssel";
 				$scope.symEncrypt = "";
@@ -251,7 +259,7 @@
 
 				// functions for deep-dive
 				$scope.missionSelected = function (sSelectedItem) {
-					$scope.selectedMission = sSelectedItem;
+					$scope.selectedMission = parseInt(sSelectedItem);
 				};
 				$scope.hash = function (sInput) {
 					return CryptoJS.SHA1(sInput).toString();
@@ -298,24 +306,22 @@
 				$scope.missionCompleted = function () {
 
 					var aArray = $scope.levelList[$scope.selectedLevel];
-					var iPos = aArray.indexOf($scope.selectedMission);
-					if (iPos + 1 >= aArray.length) {
+					if ($scope.selectedMission + 1 >= Object.keys(aArray).length) {
 						// end of level
 						var aLevels = Object.keys($scope.levelList);
-						var iLevelPos = aLevels.indexOf($scope.selectedLevel);
 
-						if (iLevelPos + 1 >= aLevels.length) {
+						if ($scope.selectedLevel + 1 >= aLevels.length) {
 							// complete finished
 							confetti.start(5000, 700);
 						} else {
-							$scope.selectedLevel = aLevels[iLevelPos + 1];
-							$scope.selectedMission = $scope.levelList[$scope.selectedLevel][0];
+							$scope.selectedLevel += 1;
+							$scope.selectedMission = 0;
 
 							$scope.token += 10;
 							confetti.start(2000, 200);
 						}
 					} else {
-						$scope.selectedMission = $scope.levelList[$scope.selectedLevel][iPos + 1];
+						$scope.selectedMission += 1;
 						$scope.token += 5;
 						confetti.start(1000, 50);
 					}
@@ -329,8 +335,8 @@
 				}
 				$scope.clickOnBlock = function (blockId) {
 					$scope.selectedBlockNumber = aBlockchain[blockId];
-					$scope.selectedLevel = 'Level 3: Fortgeschritten';
-					$scope.selectedMission = 'Wie sieht ein Block aus?';
+					$scope.selectedLevel = 2;
+					$scope.selectedMission = 1;
 					$scope.chatVisible = false;
 					$scope.deepDiveVisible = true;
 				}
@@ -504,20 +510,20 @@
 
 		<div class="background_container" ng-show="deepDiveVisible">
 			<div class="level_container">
-				<select ng-options="level as level for (level, data) in levelList" ng-model="selectedLevel"></select>
+				<select ng-options="level*1 as data for (level, data) in levelDesc track by level*1" ng-model="selectedLevel"></select>
 
 				<div class="mission_container">
-					<div ng-repeat="mission in levelList[selectedLevel]"
-						class="{{ mission === selectedMission ? 'selected_mission' : 'mission' }}"
+					<div ng-repeat="(mission, desc) in levelList[selectedLevel]"
+						class="{{ mission*1 === selectedMission ? 'selected_mission' : 'mission' }}"
 						ng-click="missionSelected(mission)">
-						{{ mission }}
+						{{ desc }}
 					</div>
 				</div>
 			</div>
 
 			<div class="info_container">
-				<h1 class="page_title">{{ selectedMission }}</h1>
-				<div ng-if="selectedMission == 'Unser Netzwerk' ">
+				<h1 class="page_title">{{ levelList[selectedLevel][selectedMission] }}</h1>
+				<div ng-if="selectedLevel == 0 && selectedMission == 1 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -552,7 +558,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Wo sind die Daten?' ">
+				<div ng-if="selectedLevel == 0 && selectedMission == 2 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -584,7 +590,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Sind die Daten echt?' ">
+				<div ng-if="selectedLevel == 0 && selectedMission == 3 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -620,7 +626,7 @@
 					</p>
 				</div>
 
-				<div ng-if="selectedMission == 'Was ist ein Hash?' ">
+				<div ng-if="selectedLevel == 1 && selectedMission == 0 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -657,7 +663,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Was ist Verschlüsselung?' ">
+				<div ng-if="selectedLevel == 1 && selectedMission == 1 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -703,7 +709,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Was schicken wir uns?' ">
+				<div ng-if="selectedLevel == 1 && selectedMission == 2 ">
 					<p class="introduction_section">
 						Deine Nachricht wird als eine Transaktion geschickt. Dabei sieht die Struktur wie folgt aus:
 
@@ -753,7 +759,7 @@
 						</ul>
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Wo sind die Nachrichten?' ">
+				<div ng-if="selectedLevel == 1 && selectedMission == 3 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -777,7 +783,7 @@
 					</p>
 				</div>
 
-				<div ng-if="selectedMission == 'Was ist ein Block?' ">
+				<div ng-if="selectedLevel == 2 && selectedMission == 0 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -808,7 +814,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Wie sieht ein Block aus?' ">
+				<div ng-if="selectedLevel == 2 && selectedMission == 1 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -878,7 +884,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Wie entsteht ein Block?' ">
+				<div ng-if="selectedLevel == 2 && selectedMission == 2 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -955,7 +961,7 @@
 				</div>
 				<!-- TODO: blocks -->
 
-				<div ng-if="selectedMission == 'Wie kann ich verschlüsseln?' ">
+				<div ng-if="selectedLevel == 3 && selectedMission == 0 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -984,7 +990,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Soll ich Blöcke suchen?' ">
+				<div ng-if="selectedLevel == 3 && selectedMission == 1 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
@@ -1044,7 +1050,7 @@
 
 					</p>
 				</div>
-				<div ng-if="selectedMission == 'Kann ich löschen?' ">
+				<div ng-if="selectedLevel == 3 && selectedMission == 2 ">
 					<p class="introduction_section">
 						<table>
 							<tr>
