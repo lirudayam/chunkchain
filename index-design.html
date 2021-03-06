@@ -83,6 +83,43 @@
 					3: 'Level 4: Profi',
 					4: 'Level 5: Voll-Profi'
 				}
+				$scope.levelRewards = {
+					0: {
+						0: 2, // Token
+						1: 2,
+						2: 2,
+						3: 2,
+						f: 4
+					},
+					1: {
+						0: 3, // Token
+						1: 3,
+						2: 3,
+						3: 3,
+						f: 8
+					},
+					2: {
+						0: 3, // Token
+						1: 3,
+						2: 3,
+						3: 3,
+						f: 10
+					},
+					3: {
+						0: 5, // Token
+						1: 5,
+						2: 5,
+						3: 5,
+						f: 10
+					},
+					4: {
+						0: 5, // Token
+						1: 5,
+						2: 5,
+						3: 5,
+						f: 20
+					}
+				}
 				$scope.selectedLevel = 0;
 				$scope.selectedMission = 0;
 				$scope.symText = "Mein Text";
@@ -304,7 +341,6 @@
 					return CryptoJS.AES.encrypt($scope.hashTx(), $scope.privateKey).toString();
 				}
 				$scope.missionCompleted = function () {
-
 					var aArray = $scope.levelList[$scope.selectedLevel];
 					if ($scope.selectedMission + 1 >= Object.keys(aArray).length) {
 						// end of level
@@ -313,17 +349,27 @@
 						if ($scope.selectedLevel + 1 >= aLevels.length) {
 							// complete finished
 							confetti.start(5000, 700);
+							$scope.token += 20;
 						} else {
+							// check for rewards
+							if ($scope.levelRewards[$scope.selectedLevel].hasOwnProperty("f")) {
+								$scope.token += $scope.levelRewards[$scope.selectedLevel].f;
+								confetti.start(2000, 200);
+								delete $scope.levelRewards[$scope.selectedLevel].f;
+							}
+
 							$scope.selectedLevel += 1;
 							$scope.selectedMission = 0;
-
-							$scope.token += 10;
-							confetti.start(2000, 200);
 						}
 					} else {
+						// check for rewards
+						if ($scope.levelRewards[$scope.selectedLevel].hasOwnProperty($scope.selectedMission)) {
+							$scope.token += $scope.levelRewards[$scope.selectedLevel][$scope.selectedMission];
+							confetti.start(1000, 50);
+							delete $scope.levelRewards[$scope.selectedLevel][$scope.selectedMission];
+						}
+
 						$scope.selectedMission += 1;
-						$scope.token += 5;
-						confetti.start(1000, 50);
 					}
 				}
 				$scope.getBlocks = function () {
