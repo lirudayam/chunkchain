@@ -39,7 +39,7 @@
 				$scope.currentMessage = "";
 				$scope.feedNews = [];
 				$scope.messagesList = [];
-				$scope.token = 100;
+				$scope.token = 10;
 				$scope.noOfNewMessages = 1;
 
 				$scope.newMessages = {};
@@ -135,6 +135,7 @@
 				$scope.availableBlocks = [0];
 				$scope.selectedBlockNumber = 0;
 				$scope.nonceInput = "";
+				$scope.highestAchievement = null;
 				
 
 				// general functions
@@ -488,7 +489,7 @@
 			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht 
 				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}" ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
 			</a>
-			<span>dein Kontostand: <b>{{ token }} Token</b></span>
+			<span>dein Kontostand: <b>{{ token }} Token</b> {{ highestAchievement === 'L2' ? '&#129352;' : (highestAchievement === 'L5' ? '&#129351;' : '') }}</span>
 		</div>
 	</div>
 
@@ -600,7 +601,8 @@
 
 		<div class="background_container" ng-show="deepDiveVisible">
 			<div class="level_container">
-				<select ng-options="level*1 as data for (level, data) in levelDesc track by level*1" ng-model="selectedLevel"></select>
+				<!--<select ng-options="level*1 as data for (level, data) in levelDesc track by level*1" ng-model="selectedLevel"></select>-->
+				{{ levelDesc[selectedLevel] }}
 
 				<div class="mission_container">
 					<div ng-repeat="(mission, desc) in levelList[selectedLevel]"

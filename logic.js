@@ -171,6 +171,7 @@ function proofOfWorkMining(difficulty) {
 }
 
 const shareAccomplishment = (sKey) => {
+	fnScope.highestAchievement = sKey;
 	b.send("U" + JSON.stringify({
 		k: sKey
 	}));
