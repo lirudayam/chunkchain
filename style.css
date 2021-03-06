@@ -60,6 +60,7 @@ button {
     font-weight: normal;
     margin: 0 auto;
     padding: 8px 5px;
+    transition: all 0.5s;
 }
 
 button:disabled,
@@ -675,4 +676,149 @@ select option {
     width: 130px; 
     white-space: nowrap;
     display: inline-block;
+}
+
+@keyframes introduceBadge {
+    0% {
+        opacity: 0;
+   }
+    100% {
+        opacity: 1;
+   }
+}
+@keyframes pulseBadge {
+    0% {
+        transform: scale(1);
+   }
+    50% {
+        transform: scale(1.05);
+   }
+    100% {
+        transform: scale(1);
+   }
+}
+@keyframes pulseBadge2 {
+    0% {
+        transform: scale(1);
+   }
+    50% {
+        transform: scale(1.1);
+   }
+    100% {
+        transform: scale(1);
+   }
+}
+.badge {
+    animation: introduceBadge 1s linear 0s 1 both;
+    background: rgba(0, 185, 242, 0.2);
+    border-radius: 50%;
+    height: 136px;
+    perspective: 600px;
+    position: absolute;
+    width: 136px;
+    left: calc(50% - 68px);
+    top: calc(50% - 68px);
+    z-index: 10;
+    width: 136px;
+}
+.badge:before, .badge:after {
+    animation: pulseBadge 3s cubic-bezier(0.86, 0, 0.07, 1) 0s infinite both;
+    border: 2px dashed #00b9f2;
+    border-radius: inherit;
+    bottom: -16px;
+    content: "";
+    left: -16px;
+    opacity: 0.2;
+    position: absolute;
+    right: -16px;
+    top: -16px;
+}
+.badge:after {
+    animation-name: pulseBadge2;
+    bottom: -32px;
+    left: -32px;
+    opacity: 0.1;
+    right: -32px;
+    top: -32px;
+}
+@keyframes introduceLabel {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4) rotateY(-1800deg);
+   }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotateY(20deg);
+   }
+}
+@keyframes rotateLabel {
+    0% {
+        transform: translate(-50%, -50%) rotateY(20deg);
+   }
+    50% {
+        transform: translate(-50%, -50%) rotateY(-20deg);
+   }
+    100% {
+        transform: translate(-50%, -50%) rotateY(20deg);
+   }
+}
+.badge__label {
+    animation: introduceLabel 2s cubic-bezier(0.19, 1, 0.22, 1) 1s 1 both, rotateLabel 5s linear 3s infinite;
+    color: #00b9f2;
+    font: 900 55px -apple-system, BlinkMacSystemFont;
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    text-shadow: 0px 4px 8px rgba(0, 185, 242, 0.2);
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes introduction {
+    0% {
+        display:block;
+        opacity: 1;
+   }
+    75% {
+        opacity: 1;
+   }
+   99% {
+        opacity: 0;
+   }
+    100% {
+        display:none;
+        opacity: 1;
+   }
+}
+
+.fade_content {
+    display: none;
+    animation: introduction 6s 1 normal forwards;
+}
+
+.blanko {
+    margin:0;
+}
+
+.push {
+    position: absolute;
+    z-index: 101;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    background: #FFF;
+    text-align: center;
+    line-height: 2.5;
+    overflow: hidden; 
+    -webkit-box-shadow: 0 0 2px #CCC;
+    -moz-box-shadow:    0 0 2px #CCC;
+    box-shadow:         0 0 2px #CCC;
+    animation: slideDown 6s 1 normal forwards;
+    color: #00b9f2;
+    display: none;
+}
+
+@keyframes slideDown {
+    0%, 100% { -webkit-transform: translateY(-50px); }
+    10%, 90% { -webkit-transform: translateY(0px); }
 }
