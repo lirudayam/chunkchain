@@ -120,8 +120,8 @@
 						f: 20
 					}
 				}
-				$scope.selectedLevel = 0;
-				$scope.selectedMission = 0;
+				$scope.selectedLevel = 2;
+				$scope.selectedMission = 3;
 				$scope.symText = "Mein Text";
 				$scope.symKey = "Schlüssel";
 				$scope.symEncrypt = "";
@@ -1051,7 +1051,31 @@
 
 					</p>
 				</div>
-				<!-- TODO: blocks -->
+				<div ng-if="selectedLevel == 2 && selectedMission == 3 ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Wie du gesehen hast wird ein Hash über block header und body gebildet.<br />
+									Im Block-Header ist jeweils eine Referenz zum vorherigen Block.<br />
+									Dadurch werden die Blöcke "verkettet".<br /><br />
+
+									Vorteil des ganzen ist, es noch schwerer zu machen, die Historie zu ändern.<br/>
+									Es ist schon so gut wie unmöglich einen Block zu ändern.<br />
+									Falls ein Angreifer einen alten Block ändern möchte, müsste er alle folgenden Blöcke neu finden.<br />
+									Das heisst, dadurch wird das System nochmals gestärkt.
+								</td>
+								<td class="center_image">
+									<!-- TODO: more interactive -->
+									<img src="./assets/Chain.svg" />
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
 
 				<div ng-if="selectedLevel == 3 && selectedMission == 0 ">
 					<p class="introduction_section">
@@ -1170,6 +1194,39 @@
 
 									Deine Antwort ist: {{ deleteChoice === 'y' ? 'richtig' : 'falsch' }} <br />
 									{{ deleteChoice === 'y' ? 'Das sollte dir gut bewusst sein. Jede deiner Nachrichten wird für immer bleiben.' : '' }}
+								</td>
+							</tr>
+						</table>
+
+						<br />
+
+					</p>
+				</div>
+				<div ng-if="selectedLevel == 3 && selectedMission == 3 ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Konsens referenziert generell erstmal nur darauf, sich zu einigen.<br />
+									Insbesondere auf Daten zu einigen.<br /><br />
+
+									Wir haben hierzu den Proof-of-Work Algorithmus:
+									<ul>
+										<li>Transaktionen sammeln</li>
+										<li>In Blöcke zusammenfassen</li>
+										<li>Den Nonce finden</li>
+										<li>Lösung mit dem Netzwerk teilen</li>
+									</ul>
+								</td>
+								<td>
+									Aber es gibt immer mehr Konsensalgorithmen.<br />
+									Insbesondere da der Proof-of-Work sehr rechenintensiv ist.<br /><br />
+
+									Die neue Ethereum-Blockchain nutzt einen Proof-of-Stake.<br />
+									Das heisst Konsens finden besondere Nutzer, die dafür mit ihrem Vermögen haften.<br /><br />
+
+									Es gibt noch sehr viele mehr.<br />
+									Immer an Use Case und Situation angepasst.
 								</td>
 							</tr>
 						</table>
