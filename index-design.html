@@ -190,6 +190,14 @@
 					});
 					$scope.msgArrived(false, oTimestamp);
 				};
+				$scope.newAccomplishment = function (sNickname, sKey) {
+					$scope.feedNews.push({
+						'type': 'U',
+						'actor': sNickname,
+						'time': moment().format("hh:mm:ss"),
+						'type': oBadges[sKey]
+					});
+				};
 				$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce, iBlockNumber) {
 					if (bSelfFlag) {
 						$scope.feedNews.push({
@@ -352,7 +360,8 @@
 							confetti.start(5000, 700);
 							$scope.showTokenIncrease(20);
 							$scope.token += 20;
-							$scope.showBadgeReward("Mission accomplished: Du hast dir das Blockchain-Experte Badge verdient.");
+							$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L5 + " verdient.");
+							shareAccomplishment("L5");
 						} else {
 							// check for rewards
 							if ($scope.levelRewards[$scope.selectedLevel].hasOwnProperty("f")) {
@@ -365,7 +374,8 @@
 
 								if ($scope.selectedLevel === 1) {
 									// Level 2 complete
-									$scope.showBadgeReward("Mission accomplished: Du hast dir das Blockchain-Kenner Badge verdient.");
+									$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L2 + " verdient.");
+									shareAccomplishment("L2");
 								}
 							}
 
@@ -560,6 +570,9 @@
 								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat eine
 								Nachricht
 								geschrieben.
+							</div>
+							<div ng-if="feedItem.type == 'U' ">
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das {{ feedItem.type }} verdient.
 							</div>
 						</div>
 					</div>

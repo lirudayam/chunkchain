@@ -29,6 +29,10 @@ const oMsgKeys = {
 	"M+": "New miner",
 	"M-": "Participant stops mining"
 }
+const oBadges = {
+	L2: "Blockchain-Kenner Abzeichen",
+	L5: "Blockchain-Experte Abzeichen"
+}
 const aKeys = Object.keys(oMsgKeys);
 
 let aBlockchain = [];
@@ -164,6 +168,12 @@ function proofOfWorkMining(difficulty) {
 		}
 	}
 	oMiningIntervalCaller = setInterval(miningFn, 50);
+}
+
+const shareAccomplishment = (sKey) => {
+	b.send("U" + JSON.stringify({
+		k: sKey
+	}));
 }
 
 // supporting functions
@@ -302,7 +312,6 @@ b.on("message", function (address, message) {
 			proofOfWorkMining(2);
 		}
 
-
 	} else if (sFirstLetter === "B") {
 		// new block arrived
 		var oFoundBlock = JSON.parse(message.substr(1));
@@ -361,6 +370,10 @@ b.on("message", function (address, message) {
 	} else if (message.substr(0, 2) === "M-") {
 		// a participant stops mining
 		iNumberOfMiners -= 1;
+	} else if (message.substr(0, 1) === "U") {
+		// accomplishment shared
+		var oTx = JSON.parse(message.substr(1));
+		fnScope.newAccomplishment(getNickname(address), oTx.k)
 	} else {
 		log(getNickname(address) + ": " + message);
 	}
