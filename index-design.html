@@ -449,6 +449,7 @@
 				setInterval(function () {
 					$scope.availableBlocks = aBlockchain.map(block => block.b).flat();
 					$scope.currentBlock = aBlockchain[aBlockchain.length - 1];
+					$scope.unspend = oBlock;
 					$scope.$apply();
 					tippy('[data-tippy-content]');
 				}, 1000);
@@ -1303,9 +1304,21 @@
 									Solange du die Datei nicht speicherst, sind die Änderungen nicht bestätigt.<br />
 									Mit dem Speichern (Block gefunden) werden sie endgültig gespeichert. <br />
 								</td>
-								<td>
-									Aktuelle UTXO:
-
+								<td class="center_image">
+									<div class="block_body">
+										<div ng-repeat="message in unspend.l" class="block_body_item">
+											<div>
+												<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
+													{{ getNickname(message.r) }}</span> <br />
+												{{ message.m }}
+											</div>
+											<div style="display:right">
+												<span class="msg_infos">Hash: </span> <br />
+												<span class="msg_infos capped">{{ message.h }}</span>
+											</div>
+										</div>
+									</div>
+									
 								</td>
 							</tr>
 						</table>
