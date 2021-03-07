@@ -242,7 +242,8 @@
 									's': tx.s,
 									'm': decryptMsg(tx),
 									't': tx.t,
-									'u': false
+									'u': false,
+									'b': tx.b
 								}
 							}).concat(
 								oBlock.l.filter(fnFilter)
@@ -543,7 +544,7 @@
 							<span ng-if="selectedConversation === 'all' && message.d === 'r' "
 								class="sender">{{ getNickname(message.s) }}</span>
 							{{ message.u ? 'warten auf Nachricht...' : message.m }} <span
-								class="message_time">{{ formatTime(message.t) }}</span>
+								class="message_time">{{ message.b ? '&#128274; ' : '' }}{{ formatTime(message.t) }}</span>
 						</div>
 					</div>
 				</div>
