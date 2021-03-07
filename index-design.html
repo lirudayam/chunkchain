@@ -29,7 +29,10 @@
 				$scope.deepDiveVisible = false;
 
 				// related to chat functionality
-				$scope.activityIndicator = true;
+				$scope.selection = {
+					activityIndicator: true,
+					encryptMessageFlag: false
+				};
 				$scope.selectedConversation = 'all';
 				$scope.activeConversations = [{
 					name: 'all',
@@ -120,7 +123,7 @@
 						f: 20
 					}
 				}
-				$scope.selectedLevel = 4;
+				$scope.selectedLevel = 3;
 				$scope.selectedMission = 0;
 				$scope.symText = "Mein Text";
 				$scope.symKey = "Schlüssel";
@@ -137,7 +140,7 @@
 				$scope.nonceInput = "";
 				$scope.nonceInputPoW = "";
 				$scope.highestAchievement = null;
-				
+
 
 				// general functions
 				$scope.switchToBlockchain = function () {
@@ -150,8 +153,9 @@
 				}
 
 				// functions for chatting
-				$scope.activityHasChanged = function () {
-					console.log($scope.activityIndicator);
+				$scope.activityHasChanged = function () {};
+				$scope.encryptionHasChanged = function () {
+					console.log("encryption changed");
 				};
 				$scope.conversationSelected = function (sSelectedItem) {
 					$scope.selectedConversation = sSelectedItem;
@@ -236,7 +240,7 @@
 								return {
 									'd': (tx.s === publicAddress) ? 's' : 'r', // direction - recieving
 									's': tx.s,
-									'm': tx.m,
+									'm': decryptMsg(tx),
 									't': tx.t,
 									'u': false
 								}
@@ -264,7 +268,6 @@
 								}
 							});
 						aMessages.forEach(item => $scope.messagesList.push(item));
-						console.log($scope.messagesList);
 					}
 
 				}
@@ -363,7 +366,8 @@
 							confetti.start(5000, 700);
 							$scope.showTokenIncrease(20);
 							$scope.token += 20;
-							$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L5 + " verdient.");
+							$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L5 +
+								" verdient.");
 							shareAccomplishment("L5");
 						} else {
 							// check for rewards
@@ -377,7 +381,8 @@
 
 								if ($scope.selectedLevel === 1) {
 									// Level 2 complete
-									$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L2 + " verdient.");
+									$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L2 +
+										" verdient.");
 									shareAccomplishment("L2");
 								}
 							}
@@ -388,7 +393,9 @@
 					} else {
 						// check for rewards
 						if ($scope.levelRewards[$scope.selectedLevel].hasOwnProperty($scope.selectedMission)) {
-							$scope.showTokenIncrease($scope.levelRewards[$scope.selectedLevel][$scope.selectedMission]);
+							$scope.showTokenIncrease($scope.levelRewards[$scope.selectedLevel][$scope
+								.selectedMission
+							]);
 							$scope.token += $scope.levelRewards[$scope.selectedLevel][$scope.selectedMission];
 							confetti.start(1000, 50);
 							delete $scope.levelRewards[$scope.selectedLevel][$scope.selectedMission];
@@ -431,7 +438,7 @@
 					$scope.deepDiveVisible = true;
 				}
 				$scope.simulateBlockHashCalculation = function (oBlock) {
-					if (oBlock && oBlock.p)  {
+					if (oBlock && oBlock.p) {
 						oBlock.n = $scope.nonceInput;
 						return simulateBlockHashCalculation(oBlock);
 					}
@@ -439,7 +446,7 @@
 				}
 
 				$scope.simulatePoW = function (oBlock) {
-					if (oBlock && oBlock.p)  {
+					if (oBlock && oBlock.p) {
 						oBlock.n = $scope.nonceInputPoW;
 						return simulateBlockHashCalculation(oBlock);
 					}
@@ -498,10 +505,12 @@
 
 		<div class="header_items">
 			<a ng-show="chatVisible" ng-click="switchToBlockchain()">zur Blockchain-Ansicht</a>
-			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht 
-				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}" ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
+			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht
+				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}"
+					ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
 			</a>
-			<span>dein Kontostand: <b>{{ token }} Token</b> {{ highestAchievement === 'L2' ? '&#129352;' : (highestAchievement === 'L5' ? '&#129351;' : '') }}</span>
+			<span>dein Kontostand: <b>{{ token }} Token</b>
+				{{ highestAchievement === 'L2' ? '&#129352;' : (highestAchievement === 'L5' ? '&#129351;' : '') }}</span>
 		</div>
 	</div>
 
@@ -522,7 +531,8 @@
 							data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}"
 							ng-click="conversationSelected(convo.name)">
 							{{ convo.name }}
-							<span class="{{ (newMessages[convo.name] && newMessages[convo.name] > 0) ? 'dot' : '' }}"></span>
+							<span
+								class="{{ (newMessages[convo.name] && newMessages[convo.name] > 0) ? 'dot' : '' }}"></span>
 						</p>
 					</div>
 					<div class="messages_container" style="overflow: scroll; height: 500px;"
@@ -540,12 +550,12 @@
 				<div class="background_activity">
 					<h3 class="minor_title">Aktivitäten im Netzwerk</h3>
 					<div class="switch_container">
-						<span class="{{ !activityIndicator ? 'switch_selected' : '' }}">alle</span>
+						<span class="{{ !selection.activityIndicator ? 'switch_selected' : '' }}">alle</span>
 						<label class="switch">
-							<input type="checkbox" ng-model="activityIndicator" ng-change="activityHasChanged()">
+							<input type="checkbox" ng-model="selection.activityIndicator" ng-change="activityHasChanged()" />
 							<span class="slider"></span>
 						</label>
-						<span class="{{ activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
+						<span class="{{ selection.activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
 					</div>
 					<div class="activity_feed">
 						<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by $index"
@@ -572,8 +582,9 @@
 								Blöcken aufgegeben.
 							</div>
 							<div ng-if="feedItem.type == 'B' ">
-								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen <span class="hoverable" ng-click="clickOnBlock(feedItem.b)">neuen
-								Block</span> gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat einen <span
+									class="hoverable" ng-click="clickOnBlock(feedItem.b)">neuen
+									Block</span> gefunden für <b>{{ feedItem.n }}</b> Nachrichten.
 							</div>
 							<div ng-if="feedItem.type == 'S' ">
 								<span class="time">{{ feedItem.time }}</span>Du hast einen Block gefunden.
@@ -585,7 +596,8 @@
 								geschrieben.
 							</div>
 							<div ng-if="feedItem.type == 'U' ">
-								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das {{ feedItem.badge }} verdient.
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das
+								{{ feedItem.badge }} verdient.
 							</div>
 						</div>
 					</div>
@@ -950,7 +962,8 @@
 									<!--
 								Place here real block
 							-->
-									<select ng-change="setBlock(event)" ng-model="selectedBlockNumber"> <!--ng-model="selectedBlockNumber"-->
+									<select ng-change="setBlock(event)" ng-model="selectedBlockNumber">
+										<!--ng-model="selectedBlockNumber"-->
 										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber">
 											Block Nr. {{ item }}
 										</option>
@@ -1072,9 +1085,10 @@
 									Im Block-Header ist jeweils eine Referenz zum vorherigen Block.<br />
 									Dadurch werden die Blöcke "verkettet".<br /><br />
 
-									Vorteil des ganzen ist, es noch schwerer zu machen, die Historie zu ändern.<br/>
+									Vorteil des ganzen ist, es noch schwerer zu machen, die Historie zu ändern.<br />
 									Es ist schon so gut wie unmöglich einen Block zu ändern.<br />
-									Falls ein Angreifer einen alten Block ändern möchte, müsste er alle folgenden Blöcke neu finden.<br />
+									Falls ein Angreifer einen alten Block ändern möchte, müsste er alle folgenden Blöcke
+									neu finden.<br />
 									Das heisst, dadurch wird das System nochmals gestärkt.
 								</td>
 								<td class="center_image">
@@ -1109,7 +1123,18 @@
 									Denn damit kann nur er mit seinem private key deine Nachricht entschlüsseln.
 								</td>
 								<td class="center_image">
-									<img src="./assets/Encryption.svg" />
+									<img src="./assets/Encryption.svg" /> <br />
+									<div class="switch_container">
+										<span
+											class="{{ !selection.encryptMessageFlag ? 'switch_selected' : '' }}">unverschlüsselt</span>
+										<label class="switch">
+											<input type="checkbox" ng-model="selection.encryptMessageFlag"
+												ng-change="encryptionHasChanged()" />
+											<span class="slider"></span>
+										</label>
+										<span class="{{ selection.encryptMessageFlag ? 'switch_selected' : '' }}">Nachrichten
+											verschlüsseln</span>
+									</div>
 								</td>
 							</tr>
 						</table>
@@ -1203,7 +1228,9 @@
 										<option value="n">nein</option>
 									</select><br /><br />
 
-									Deine Antwort ist: {{ deleteChoice === 'y' ? 'richtig' : (deleteChoice === 'n' ? 'falsch' : '') }} <br />
+									Deine Antwort ist:
+									{{ deleteChoice === 'y' ? 'richtig' : (deleteChoice === 'n' ? 'falsch' : '') }}
+									<br />
 									{{ deleteChoice === 'y' ? 'Das sollte dir gut bewusst sein. Jede deiner Nachrichten wird für immer bleiben.' : '' }}
 								</td>
 							</tr>
@@ -1234,7 +1261,8 @@
 									Insbesondere da der Proof-of-Work sehr rechenintensiv ist.<br /><br />
 
 									Die neue Ethereum-Blockchain nutzt einen Proof-of-Stake.<br />
-									Das heisst Konsens finden besondere Nutzer, die dafür mit ihrem Vermögen haften.<br /><br />
+									Das heisst Konsens finden besondere Nutzer, die dafür mit ihrem Vermögen
+									haften.<br /><br />
 
 									Es gibt noch sehr viele mehr.<br />
 									Immer an Use Case und Situation angepasst.
@@ -1252,11 +1280,15 @@
 						<table>
 							<tr>
 								<td>
-									Wie du gelernt hast, ist die Blocksuche die Suche nach der Lösung zur Challenge.<br />
-									Wichtig dabei, es ist sehr schwer die Lösung zu finden, aber sehr leicht sie zu verifizieren.<br /><br />
+									Wie du gelernt hast, ist die Blocksuche die Suche nach der Lösung zur
+									Challenge.<br />
+									Wichtig dabei, es ist sehr schwer die Lösung zu finden, aber sehr leicht sie zu
+									verifizieren.<br /><br />
 
-									Das heisst also, dass wer als erstes diesen Nonce findet, dieser Miner den Block gefunden hat.<br />
-									Idealerweise sind in solch öffentlichen Netzwerken, die Schwierigkeitsstufen dynamisch geregelt.<br />
+									Das heisst also, dass wer als erstes diesen Nonce findet, dieser Miner den Block
+									gefunden hat.<br />
+									Idealerweise sind in solch öffentlichen Netzwerken, die Schwierigkeitsstufen
+									dynamisch geregelt.<br />
 									Das heisst, je weniger Miner, desto einfacher wird die Challenge.<br />
 									Andernfalls, würden Transaktionen ewig brauchen, bis sie bestätigt werden. <br />
 								</td>
@@ -1297,9 +1329,12 @@
 						<table>
 							<tr>
 								<td>
-									Die unbestätigten Nachrichten (unconfirmed transactions) sind Nachrichten, die noch in keinem Block sind.<br />
-									Sie werden also in einem Pool aufgefangen und warten bis ein Miner einen Block findet.<br />
-									Trotzdem sind diese im ganzen Netzwerk bekannt, denn sonst würden die Miner diese Infos nicht bekommen.<br /><br />
+									Die unbestätigten Nachrichten (unconfirmed transactions) sind Nachrichten, die noch
+									in keinem Block sind.<br />
+									Sie werden also in einem Pool aufgefangen und warten bis ein Miner einen Block
+									findet.<br />
+									Trotzdem sind diese im ganzen Netzwerk bekannt, denn sonst würden die Miner diese
+									Infos nicht bekommen.<br /><br />
 
 									Du kannst dir das analog zu einer Word-Datei vorstellen.<br />
 									Solange du die Datei nicht speicherst, sind die Änderungen nicht bestätigt.<br />
@@ -1319,7 +1354,7 @@
 											</div>
 										</div>
 									</div>
-									
+
 								</td>
 							</tr>
 						</table>
@@ -1332,13 +1367,17 @@
 						<table>
 							<tr>
 								<td>
-									Bisher haben wir immer, davon gesprochen, es sei unmöglich, Daten zu verändern.<br />
+									Bisher haben wir immer, davon gesprochen, es sei unmöglich, Daten zu
+									verändern.<br />
 									Das stimmt nicht ganz. Es ist mit einem gigantischen Aufwand durchaus möglich.<br />
-									Dazu musst du letztendlich wissen, was es bedeutet Daten zu manipulieren.<br /><br />
+									Dazu musst du letztendlich wissen, was es bedeutet Daten zu
+									manipulieren.<br /><br />
 
-									Transaktionsdaten kannst du nicht manipulieren, wegen den fehlenden private keys.<br />
+									Transaktionsdaten kannst du nicht manipulieren, wegen den fehlenden private
+									keys.<br />
 									Du kannst dich aber als Miner betätigen, und so über neue Daten entscheiden.<br />
-									Wenn du also die absolute Mehrheit (>50%) der Rechnepower hat, kannst du das ziemlich gut sogar. <br /><br />
+									Wenn du also die absolute Mehrheit (>50%) der Rechnepower hat, kannst du das
+									ziemlich gut sogar. <br /><br />
 
 									Aber das ist so gut wie unmöglich.
 								</td>
@@ -1350,10 +1389,11 @@
 				</div>
 
 				<div class="floating_confirm">
-					<button class="button" id="completionBtn" ng-click="missionCompleted()">Mission abschliessen</button>
+					<button class="button" id="completionBtn" ng-click="missionCompleted()">Mission
+						abschliessen</button>
 				</div>
 
-				
+
 			</div>
 		</div>
 	</div>

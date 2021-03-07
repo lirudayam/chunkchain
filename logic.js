@@ -6,7 +6,8 @@ const oChatInterface = {
 	m: "", // m - message
 	c: 0, // c - coins
 	t: 0, // t - unix timestamp
-	h: "" // h - hash
+	h: "", // h - hash,
+	b: false // b - encrypted
 };
 
 const oBlockInterface = {
@@ -73,6 +74,52 @@ function getPrivateKey(sBugoutAddress) {
 	return _reverse(_rot13(sBugoutAddress)).toLowerCase();
 }
 
+var JsonFormatter = {
+	stringify: function(cipherParams) {
+		// create json object with ciphertext
+		var sOutputString = cipherParams.ciphertext.toString(CryptoJS.enc.Base64) + "#";
+		sOutputString += cipherParams.iv.toString() + "#";
+		sOutputString += cipherParams.salt.toString();
+
+		return sOutputString;
+	},
+	parse: function(jsonStr) {
+		var aArray = jsonStr.split("#");
+		var jsonObj = {
+			ct: aArray[0],
+			iv: aArray[1],
+			s: aArray[2]
+		}
+
+		// extract ciphertext from json object, and create cipher params object
+		var cipherParams = CryptoJS.lib.CipherParams.create({
+			ciphertext: CryptoJS.enc.Base64.parse(jsonObj.ct)
+		});
+
+		// optionally extract iv or salt
+
+		if (jsonObj.iv) {
+			cipherParams.iv = CryptoJS.enc.Hex.parse(jsonObj.iv);
+		}
+
+		if (jsonObj.s) {
+			cipherParams.salt = CryptoJS.enc.Hex.parse(jsonObj.s);
+		}
+
+		return cipherParams;
+	}
+  };
+
+function decryptMsg(oTx) {
+	if (oTx.b) {
+		var sKey = (oTx.s === publicAddress) ? oTx.r : publicAddress;
+		var decrypted = CryptoJS.AES.decrypt(oTx.m, sKey, {
+			format: JsonFormatter
+		});
+		return decrypted.toString(CryptoJS.enc.Utf8)
+	}
+	return oTx.m;
+}
 
 // Functions to encrypt our messages and to decrypt them
 function createTxHash(oChat, sPrivateKey) {
@@ -391,11 +438,21 @@ const sendMessage = (sMessage, sRecipient, sToken) => {
 	oChat.s = publicAddress;
 	if (sRecipient === "all") {
 		oChat.r = "all";
+		oChat.m = sMessage;
 	}
 	else {
 		oChat.r = Object.keys(oNickNames).find(key => oNickNames[key] === sRecipient);
+		if (fnScope.selection.encryptMessageFlag) {
+			oChat.m = CryptoJS.AES.encrypt(sMessage, sRecipient, {
+				format: JsonFormatter
+			}).toString();
+			oChat.b = true;
+		}
+		else {
+			oChat.m = sMessage;
+		}
 	}	
-	oChat.m = sMessage;
+	
 	oChat.c = parseInt(sToken, 10);
 
 	var oTx = createTxHash(oChat, privateKey);
