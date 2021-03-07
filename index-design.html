@@ -135,6 +135,7 @@
 				$scope.availableBlocks = [0];
 				$scope.selectedBlockNumber = 0;
 				$scope.nonceInput = "";
+				$scope.nonceInputPoW = "";
 				$scope.highestAchievement = null;
 				
 
@@ -429,9 +430,12 @@
 					$scope.deepDiveVisible = true;
 				}
 				$scope.simulateBlockHashCalculation = function (oBlock) {
-					console.log($scope.nonceInput);
 					oBlock.n = $scope.nonceInput;
-					console.log(oBlock);
+					return simulateBlockHashCalculation(oBlock);
+				}
+
+				$scope.simulatePoW = function (oBlock) {
+					oBlock.n = $scope.nonceInputPoW;
 					return simulateBlockHashCalculation(oBlock);
 				}
 
@@ -1138,7 +1142,7 @@
 										<div class="block_header">
 											Blocknummer: {{ currentBlock.b }} <br />
 											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br />
-											Vorheriger Blockhash: {{ selectedBlock.p }} <br /><br />
+											Vorheriger Blockhash: {{ currentBlock.p }} <br /><br />
 											Nonce: <input type="text" size="40" placeholder="Probier es aus..."
 												ng-model="nonceInput" />
 										</div>
@@ -1248,9 +1252,31 @@
 									Das heisst, je weniger Miner, desto einfacher wird die Challenge.<br />
 									Andernfalls, würden Transaktionen ewig brauchen, bis sie bestätigt werden. <br />
 								</td>
-								<td>
-									Simulation PoW:
+								<td class="center_image">
+									<div class="block_cover">
+										Blockhash: {{ simulatePoW(currentBlock) }}
 
+										<div class="block_header">
+											Blocknummer: {{ currentBlock.b }} <br />
+											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br />
+											Vorheriger Blockhash: {{ currentBlock.p }} <br /><br />
+											Nonce: <input type="text" size="40" disabled ng-model="nonceInputPoW" />
+										</div>
+
+										<div class="block_body">
+											<div ng-repeat="message in currentBlock.l" class="block_body_item">
+												<div>
+													<span class="msg_sender">{{ message.s }} &#x2192;
+														{{ message.r }}</span> <br />
+													{{ message.m }}
+												</div>
+												<div style="display:right">
+													<span class="msg_infos">Hash: </span> <br />
+													<span class="msg_infos">{{ message.h }}</span>
+												</div>
+											</div>
+										</div>
+									</div>
 								</td>
 							</tr>
 						</table>

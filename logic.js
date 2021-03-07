@@ -153,6 +153,7 @@ function proofOfWorkMining(difficulty) {
 		if (bMining && oBlock.l.length > 3 && hash.substr(0, difficulty) !== Array(difficulty + 1).join("0")) {
 			oBlock.t = moment().valueOf();
 			nonce++;
+			fnScope.nonceInputPoW = nonce;
 			hash = calculateBlockHash(oBlock, nonce);
 
 			if (hash.substr(0, difficulty) === Array(difficulty + 1).join("0")) {
