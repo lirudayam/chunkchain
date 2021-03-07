@@ -102,7 +102,12 @@ function startNewBlock() {
 	oBlock = Object.assign({}, oBlockInterface);
 	oBlock.l = [];
 	oBlock.b = aBlockchain.length;
-	oBlock.p = aBlockchain[aBlockchain.length - 1].h;
+	if (aBlockchain.length > 0) {
+		oBlock.p = aBlockchain[aBlockchain.length - 1].h;
+	}
+	else {
+		oBlock.p = "";
+	}
 	oBlock.r = publicAddress;
 }
 

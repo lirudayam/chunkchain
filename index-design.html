@@ -430,13 +430,19 @@
 					$scope.deepDiveVisible = true;
 				}
 				$scope.simulateBlockHashCalculation = function (oBlock) {
-					oBlock.n = $scope.nonceInput;
-					return simulateBlockHashCalculation(oBlock);
+					if (oBlock && oBlock.p)  {
+						oBlock.n = $scope.nonceInput;
+						return simulateBlockHashCalculation(oBlock);
+					}
+					return "";
 				}
 
 				$scope.simulatePoW = function (oBlock) {
-					oBlock.n = $scope.nonceInputPoW;
-					return simulateBlockHashCalculation(oBlock);
+					if (oBlock && oBlock.p)  {
+						oBlock.n = $scope.nonceInputPoW;
+						return simulateBlockHashCalculation(oBlock);
+					}
+					return "";
 				}
 
 				// overall refresh
