@@ -1156,13 +1156,13 @@
 										<div class="block_body">
 											<div ng-repeat="message in currentBlock.l" class="block_body_item">
 												<div>
-													<span class="msg_sender">{{ message.s }} &#x2192;
-														{{ message.r }}</span> <br />
+													<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
+														{{ getNickname(message.r) }}</span> <br />
 													{{ message.m }}
 												</div>
 												<div style="display:right">
 													<span class="msg_infos">Hash: </span> <br />
-													<span class="msg_infos">{{ message.h }}</span>
+													<span class="msg_infos capped">{{ message.h }}</span>
 												</div>
 											</div>
 										</div>
@@ -1272,13 +1272,13 @@
 										<div class="block_body">
 											<div ng-repeat="message in currentBlock.l" class="block_body_item">
 												<div>
-													<span class="msg_sender">{{ message.s }} &#x2192;
-														{{ message.r }}</span> <br />
+													<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
+														{{ getNickname(message.r) }}</span> <br />
 													{{ message.m }}
 												</div>
 												<div style="display:right">
 													<span class="msg_infos">Hash: </span> <br />
-													<span class="msg_infos">{{ message.h }}</span>
+													<span class="msg_infos capped">{{ message.h }}</span>
 												</div>
 											</div>
 										</div>
