@@ -590,6 +590,14 @@ select option {
     font-size: 0.8rem;
 }
 
+.block_body_item div {
+    text-overflow: ellipsis;
+    max-width: 350px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden !important;
+}
+
 .msg_sender {
     font-size: 0.7rem;
     font-style: italic;
