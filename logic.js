@@ -443,7 +443,7 @@ const sendMessage = (sMessage, sRecipient, sToken) => {
 	else {
 		oChat.r = Object.keys(oNickNames).find(key => oNickNames[key] === sRecipient);
 		if (fnScope.selection.encryptMessageFlag) {
-			oChat.m = CryptoJS.AES.encrypt(sMessage, sRecipient, {
+			oChat.m = CryptoJS.AES.encrypt(sMessage, oChat.r, {
 				format: JsonFormatter
 			}).toString();
 			oChat.b = true;
