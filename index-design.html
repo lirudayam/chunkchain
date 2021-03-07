@@ -197,7 +197,7 @@
 						'type': 'U',
 						'actor': sNickname,
 						'time': moment().format("hh:mm:ss"),
-						'type': oBadges[sKey]
+						'badge': oBadges[sKey]
 					});
 				};
 				$scope.blockFound = function (sNickname, bSelfFlag, iMessages, sNonce, iBlockNumber) {
@@ -584,7 +584,7 @@
 								geschrieben.
 							</div>
 							<div ng-if="feedItem.type == 'U' ">
-								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das {{ feedItem.type }} verdient.
+								<span class="time">{{ feedItem.time }}</span><b>{{ feedItem.actor }}</b> hat das {{ feedItem.badge }} verdient.
 							</div>
 						</div>
 					</div>
@@ -1313,7 +1313,7 @@
 												{{ message.m }}
 											</div>
 											<div style="display:right">
-												<span class="msg_infos">Hash: </span> <br />
+												<span class="msg_infos">Signierter Hash: </span> <br />
 												<span class="msg_infos capped">{{ message.h }}</span>
 											</div>
 										</div>
