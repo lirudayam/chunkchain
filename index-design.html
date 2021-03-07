@@ -120,7 +120,7 @@
 						f: 20
 					}
 				}
-				$scope.selectedLevel = 0;
+				$scope.selectedLevel = 4;
 				$scope.selectedMission = 0;
 				$scope.symText = "Mein Text";
 				$scope.symKey = "Schlüssel";
@@ -1137,9 +1137,8 @@
 
 										<div class="block_header">
 											Blocknummer: {{ currentBlock.b }} <br />
-											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br /><br />
-
-											Vorheriger Blockhash: {{ selectedBlock.p }} <br />
+											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br />
+											Vorheriger Blockhash: {{ selectedBlock.p }} <br /><br />
 											Nonce: <input type="text" size="40" placeholder="Probier es aus..."
 												ng-model="nonceInput" />
 										</div>
@@ -1192,7 +1191,7 @@
 										<option value="n">nein</option>
 									</select><br /><br />
 
-									Deine Antwort ist: {{ deleteChoice === 'y' ? 'richtig' : 'falsch' }} <br />
+									Deine Antwort ist: {{ deleteChoice === 'y' ? 'richtig' : (deleteChoice === 'n' ? 'falsch' : '') }} <br />
 									{{ deleteChoice === 'y' ? 'Das sollte dir gut bewusst sein. Jede deiner Nachrichten wird für immer bleiben.' : '' }}
 								</td>
 							</tr>
@@ -1233,6 +1232,77 @@
 
 						<br />
 
+					</p>
+				</div>
+
+				<div ng-if="selectedLevel == 4 && selectedMission == 0 ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Wie du gelernt hast, ist die Blocksuche die Suche nach der Lösung zur Challenge.<br />
+									Wichtig dabei, es ist sehr schwer die Lösung zu finden, aber sehr leicht sie zu verifizieren.<br /><br />
+
+									Das heisst also, dass wer als erstes diesen Nonce findet, dieser Miner den Block gefunden hat.<br />
+									Idealerweise sind in solch öffentlichen Netzwerken, die Schwierigkeitsstufen dynamisch geregelt.<br />
+									Das heisst, je weniger Miner, desto einfacher wird die Challenge.<br />
+									Andernfalls, würden Transaktionen ewig brauchen, bis sie bestätigt werden. <br />
+								</td>
+								<td>
+									Simulation PoW:
+
+								</td>
+							</tr>
+						</table>
+						<br />
+					</p>
+				</div>
+
+				<div ng-if="selectedLevel == 4 && selectedMission == 1 ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Die unbestätigten Nachrichten (unconfirmed transactions) sind Nachrichten, die noch in keinem Block sind.<br />
+									Sie werden also in einem Pool aufgefangen und warten bis ein Miner einen Block findet.<br />
+									Trotzdem sind diese im ganzen Netzwerk bekannt, denn sonst würden die Miner diese Infos nicht bekommen.<br /><br />
+
+									Du kannst dir das analog zu einer Word-Datei vorstellen.<br />
+									Solange du die Datei nicht speicherst, sind die Änderungen nicht bestätigt.<br />
+									Mit dem Speichern (Block gefunden) werden sie endgültig gespeichert. <br />
+								</td>
+								<td>
+									Aktuelle UTXO:
+
+								</td>
+							</tr>
+						</table>
+						<br />
+					</p>
+				</div>
+
+				<div ng-if="selectedLevel == 4 && selectedMission == 2 ">
+					<p class="introduction_section">
+						<table>
+							<tr>
+								<td>
+									Bisher haben wir immer, davon gesprochen, es sei unmöglich, Daten zu verändern.<br />
+									Das stimmt nicht ganz. Es ist mit einem gigantischen Aufwand durchaus möglich.<br />
+									Dazu musst du letztendlich wissen, was es bedeutet Daten zu manipulieren.<br /><br />
+
+									Transaktionsdaten kannst du nicht manipulieren, wegen den fehlenden private keys.<br />
+									Du kannst dich aber als Miner betätigen, und so über neue Daten entscheiden.<br />
+									Wenn du also die absolute Mehrheit (>50%) der Rechnepower hat, kannst du das ziemlich gut sogar. <br /><br />
+
+									Aber das ist so gut wie unmöglich.
+								</td>
+								<td>
+									Aktuelle UTXO:
+
+								</td>
+							</tr>
+						</table>
+						<br />
 					</p>
 				</div>
 
