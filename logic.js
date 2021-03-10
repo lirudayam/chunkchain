@@ -350,14 +350,14 @@ function proofOfWorkMining() {
     if (
       bMining &&
       oBlock.l.length > 2 &&
-      hash.substr(0, difficulty) !== Array(difficulty).join("0")
+      hash.substr(0, difficulty) !== Array(difficulty + 1).join("0")
     ) {
       oBlock.t = moment().valueOf();
       nonce++;
       fnScope.nonceInputPoW = nonce;
       hash = calculateBlockHash(oBlock, nonce);
 
-      if (hash.substr(0, difficulty) === Array(difficulty).join("0")) {
+      if (hash.substr(0, difficulty) === Array(difficulty + 1).join("0")) {
         oBlock.h = hash;
         oBlock.n = nonce;
 
