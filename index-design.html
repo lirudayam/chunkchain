@@ -557,8 +557,8 @@
 		<img src="assets/ChunkChain_Logo.svg" width="200px" />
 
 		<div class="header_items">
-			<a ng-show="chatVisible" ng-click="switchToBlockchain()">zur Blockchain-Ansicht</a>
-			<a ng-show="deepDiveVisible" ng-click="switchToChat()">zur Chat-Ansicht
+			<a ng-show="chatVisible" ng-click="switchToBlockchain()">wie es funktioniert</a>
+			<a ng-show="deepDiveVisible" ng-click="switchToChat()">wieder chatten
 				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}"
 					ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
 			</a>
@@ -1392,11 +1392,11 @@
 											<div ng-repeat="message in currentBlock.l" class="block_body_item">
 												<div>
 													<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
-														{{ getNickname(message.r) }}</span> <br />
+														{{ getNickname(message.r) }} {{ message.b ? '&#128274; ' : '' }}</span> <br />
 													{{ message.m }}
 												</div>
 												<div style="display:right">
-													<span class="msg_infos">Hash: </span> <br />
+													<span class="msg_infos">Signierter Hash: </span> <br />
 													<span class="msg_infos capped">{{ message.h }}</span>
 												</div>
 											</div>
@@ -1430,7 +1430,7 @@
 										<div ng-repeat="message in unspend.l" class="block_body_item">
 											<div>
 												<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
-													{{ getNickname(message.r) }}</span> <br />
+													{{ getNickname(message.r) }} {{ message.b ? '&#128274; ' : '' }}</span> <br />
 												{{ message.m }}
 											</div>
 											<div style="display:right">
