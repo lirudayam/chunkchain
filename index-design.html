@@ -141,6 +141,65 @@
 				$scope.nonceInputPoW = "";
 				$scope.highestAchievement = null;
 
+				$scope.keyPair = {
+
+				};
+				$scope.asymInputText = "Hello World";
+				$scope.asymOutputText = "";
+
+				$scope.generateKeyPair = function () {
+					window.crypto.subtle.generateKey({
+							name: "RSA-OAEP",
+							// Consider using a 4096-bit key for systems that require long-term security
+							modulusLength: 2048,
+							publicExponent: new Uint8Array([1, 0, 1]),
+							hash: "SHA-256",
+						},
+						true,
+						["encrypt", "decrypt"]
+					).then((keyPair) => {
+						$scope.keyPair = keyPair
+						console.log($scope.keyPair);
+					});
+				};
+
+				$scope.generateKeyPair();
+
+				$scope.asymEncryptMessage = async function (sText) {
+					if ($scope.keyPair.privateKey) {
+						//let enc = new TextEncoder();
+						ciphertext = await window.crypto.subtle.encrypt({
+								name: "RSA-OAEP"
+							},
+							$scope.keyPair.publicKey,
+							stringToArrayBuffer(sText)
+						);
+						let buffer = new Uint8Array(ciphertext, 0, 5);
+						console.log($scope.keyPair.publicKey);
+						console.log(stringToArrayBuffer(sText));
+						console.log(arrayBufferToString(buffer));
+						$scope.asymOutputText = arrayBufferToString(buffer);
+						return arrayBufferToString(buffer);
+					}
+					return "";
+				};
+				/*
+				  Fetch the ciphertext and decrypt it.
+				  Write the decrypted message into the "Decrypted" box.
+				  */
+				$scope.asymDecryptMessage = async function () {
+					if ($scope.keyPair.publicKey) {
+						let decrypted = await window.crypto.subtle.decrypt({
+								name: "RSA-OAEP"
+							},
+							$scope.keyPair.privateKey,
+							stringToArrayBuffer($scope.asymOutputText)
+						);
+						let dec = new TextDecoder();
+						return dec.decode(decrypted);
+					}
+					return "";
+				}
 
 				// general functions
 				$scope.switchToBlockchain = function () {
@@ -516,7 +575,7 @@
 				<b>on-chain</b> (alle Daten in der Blockchain). <br />
 				Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
 			</p>
-			<p class="introduction_section" >
+			<p class="introduction_section">
 				<div class="switch_container" ng-if="levelRewards[3][0] !== 5">
 					<span class="{{ !selection.encryptMessageFlag ? 'switch_selected' : '' }}">unverschlüsselt</span>
 					<label class="switch">
@@ -825,6 +884,22 @@
 										Dein Schlüssel: <input type="text" size="50" ng-model="symDecryptKey" />
 										<br /><br />
 										Entschlüsselte Nachricht: <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
+									</div>
+								</td>
+								<td>
+									Ein Beispiel: <br />
+									<div class="form">
+										Nachricht: <input type="text" size="50" ng-model="asymInputText" /> <br /><br />
+										public key: {{ keyPair.publicKey }} <br /><br />
+										Verschlüsselte Nachricht: <b>{{ asymEncryptMessage(asymInputText) }}</b>
+									</div>
+									<br />
+									<hr /><br />
+									Zum Entschlüsseln:
+									<div class="form">
+										private key: {{ keyPair.privateKey }}
+										<br /><br />
+										entschlüsselt: <b>{{ asymDecryptMessage() }}</b>
 									</div>
 								</td>
 							</tr>
