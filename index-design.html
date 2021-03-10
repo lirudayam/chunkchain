@@ -453,6 +453,12 @@
 					}
 					return "";
 				}
+				$scope.getFeedNews = function () {
+					if ($scope.selection.activityIndicator) {
+						return $scope.feedNews.filter(item => item.actor === sNickname || item.type == 'S').reverse();
+					}
+					return $scope.feedNews.slice().reverse();
+				}
 
 				// overall refresh
 				setInterval(function () {
@@ -559,7 +565,7 @@
 						<span class="{{ selection.activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
 					</div>
 					<div class="activity_feed">
-						<div class="activity_item" ng-repeat="feedItem in feedNews.slice().reverse() track by $index"
+						<div class="activity_item" ng-repeat="feedItem in getFeedNews() track by ( feedItem.time + feedItem.actor )"
 							ng-click="feedItemSelected(feedItem)">
 							<div ng-if="feedItem.type == '+' ">
 								<span class="time">{{ feedItem.time }}</span><b
