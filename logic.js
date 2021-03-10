@@ -337,7 +337,7 @@ function calculateBlockHash(oBlock, nonce) {
   return CryptoJS.SHA1(sComboundString).toString();
 }
 
-function proofOfWorkMining(difficulty) {
+function proofOfWorkMining() {
   var nonce = 0;
   var hash = "";
 
@@ -346,9 +346,10 @@ function proofOfWorkMining(difficulty) {
   }
 
   const miningFn = () => {
+    var difficulty = (iNumberOfMiners >= 10 ? 3 : 2);
     if (
       bMining &&
-      oBlock.l.length > 3 &&
+      oBlock.l.length > 2 &&
       hash.substr(0, difficulty) !== Array(difficulty + 1).join("0")
     ) {
       oBlock.t = moment().valueOf();
@@ -369,7 +370,7 @@ function proofOfWorkMining(difficulty) {
       }
     }
   };
-  oMiningIntervalCaller = setInterval(miningFn, 50);
+  oMiningIntervalCaller = setInterval(miningFn, (iNumberOfMiners >= 10 ? 100 : 200));
 }
 
 const shareAccomplishment = (sKey) => {
@@ -456,6 +457,7 @@ b.on("connections", function (iConnections) {
   if (iConnections > previousConnections) {
     if (aBlockchain.length > 0) {
       // whenever a new participant joins the entire blockchain will be send
+      iNumberOfMiners += 1;
       b.send(
         "C" +
           JSON.stringify({
@@ -470,6 +472,7 @@ b.on("connections", function (iConnections) {
 
 b.on("left", function (address) {
   fnScope.participantLeft(getNickname(address));
+  iNumberOfMiners -= 1;
 
   delete oNickNames[address];
 });
@@ -536,7 +539,7 @@ b.on("message", function (address, message) {
         );
       }
 
-      proofOfWorkMining(2);
+      proofOfWorkMining();
     }
   } else if (sFirstLetter === "B") {
     // new block arrived
@@ -641,5 +644,5 @@ const sendMessage = (sMessage, sRecipient, sToken) => {
   console.log(oTx);
   b.send("A" + JSON.stringify(createTxHash(oChat, privateKey)));
 
-  proofOfWorkMining(2);
+  proofOfWorkMining();
 };

@@ -31,7 +31,8 @@
 				// related to chat functionality
 				$scope.selection = {
 					activityIndicator: false,
-					encryptMessageFlag: false
+					encryptMessageFlag: false,
+					isMining: false
 				};
 				$scope.selectedConversation = 'all';
 				$scope.activeConversations = [{
@@ -215,6 +216,14 @@
 				$scope.activityHasChanged = function () {};
 				$scope.encryptionHasChanged = function () {
 					console.log("encryption changed");
+				};
+				$scope.miningHasChanged = function () {
+					if ($scope.selection.isMining) {
+						startMining(b);
+					}
+					else {
+						stopMining(b)
+					}
 				};
 				$scope.conversationSelected = function (sSelectedItem) {
 					$scope.selectedConversation = sSelectedItem;
@@ -511,6 +520,7 @@
 					$scope.availableBlocks = aBlockchain.map(block => block.b).flat();
 					$scope.currentBlock = aBlockchain[aBlockchain.length - 1];
 					$scope.unspend = oBlock;
+					$scope.selection.isMining = bMining;
 					$scope.$apply();
 					tippy('[data-tippy-content]');
 				}, 1000);
@@ -1251,7 +1261,18 @@
 
 									Das Bitcoin-Netzwerk verbraucht nur durch Mining soviel Strom wie die gesamten
 									Niederlande!<br />
-									Klimatechnisch eine reinste Katastrophe.
+									Klimatechnisch eine reinste Katastrophe. <br />
+									<div class="switch_container">
+										<span
+											class="{{ !selection.isMining ? 'switch_selected' : '' }}">Nicht suchen</span>
+										<label class="switch">
+											<input type="checkbox" ng-model="selection.isMining"
+												ng-change="miningHasChanged()" />
+											<span class="slider"></span>
+										</label>
+										<span
+											class="{{ selection.isMining ? 'switch_selected' : '' }}">Nach Blöcken suchen</span>
+									</div>
 								</td>
 								<td class="center_image">
 									<div class="block_cover">
@@ -1261,8 +1282,8 @@
 											Blocknummer: {{ currentBlock.b }} <br />
 											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br />
 											Vorheriger Blockhash: {{ currentBlock.p }} <br /><br />
-											Nonce: <input type="text" size="40" placeholder="Probier es aus..."
-												ng-model="nonceInput" />
+											Nonce: <input type="text" size="40"
+												ng-model="nonceInputPoW" />
 										</div>
 
 										<div class="block_body">
