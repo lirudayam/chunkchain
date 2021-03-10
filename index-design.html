@@ -455,7 +455,8 @@
 				}
 				$scope.getFeedNews = function () {
 					if ($scope.selection.activityIndicator) {
-						return $scope.feedNews.filter(item => item.actor === sNickname || item.type == 'S').reverse();
+						return $scope.feedNews.filter(item => item.actor === sNickname || item.type == 'S')
+							.reverse();
 					}
 					return $scope.feedNews.slice().reverse();
 				}
@@ -524,10 +525,22 @@
 	<div class="main_body">
 		<div ng-show="chatVisible">
 			<h1 class="page_title">Chat</h1>
-			<p class="introduction_section">
+			<p class="introduction_section" ng-if="levelRewards[3][0] === 5">
 				Aktuell nutzen wir eine <b>public blockchain</b> (jeder darf schreiben und lesen) und speichern
 				<b>on-chain</b> (alle Daten in der Blockchain). <br />
 				Damit kannst du aktuell jede Nachricht lesen, die jemand in diesem Netzwerk schickt.
+			</p>
+			<p class="introduction_section" >
+				<div class="switch_container" ng-if="levelRewards[3][0] !== 5">
+					<span class="{{ !selection.encryptMessageFlag ? 'switch_selected' : '' }}">unverschlüsselt</span>
+					<label class="switch">
+						<input type="checkbox" ng-model="selection.encryptMessageFlag"
+							ng-change="encryptionHasChanged()" />
+						<span class="slider"></span>
+					</label>
+					<span class="{{ selection.encryptMessageFlag ? 'switch_selected' : '' }}">Nachrichten
+						verschlüsseln</span>
+				</div>
 			</p>
 
 			<div class="chat_container">
@@ -559,13 +572,16 @@
 					<div class="switch_container">
 						<span class="{{ !selection.activityIndicator ? 'switch_selected' : '' }}">alle</span>
 						<label class="switch">
-							<input type="checkbox" ng-model="selection.activityIndicator" ng-change="activityHasChanged()" />
+							<input type="checkbox" ng-model="selection.activityIndicator"
+								ng-change="activityHasChanged()" />
 							<span class="slider"></span>
 						</label>
-						<span class="{{ selection.activityIndicator ? 'switch_selected' : '' }}">nur meine Aktivitäten</span>
+						<span class="{{ selection.activityIndicator ? 'switch_selected' : '' }}">nur meine
+							Aktivitäten</span>
 					</div>
 					<div class="activity_feed">
-						<div class="activity_item" ng-repeat="feedItem in getFeedNews() track by ( feedItem.time + feedItem.actor )"
+						<div class="activity_item"
+							ng-repeat="feedItem in getFeedNews() track by ( feedItem.time + feedItem.actor )"
 							ng-click="feedItemSelected(feedItem)">
 							<div ng-if="feedItem.type == '+' ">
 								<span class="time">{{ feedItem.time }}</span><b
@@ -1139,7 +1155,8 @@
 												ng-change="encryptionHasChanged()" />
 											<span class="slider"></span>
 										</label>
-										<span class="{{ selection.encryptMessageFlag ? 'switch_selected' : '' }}">Nachrichten
+										<span
+											class="{{ selection.encryptMessageFlag ? 'switch_selected' : '' }}">Nachrichten
 											verschlüsseln</span>
 									</div>
 								</td>
