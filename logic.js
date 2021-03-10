@@ -360,6 +360,7 @@ function proofOfWorkMining(difficulty) {
         oBlock.h = hash;
         oBlock.n = nonce;
 
+        fnScope.token += 5; // give 5 tokens as reward
         b.send("B" + JSON.stringify(oBlock));
         //aBlockchain.push(oBlock);
         startNewBlock();
