@@ -500,7 +500,7 @@
 				}
 				$scope.getFeedNews = function () {
 					if ($scope.selection.activityIndicator) {
-						return $scope.feedNews.filter(item => item.actor === sNickname || item.type == 'S')
+						return $scope.feedNews.filter(item => item.actor === sUserNickName || item.type == 'S')
 							.reverse();
 					}
 					return $scope.feedNews.slice().reverse();
