@@ -123,8 +123,8 @@
 						f: 20
 					}
 				}
-				$scope.selectedLevel = 3;
-				$scope.selectedMission = 0;
+				$scope.selectedLevel = 1;
+				$scope.selectedMission = 1;
 				$scope.symText = "Mein Text";
 				$scope.symKey = "Schlüssel";
 				$scope.symEncrypt = "";
@@ -318,29 +318,15 @@
 					return CryptoJS.SHA1(sInput).toString();
 				};
 				$scope.encrypt = function (sInput, sKey) {
-					const encrypt = CryptoJS.AES.encrypt(sInput, CryptoJS.enc.Base64.parse(sKey), {
-						iv: CryptoJS.enc.Base64.parse("iv"),
-						padding: CryptoJS.pad.NoPadding
-					});
-					console.log(encrypt);
+					const encrypt = vignereEncrypt(sInput, sKey);
 					if ($scope.symEncrypt === "") {
-						$scope.symEncrypt = encrypt.toString(CryptoJS.format.Hex);
+						$scope.symEncrypt = encrypt;
 					}
-					return encrypt.toString(CryptoJS.format.Hex);
+					return encrypt;
 				};
 				$scope.decrypt = function (sInput, sKey) {
 					if (sInput !== "") {
-						const encryptedHex = CryptoJS.enc.Hex.parse(sInput);
-						const decrypt = CryptoJS.AES.decrypt({
-							ciphertext: encryptedHex
-						}, CryptoJS.enc.Base64.parse(sKey), {
-							iv: CryptoJS.enc.Base64.parse("iv"),
-							padding: CryptoJS.pad.NoPadding
-						});
-						//
-						console.log(decrypt); //CryptoJS.enc.Utf8
-						return decrypt.toString(); //TODO: fix it
-
+						return vignereDecrypt(sInput, sKey);
 					}
 					return "";
 				}
@@ -1400,7 +1386,7 @@
 									Transaktionsdaten kannst du nicht manipulieren, wegen den fehlenden private
 									keys.<br />
 									Du kannst dich aber als Miner betätigen, und so über neue Daten entscheiden.<br />
-									Wenn du also die absolute Mehrheit (>50%) der Rechnepower hat, kannst du das
+									Wenn du also die absolute Mehrheit (>50%) der Rechenpower hat, kannst du das
 									ziemlich gut sogar. <br /><br />
 
 									Aber das ist so gut wie unmöglich.
