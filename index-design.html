@@ -567,7 +567,7 @@
 		<img src="assets/ChunkChain_Logo.svg" width="200px" />
 
 		<div class="header_items">
-			<a ng-show="chatVisible" ng-click="switchToBlockchain()">wie es funktioniert</a>
+			<a ng-show="chatVisible" ng-click="switchToBlockchain()">{{ levelRewards[1][0] === 2 ? 'weiter deep-diven' : 'wie es funktioniert'}</a>
 			<a ng-show="deepDiveVisible" ng-click="switchToChat()">wieder chatten
 				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}"
 					ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
