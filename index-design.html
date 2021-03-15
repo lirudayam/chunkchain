@@ -145,8 +145,30 @@
 				$scope.keyPair = {
 
 				};
+				$scope.keyPairOutput = {
+					publicKey: "",
+					privateKey: ""
+				};
 				$scope.asymInputText = "Hello World";
 				$scope.asymOutputText = "";
+
+
+				$scope.exportCryptoKey = async function () {
+					let exported = await window.crypto.subtle.exportKey(
+						"raw",
+						$scope.keyPair.publicKey
+					);
+					let exportedKeyBuffer = new Uint8Array(exported);
+					$scope.keyPairOutput.publicKey = `[${exportedKeyBuffer}]`;
+
+					exported = await window.crypto.subtle.exportKey(
+						"raw",
+						$scope.keyPair.privateKey
+					);
+					exportedKeyBuffer = new Uint8Array(exported);
+					$scope.keyPairOutput.privateKey = `[${exportedKeyBuffer}]`;
+				}
+
 
 				$scope.generateKeyPair = function () {
 					window.crypto.subtle.generateKey({
@@ -159,7 +181,8 @@
 						true,
 						["encrypt", "decrypt"]
 					).then((keyPair) => {
-						$scope.keyPair = keyPair
+						$scope.keyPair = keyPair;
+						$scope.exportCryptoKey();
 						console.log($scope.keyPair);
 					});
 				};
@@ -722,10 +745,10 @@
 						<table>
 							<tr>
 								<td>
-									Unser Chat basiert auf eine verteilten System. Aber was ist ein verteiltes
+									Unser Chat-System läuft auf einem verteilten System. Aber was ist ein verteiltes
 									System?<br />
-									Unten siehst du unsere klassische Client-Server-Architektur wie du sie aus Chat-Apps
-									wie WhatsApp und Co kennst.<br />
+									Unten siehst du eine klassische Client-Server-Architektur wie du sie aus Chat-Apps
+									wie WhatsApp kennst.<br />
 									Normalerweise schicken wir die Nachrichten an einen Server und dieser leitet sie
 									dann weiter.<br />
 								</td>
@@ -733,8 +756,8 @@
 									Bei uns sind das anders aus. Wie du siehst, gibt es kein Server. Jeder kommuniziert
 									direkt mit jedem.<br />
 									Da wir alle gleichwertig in diesem Netzwerk sind, reden wir gar nicht mehr von
-									Client oder Server, sondern von Peers.<br />
-									Wir sind alle Peers, weswegen uns das zu einem Peer-to-Peer Netzwerk macht aka
+									Client oder Server, sondern von <b>Peers</b>.<br />
+									Wir sind alle Peers, weswegen uns das zu einem Peer-to-Peer-Netzwerk macht aka
 									P2P.<br />
 								</td>
 							</tr>
@@ -758,7 +781,7 @@
 							<tr>
 								<td>
 									Tatsächlich ist das eine gute Frage und gar nicht so einfach.<br />
-									Schauen wir uns da nocheinmal die klassische Client-Server-Architektur an.<br />
+									Schauen wir uns da noch einmal die klassische Client-Server-Architektur an.<br />
 									Hier werden alle Daten auf dem Server in einer zentralen Datenbank
 									gespeichert.<br />
 								</td>
@@ -766,7 +789,7 @@
 									Und hier speichern wir tatsächlich <i>alle</i> Daten auf <i>allen</i>
 									Peer-Rechnern.<br />
 									Diese Redundanz ist bewusst erzeugt, um das System stabiler zu machen.<br />
-									Fällt ein Rechner aus, sind genug andere noch da. Doch das ganze System hat auch
+									Fällt ein Rechner aus, sind genug andere noch da. Doch das Ganze hat auch
 									Nachteile.<br />
 								</td>
 							</tr>
@@ -790,7 +813,7 @@
 							<tr>
 								<td>
 									Auch das ist eine sehr gute Frage.<br />
-									Bei klassischen Client-Server-Architektur, sind die Daten zentral auf dem
+									Bei klassischen Client-Server-Architekturen sind die Daten zentral auf dem
 									Server.<br />
 									Wir vertrauen also diesem Server, dass die Daten echt sind.<br />
 									Das machen wir sehr häufig. Wir vertrauen Services wie Amazon, PayPal, Instagram
@@ -801,7 +824,7 @@
 									Das P2P Network erzeugt bewusst Redundanz, sodass wir nicht einer einzelnen Person
 									vertrauen müssen.<br />
 									Stattdessen vertrauen wir dem gesamten System und überprüfen uns gegenseitig.<br />
-									Das bedeutet aber auch, dass wir auf jede noch so kleine Information gemeinsam
+									Das bedeutet aber auch, dass wir uns auf jede noch so kleine Information gemeinsam
 									einigen müssen.<br />
 								</td>
 							</tr>
@@ -862,19 +885,17 @@
 						<table>
 							<tr>
 								<td>
-									Die <b>symmetrische</b> Verschlüsselung nutzt das Prinzip, dass du eine Nachricht
-									mit dem gleichen Schlüssel verschlüsseln und entschlüsseln kannst.<br />
+									Die <b>symmetrische</b> Verschlüsselung nutzt verschlüsselt und entschlüsselt mit dem gleichen Schlüssel.<br />
 									Das ist ähnlich wie bei einem Haustürschloss. Du kannst deinen Schlüssel nutzen, um
 									die Tür aufzumachen und abzuschliessen.<br /><br />
 								</td>
 								<td>
-									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen Schlüssel zum
-									Verschlüsseln (<b>private key</b>) und einen zum Entschlüsseln (<b>public
+									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen privaten Schlüssel (<b>private key</b>) und einen öffentlichen (<b>public
 										key</b>).<br />
 									Um ein solches Schlüssel-Paar zu erzeugen, generierst du einen private key und
 									leitest einen public key davon ab.<br />
 									Man kann von einem public key nie den dazugehörigen private key erraten. <br />
-									Du kannst natürlich auch private und public key andersherum einsetzen.
+									Dabei kannst du sowohl private als auch public zum Entschlüsseln nutzen.
 								</td>
 							</tr>
 							<tr>
@@ -900,7 +921,7 @@
 									Ein Beispiel: <br />
 									<div class="form">
 										Nachricht: <input type="text" size="50" ng-model="asymInputText" /> <br /><br />
-										public key: {{ keyPair.publicKey }} <br /><br />
+										public key: {{ keyPairOutput.publicKey }} <br /><br />
 										Verschlüsselte Nachricht: <b>{{ asymEncryptMessage(asymInputText) }}</b>
 									</div>
 									<br />
