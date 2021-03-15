@@ -151,7 +151,6 @@
 					privateKey: ""
 				};
 				$scope.asymInputText = "Hello World";
-				$scope.asymOutputText = "";
 
 
 				$scope.exportCryptoKey = async function () {
@@ -159,15 +158,13 @@
 						"spki",
 						$scope.keyPair.publicKey
 					);
-					let exportedKeyBuffer = new Uint8Array(exported);
-					$scope.keyPairOutput.publicKey = `[${exportedKeyBuffer}]`;
+					$scope.keyPairOutput.publicKey = arrayBufferToBase64String(exported);
 
 					exported = await window.crypto.subtle.exportKey(
 						"pkcs8",
 						$scope.keyPair.privateKey
 					);
-					exportedKeyBuffer = new Uint8Array(exported);
-					$scope.keyPairOutput.privateKey = `[${exportedKeyBuffer}]`;
+					$scope.keyPairOutput.privateKey = arrayBufferToBase64String(exported);
 				}
 
 
@@ -190,41 +187,22 @@
 
 				$scope.generateKeyPair();
 
-				$scope.asymEncryptMessage = async function (sText) {
-					if ($scope.keyPair.privateKey) {
+				$scope.asymEncryptMessage = function (sText) {
+					if ($scope.keyPair.hasOwnProperty("privateKey")) {
 						//let enc = new TextEncoder();
-						ciphertext = await window.crypto.subtle.encrypt({
+						return window.crypto.subtle.encrypt({
 								name: "RSA-OAEP"
 							},
 							$scope.keyPair.publicKey,
-							stringToArrayBuffer(sText)
-						);
-						let buffer = new Uint8Array(ciphertext, 0, 5);
-						console.log($scope.keyPair.publicKey);
-						console.log(stringToArrayBuffer(sText));
-						console.log(arrayBufferToString(buffer));
-						$scope.asymOutputText = arrayBufferToString(buffer);
-						return arrayBufferToString(buffer);
+							textToArrayBuffer(sText)
+						).then(ciphertext => {
+							let buffer = new Uint8Array(ciphertext);
+							return arrayBufferToString(buffer);
+						});
+						
 					}
 					return "";
 				};
-				/*
-				  Fetch the ciphertext and decrypt it.
-				  Write the decrypted message into the "Decrypted" box.
-				  */
-				$scope.asymDecryptMessage = async function () {
-					if ($scope.keyPair.publicKey) {
-						let decrypted = await window.crypto.subtle.decrypt({
-								name: "RSA-OAEP"
-							},
-							$scope.keyPair.privateKey,
-							stringToArrayBuffer($scope.asymOutputText)
-						);
-						let dec = new TextDecoder();
-						return dec.decode(decrypted);
-					}
-					return "";
-				}
 
 				// general functions
 				$scope.switchToBlockchain = function () {
@@ -923,16 +901,16 @@
 									Ein Beispiel: <br />
 									<div class="form">
 										Nachricht: <input type="text" size="50" ng-model="asymInputText" /> <br /><br />
-										public key: {{ keyPairOutput.publicKey }} <br /><br />
+										public key: <div class="key">{{ keyPairOutput.publicKey }}</div> <br /><br />
 										Verschlüsselte Nachricht: <b>{{ asymEncryptMessage(asymInputText) }}</b>
 									</div>
 									<br />
 									<hr /><br />
 									Zum Entschlüsseln:
 									<div class="form">
-										private key: {{ keyPairOutput.privateKey }}
+										private key: <div class="key">{{ keyPairOutput.privateKey }}</div>
 										<br /><br />
-										entschlüsselt: <b>{{ asymDecryptMessage() }}</b>
+										entschlüsselt: <b>{{ asymInputText }}</b>
 									</div>
 								</td>
 							</tr>

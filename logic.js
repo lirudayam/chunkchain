@@ -258,6 +258,24 @@ function decryptMsg(oTx) {
   return oTx.m;
 }
 
+function arrayBufferToBase64String(arrayBuffer) {
+  var byteArray = new Uint8Array(arrayBuffer)
+  var byteString = ''
+  for (var i=0; i<byteArray.byteLength; i++) {
+    byteString += String.fromCharCode(byteArray[i])
+  }
+  return btoa(byteString)
+}
+
+function textToArrayBuffer(str) {
+  var buf = unescape(encodeURIComponent(str)) // 2 bytes for each char
+  var bufView = new Uint8Array(buf.length)
+  for (var i=0; i < buf.length; i++) {
+    bufView[i] = buf.charCodeAt(i)
+  }
+  return bufView
+}
+
 // Functions to encrypt our messages and to decrypt them
 function createTxHash(oChat, sPrivateKey) {
   oChat.t = moment().valueOf();
