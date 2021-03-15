@@ -134,6 +134,7 @@
 				$scope.coins = 1;
 				$scope.publicKey = "6c157587185fd2";
 				$scope.privateKey = "6c157587185fd2";
+				$scope.deleteChoice = "-";
 
 				$scope.selectedBlock = Object.assign({}, oBlockInterface);
 				$scope.availableBlocks = [0];
@@ -505,7 +506,7 @@
 					return aBlockchain.map(block => block.b).flat();
 				}
 				$scope.setBlock = function ($event) {
-					console.log($event);
+					$scope.selectedBlockNumber = parseInt(document.querySelector('#selectedBlockNumber').value, 10);
 					$scope.selectedBlock = aBlockchain[$scope.selectedBlockNumber];
 				}
 				$scope.clickOnBlock = function (blockId) {
@@ -515,9 +516,9 @@
 					$scope.chatVisible = false;
 					$scope.deepDiveVisible = true;
 				}
-				$scope.simulateBlockHashCalculation = function (oBlock) {
+				$scope.simulateBlockHashCalculation = function (oBlock, sNonce) {
 					if (oBlock && oBlock.p) {
-						oBlock.n = $scope.nonceInput;
+						oBlock.n = sNonce;
 						return simulateBlockHashCalculation(oBlock);
 					}
 					return "";
@@ -928,7 +929,7 @@
 									<hr /><br />
 									Zum Entschlüsseln:
 									<div class="form">
-										private key: {{ keyPair.privateKey }}
+										private key: {{ keyPairOutput.privateKey }}
 										<br /><br />
 										entschlüsselt: <b>{{ asymDecryptMessage() }}</b>
 									</div>
@@ -945,13 +946,13 @@
 						Deine Nachricht wird als eine Transaktion geschickt. Dabei sieht die Struktur wie folgt aus:
 
 						<ul class="flow">
-							<li><b>Orginale Transaction</b> <br /><br />
+							<li><b>Orginale Transaktion</b> <br /><br />
 								{<br />
-								<span class="attribute">sender:</span> "{{ publicKey }}",<br />
-								<span class="attribute">recipient:</span> "all",<br />
-								<span class="attribute">message:</span> "<input type="text" size="10"
+								<span class="attribute">Absender:</span> "{{ publicKey }}",<br />
+								<span class="attribute">Empfänger:</span> "all",<br />
+								<span class="attribute">Nachricht:</span> "<input type="text" size="10"
 									ng-model="messageSimulation" />",<br />
-								<span class="attribute">coins:</span> {{ coins }}<br />
+								<span class="attribute">Kosten:</span> {{ coins }}<br />
 								}<br />
 							</li>
 							<li><b>Zeitstempel dazu</b> <br /><br />
@@ -975,7 +976,7 @@
 								<div class="cut-text">{{ hashTx() }}</div><br />
 								}
 							</li>
-							<li><b>Hash signieren mit private key</b> <br /><br />
+							<li><b>Hash signieren mit deinem private key</b> <br /><br />
 								{<br />
 								<span class="attribute">sender:</span> "{{ publicKey }}",<br />
 								<span class="attribute">recipient:</span> "all",<br />
@@ -999,9 +1000,9 @@
 									Wir haben hier extra Redundanz, sodass das System robuster wird.<br />
 									Also hat auch jeder eine vollständige Kopie der Daten.<br />
 									Das kann natürlich ziemlich schnell, ziemlich gross werden, weswegen es auch
-									off-chain Lösungen gibt.<br /><br />
+									inzwischen auch andere Lösungen gibt.<br /><br />
 									In unserem Fall speichern wir jede Transaktion bei jedem Peer. <br />
-									Das heisst, du kannst auch immer sehen, wer wem geschrieben hat.
+									Das heisst, du kannst auch immer sehen, wer wem was geschrieben hat.
 								</td>
 								<td class="center_image">
 									<img src="./assets/P2P_Network_Data.svg" />
@@ -1074,12 +1075,9 @@
 									Du kannst dir aber zuerst mal einen x-beliebigen Block anschauen.
 								</td>
 								<td class="center_image">
-									<!--
-								Place here real block
-							-->
-									<select ng-change="setBlock(event)" ng-model="selectedBlockNumber">
+									<select ng-change="setBlock(event)" id="selectedBlockNumber">
 										<!--ng-model="selectedBlockNumber"-->
-										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber">
+										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber" value="{{ item }}">
 											Block Nr. {{ item }}
 										</option>
 									</select>
@@ -1121,8 +1119,8 @@
 						<table>
 							<tr>
 								<td>
-									Jede Transaktion (Nachricht) wird direkt im gesamten Netzwerk geteilt. <br />
-									Jeder Teilnehmer kann hierbei prüfen, ob die Transaktion gültig ist. <br />
+									Jede Transaktion wird direkt im gesamten Netzwerk geteilt. <br />
+									Jeder Teilnehmer kann hierbei sehr leicht prüfen, ob die Transaktion gültig ist. <br />
 									Wenn dies der Fall sein sollte, landen die Transaktionen in einem Pool (unconfirmed
 									transaction pool). <br /><br />
 
@@ -1130,17 +1128,13 @@
 									Dabei sucht die Person die Lösung (Nonce) einer kryptographischen Challenge.
 									<br /><br />
 
-									Jede Transaktion hat einen Hash. Nun kann die Hashes von Transaktionen aus einem
-									Pool wiederrum zusammenhashen.<br />
-									Dabei entsteht der sogenannte Merkle-Root (Hash der Hashes).<br /><br />
-
-									Mit dem Merkle-Root zusammen werden einige Informationen aus dem <b>block header</b>
+									Mit dem Hash der Transaktionen zusammen werden einige Informationen aus dem <b>block header</b>
 									weiter gehasht.<br />
 									Darunter sind vorallem der Blockhash des vorherigen Blocks und
 									Zeitstempel.<br /><br />
 
-									Die kryptographische Challenge liegt darin eine einen Hash zu finden, der mit Nullen
-									beginn.<br />
+									Die kryptographische Challenge liegt darin eine Zeichenkette in Block hinzuzufügen, sodass der Endhash mit Nullen
+									beginnt.<br />
 									Wie du vorhin gesehen hast, verändert ein Buchstabe einen Hash komplett. <br />
 									Jetzt muss jemand eine x-beliebige Zeichenfolge zu den bestehenden Daten zu finden,
 									sodass der Hash mit x Nullen beginnt. <br />
@@ -1154,11 +1148,8 @@
 									Das Bitcoin-Netzwerk verlangt aktuell 19 Nullen am Anfang!
 								</td>
 								<td class="center_image">
-									<!--
-								Place here real block
-							-->
 									<div class="block_cover">
-										Blockhash: {{ simulateBlockHashCalculation(currentBlock) }}
+										Blockhash: {{ simulateBlockHashCalculation(currentBlock, nonceInput) }}
 
 										<div class="block_header">
 											Blocknummer: {{ currentBlock.b }} <br />
@@ -1297,14 +1288,14 @@
 								</td>
 								<td class="center_image">
 									<div class="block_cover">
-										Blockhash: {{ calcBlockHash }}
+										Blockhash: {{ simulatePoW(currentBlock) }}
 
 										<div class="block_header">
 											Blocknummer: {{ currentBlock.b }} <br />
 											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br />
 											Vorheriger Blockhash: {{ currentBlock.p }} <br /><br />
 											Nonce: <input type="text" size="40"
-												ng-model="nonceInputPoW" />
+												ng-model="nonceInputPoW" disabled />
 										</div>
 
 										<div class="block_body">
