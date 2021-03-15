@@ -577,11 +577,12 @@ b.on("message", function (address, message) {
       }
     }
   } else if (sFirstLetter === "N") {
-    // a list of new nicknames arrived
+    // a new user is there
     var oNickNameObject = JSON.parse(message.substr(1));
     oNickNames[oNickNameObject.k] = oNickNameObject.n;
   } else if (sFirstLetter === "S") {
     // a list of new nicknames arrived
+    console.log(message.substr(1));
     var oNickNameDirectory = JSON.parse(message.substr(1));
     for (const [sAddress, sRelatedNickName] of Object.entries(
       oNickNameDirectory

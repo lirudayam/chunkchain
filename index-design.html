@@ -156,14 +156,14 @@
 
 				$scope.exportCryptoKey = async function () {
 					let exported = await window.crypto.subtle.exportKey(
-						"raw",
+						"spki",
 						$scope.keyPair.publicKey
 					);
 					let exportedKeyBuffer = new Uint8Array(exported);
 					$scope.keyPairOutput.publicKey = `[${exportedKeyBuffer}]`;
 
 					exported = await window.crypto.subtle.exportKey(
-						"raw",
+						"pkcs8",
 						$scope.keyPair.privateKey
 					);
 					exportedKeyBuffer = new Uint8Array(exported);
