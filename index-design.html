@@ -511,6 +511,7 @@
 				}
 				$scope.clickOnBlock = function (blockId) {
 					$scope.selectedBlockNumber = aBlockchain[blockId];
+					$scope.selectedBlock = aBlockchain[$scope.selectedBlockNumber];
 					$scope.selectedLevel = 2;
 					$scope.selectedMission = 1;
 					$scope.chatVisible = false;
