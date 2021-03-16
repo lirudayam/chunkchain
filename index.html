@@ -18,7 +18,7 @@
 	<script src="https://chr15m.github.io/bugout/bugout.min.js" type="application/javascript"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 	<script src="https://momentjs.com/downloads/moment.js"></script>
-	
+
 	<script src="https://cdn.jsdelivr.net/gh/mathusummut/confetti.js/confetti.min.js"></script>
 
 	<script src="./logic.js"></script>
@@ -171,6 +171,7 @@
 				$scope.selectedBlock = Object.assign({}, oBlockInterface);
 				// select field options
 				$scope.availableBlocks = [0];
+				$scope.blockchain = [];
 				$scope.selectedBlockNumber = 0;
 
 				// nonce models for input field and simulation of PoW
@@ -180,7 +181,7 @@
 				// acomplishments for badge on header
 				$scope.highestAchievement = null;
 
-				
+
 				$scope.exportCryptoKey = async function () {
 					let exported = await window.crypto.subtle.exportKey(
 						"spki",
@@ -288,7 +289,8 @@
 					$scope.feedNews.push({
 						'type': 'MSG',
 						'actor': sNickname,
-						'time': moment(oTimestamp).format("hh:mm:ss")
+						'time': moment(oTimestamp).format("hh:mm:ss"),
+						'id': 'MSG' + sNickname + moment(oTimestamp).format("hh:mm:ss:SSS")
 					});
 					$scope.msgArrived(false, oTimestamp);
 				};
@@ -298,7 +300,8 @@
 						'type': 'U',
 						'actor': sNickname,
 						'time': moment().format("hh:mm:ss"),
-						'badge': oBadges[sKey]
+						'badge': oBadges[sKey],
+						'id': 'U' + sNickname + moment().format("hh:mm:ss:SSS")
 					});
 				};
 
@@ -307,7 +310,8 @@
 						$scope.feedNews.push({
 							'type': 'S',
 							'nonce': sNonce,
-							'time': moment().format("hh:mm:ss")
+							'time': moment().format("hh:mm:ss"),
+							'id': 'S' + moment().format("hh:mm:ss:SSS")
 						});
 					} else {
 						$scope.feedNews.push({
@@ -315,7 +319,8 @@
 							'actor': sNickname,
 							'n': iMessages,
 							'b': iBlockNumber,
-							'time': moment().format("hh:mm:ss")
+							'time': moment().format("hh:mm:ss"),
+							'id': 'B' + sNickname + moment().format("hh:mm:ss:SSS")
 						});
 					}
 					$scope.msgArrived(true);
@@ -514,7 +519,7 @@
 				$scope.getBlocks = function () {
 					return aBlockchain.map(block => block.b).flat();
 				}
-				$scope.setBlock = function ($event) {
+				$scope.setBlock = function () {
 					$scope.selectedBlockNumber = parseInt(document.querySelector('#selectedBlockNumber').value,
 						10);
 					$scope.selectedBlock = aBlockchain[$scope.selectedBlockNumber];
@@ -550,6 +555,7 @@
 
 				// overall refresh
 				setInterval(function () {
+					$scope.blockchain = aBlockchain;
 					$scope.availableBlocks = aBlockchain.map(block => block.b).flat();
 					$scope.currentBlock = aBlockchain[aBlockchain.length - 1];
 					$scope.unspend = oBlock;
@@ -571,7 +577,7 @@
 					modal.style.display = "none";
 				}
 			}])
-			.directive('scrollToBottom', function ($timeout, $window) {
+			/*.directive('scrollToBottom', function ($timeout, $window) {
 				return {
 					scope: {
 						scrollToBottom: "="
@@ -588,7 +594,7 @@
 						});
 					}
 				};
-			});
+			});*/
 	</script>
 
 </head>
@@ -646,8 +652,8 @@
 						scroll-to-bottom="messagesList">
 						<div ng-repeat="message in messagesList track by $index"
 							class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}">
-							<span ng-if="selectedConversation === 'all' && message.d === 'r' "
-								class="sender" title="{{ message.u ? 'Nachricht muss erst in einen Block gefasst werden' : '' }}">{{ getNickname(message.s) }}</span>
+							<span ng-if="selectedConversation === 'all' && message.d === 'r' " class="sender"
+								title="{{ message.u ? 'Nachricht muss erst in einen Block gefasst werden' : '' }}">{{ getNickname(message.s) }}</span>
 							{{ message.u ? 'warten auf Nachricht...' : message.m }} <span
 								class="message_time">{{ message.b ? '&#128274; ' : '' }}{{ formatTime(message.t) }}</span>
 						</div>
@@ -666,7 +672,7 @@
 					</div>
 					<div class="activity_feed">
 						<div class="activity_item"
-							ng-repeat="feedItem in getFeedNews() track by ( feedItem.time + feedItem.actor )">
+							ng-repeat="feedItem in getFeedNews() track by feedItem.id">
 							<div ng-if="feedItem.type == '+' ">
 								<span class="time">{{ feedItem.time }}</span><b
 									ng-click="newConvoSelected(feedItem.actor)"
@@ -1091,7 +1097,7 @@
 									Du kannst dir aber zuerst mal einen x-beliebigen Block anschauen.
 								</td>
 								<td class="center_image">
-									<select ng-change="setBlock(event)" id="selectedBlockNumber">
+									<select ng-change="setBlock()" id="selectedBlockNumber">
 										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber"
 											value="{{ item }}">
 											Block Nr. {{ item }}
@@ -1217,8 +1223,19 @@
 									Das heisst, dadurch wird das System nochmals gestärkt.
 								</td>
 								<td class="center_image">
-									<!-- TODO: more interactive -->
-									<img src="./assets/Chain.svg" />
+									<div class="block_container">
+
+										<div class="block" ng-repeat="block in blockchain track by block.b">
+											<span class="block_hash">{{ block.h }}</span>
+											<b>#{{ block.b }}</b>
+											{{ formatTime(block.t) }}<br /><br />
+											Vorheriger Hash: <br /><span class="hash">{{ block.p }}</span><br /><br />
+											<div class="tx_container">
+												<div class="tx" ng-repeat="msg in block.l track by $index"></div>
+											</div>
+										</div>
+									
+									</div>
 								</td>
 							</tr>
 						</table>
