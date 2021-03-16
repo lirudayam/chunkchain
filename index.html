@@ -19,7 +19,6 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 	<script src="https://momentjs.com/downloads/moment.js"></script>
 	
-	<script src="https://unpkg.com/tippy.js@6"></script>
 	<script src="https://cdn.jsdelivr.net/gh/mathusummut/confetti.js/confetti.min.js"></script>
 
 	<script src="./logic.js"></script>
@@ -556,7 +555,6 @@
 					$scope.unspend = oBlock;
 					bMining = $scope.selection.isMining;
 					$scope.$apply();
-					tippy('[data-tippy-content]');
 				}, 1000);
 
 				fnScope = $scope;
@@ -648,9 +646,8 @@
 						scroll-to-bottom="messagesList">
 						<div ng-repeat="message in messagesList track by $index"
 							class="message {{ message.d === 's' ? 'sent ' : '' }}{{ message.u === true ? 'unspend' : '' }}">
-							<!--data-tippy-content="{{ message.u ? 'Nachricht kann erst angezeigt werden, wenn ein entsprechender Block gefunden wird' : '' }}"-->
 							<span ng-if="selectedConversation === 'all' && message.d === 'r' "
-								class="sender">{{ getNickname(message.s) }}</span>
+								class="sender" title="{{ message.u ? 'Nachricht muss erst in einen Block gefasst werden' : '' }}">{{ getNickname(message.s) }}</span>
 							{{ message.u ? 'warten auf Nachricht...' : message.m }} <span
 								class="message_time">{{ message.b ? '&#128274; ' : '' }}{{ formatTime(message.t) }}</span>
 						</div>
@@ -766,8 +763,7 @@
 						<table>
 							<tr>
 								<td>
-									Unser Chat-System läuft auf einem verteilten System. Aber was ist ein verteiltes
-									System?<br />
+									Unser Chat-System läuft auf einem <b>verteilten System</b>. Aber was ist das?<br />
 									Unten siehst du eine klassische Client-Server-Architektur wie du sie aus Chat-Apps
 									wie WhatsApp kennst.<br />
 									Normalerweise schicken wir die Nachrichten an einen Server und dieser leitet sie
@@ -846,7 +842,7 @@
 									vertrauen müssen.<br />
 									Stattdessen vertrauen wir dem gesamten System und überprüfen uns gegenseitig.<br />
 									Das bedeutet aber auch, dass wir uns auf jede noch so kleine Information gemeinsam
-									einigen müssen.<br />
+									einigen müssen (<b>Konsens</b>).<br />
 								</td>
 							</tr>
 							<tr>
@@ -906,7 +902,7 @@
 						<table>
 							<tr>
 								<td>
-									Die <b>symmetrische</b> Verschlüsselung nutzt verschlüsselt und entschlüsselt mit
+									Die <b>symmetrische</b> Verschlüsselung verschlüsselt und entschlüsselt mit
 									dem gleichen Schlüssel.<br />
 									Das ist ähnlich wie bei einem Haustürschloss. Du kannst deinen Schlüssel nutzen, um
 									die Tür aufzumachen und abzuschliessen.<br /><br />
@@ -917,8 +913,7 @@
 										key</b>).<br />
 									Um ein solches Schlüssel-Paar zu erzeugen, generierst du einen private key und
 									leitest einen public key davon ab.<br />
-									Man kann von einem public key nie den dazugehörigen private key erraten. <br />
-									Dabei kannst du sowohl private als auch public zum Entschlüsseln nutzen.
+									Man kann von einem public key nie den dazugehörigen private key erraten.
 								</td>
 							</tr>
 							<tr>
@@ -976,7 +971,7 @@
 								<span class="attribute">Kosten:</span> {{ coins }}<br />
 								}<br />
 							</li>
-							<li><b>Zeitstempel dazu</b> <br /><br />
+							<li><b>mit Zeitstempel dazu</b> <br /><br />
 								{<br />
 								<span class="attribute">sender:</span> "{{ publicKey }}",<br />
 								<span class="attribute">recipient:</span> "all",<br />
@@ -1008,7 +1003,7 @@
 								<div class="cut-text">{{ hashTxSigned() }}</div><br />
 								}
 							</li>
-							<li><b>ins P2P-Netzwerk</b></li>
+							<li><b>ins Netzwerk</b></li>
 						</ul>
 					</p>
 				</div>
@@ -1017,9 +1012,9 @@
 						<table>
 							<tr>
 								<td>
-									Dazu müssen wir uns nur unser P2P-Netzwerk anschauen.<br />
+									Dazu müssen wir uns nur unser P2P (Peer-to-Peer)-Netzwerk anschauen.<br />
 									Wir haben hier extra Redundanz, sodass das System robuster wird.<br />
-									Also hat auch jeder eine vollständige Kopie der Daten.<br />
+									Also hat auch jeder eine vollständige Kopie der Daten (oder Backup).<br />
 									Das kann natürlich ziemlich schnell, ziemlich gross werden, weswegen es auch
 									inzwischen auch andere Lösungen gibt.<br /><br />
 									In unserem Fall speichern wir jede Transaktion bei jedem Peer. <br />
@@ -1097,7 +1092,6 @@
 								</td>
 								<td class="center_image">
 									<select ng-change="setBlock(event)" id="selectedBlockNumber">
-										<!--ng-model="selectedBlockNumber"-->
 										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber"
 											value="{{ item }}">
 											Block Nr. {{ item }}
