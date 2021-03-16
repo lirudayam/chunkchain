@@ -150,8 +150,8 @@
 					publicKey: "",
 					privateKey: ""
 				};
-				$scope.asymInputText = "Hello World";
-
+				$scope.asymInputText = "";
+				$scope.asymOutputText = "";
 
 				$scope.exportCryptoKey = async function () {
 					let exported = await window.crypto.subtle.exportKey(
@@ -190,18 +190,18 @@
 				$scope.asymEncryptMessage = function (sText) {
 					if ($scope.keyPair.hasOwnProperty("privateKey")) {
 						//let enc = new TextEncoder();
-						return window.crypto.subtle.encrypt({
+						window.crypto.subtle.encrypt({
 								name: "RSA-OAEP"
 							},
 							$scope.keyPair.publicKey,
 							textToArrayBuffer(sText)
 						).then(ciphertext => {
 							let buffer = new Uint8Array(ciphertext);
-							return arrayBufferToString(buffer);
+							$scope.asymOutputText = arrayBufferToString(buffer);
 						});
 						
 					}
-					return "";
+					$scope.asymOutputText = "";
 				};
 
 				// general functions
@@ -891,7 +891,6 @@
 							</tr>
 							<tr>
 								<td>
-									Ein Beispiel: <br />
 									<div class="form">
 										Nachricht: <input type="text" size="50" ng-model="symText" /> <br /><br />
 										Dein Schlüssel: <input type="text" size="50" ng-model="symKey" /> <br /><br />
@@ -909,11 +908,10 @@
 									</div>
 								</td>
 								<td>
-									Ein Beispiel: <br />
 									<div class="form">
-										Nachricht: <input type="text" size="50" ng-model="asymInputText" /> <br /><br />
+										Nachricht: <input type="text" size="50" ng-model="asymInputText" ng-change="asymEncryptMessage(asymInputText)" /> <br /><br />
 										public key: <div class="key">{{ keyPairOutput.publicKey }}</div> <br /><br />
-										Verschlüsselte Nachricht: <b>{{ asymEncryptMessage(asymInputText) }}</b>
+										Verschlüsselte Nachricht: <b>{{ asymOutputText }}</b>
 									</div>
 									<br />
 									<hr /><br />
