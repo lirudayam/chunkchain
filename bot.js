@@ -19,6 +19,35 @@ const aWelcome = [
   "Viel Spass hier."
 ];
 
+const aRandomMsg = [
+  "Hallo",
+  "Alles klar?",
+  "Wie geht's so?",
+  "Alles gucci?",
+  "Spam",
+  "Test",
+  "123",
+  "Ist da jemand?",
+  "Voll spannend",
+  "Ich bin ein Bot",
+  "Frankreich hat die längste Grenze mit Brasilien",
+  "P2P-Netzwerke sind cool",
+  "Ich suche gerade nach Blöcken und ihr?",
+  "Hashes sind genial",
+  "Blockchains sind super interessant",
+  "Mal nicht WhatsApp vertrauen",
+  "Cherophobie ist die Angst vor Spaß",
+  "Pinguine sind cool",
+  "Schnecken haben 4 Nasen",
+  "Proof-of-Work ist ein Konsensmechanisumus",
+  "Konens heisst sich auf ein Stück Daten zu einigen",
+  "Blockchains sind vorallem für Lieferketten gut",
+  "Interne Produktionen brauchen keine Blockchains",
+  "Blockchains helfen, wenn man sich nicht immer vertrauen kann",
+  "Maximale Redudanz",
+  "ABC"
+]
+
 const getRandomFromArray = (array) => {
   return array[Math.floor(Math.random() * array.length)]
 }
@@ -73,6 +102,9 @@ b.on("left", function (address) {
 
   delete oNickNames[address];
 });
+
+// delay to send random message to network
+var oSpamTimeout;
 
 b.on("message", function (address, message) {
   
@@ -137,6 +169,12 @@ b.on("message", function (address, message) {
       }
 
       proofOfWorkMining();
+
+      // schedule a bot message to everyone
+      clearInterval(oSpamTimeout);
+      oSpamTimeout = setInterval(function(){ 
+        sendBotMessage("all", getRandomFromArray(aRandomMsg));
+      }, 5000 + Math.round(Math.random() * 4000));
     }
   } else if (sFirstLetter === oMessageTypes.NEW_BLOCK) {
     // new block arrived
