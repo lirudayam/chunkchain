@@ -199,7 +199,7 @@
 							let buffer = new Uint8Array(ciphertext);
 							$scope.asymOutputText = arrayBufferToString(buffer);
 						});
-						
+
 					}
 					$scope.asymOutputText = "";
 				};
@@ -222,8 +222,7 @@
 				$scope.miningHasChanged = function () {
 					if ($scope.selection.isMining) {
 						startMining(b);
-					}
-					else {
+					} else {
 						stopMining(b)
 					}
 				};
@@ -484,7 +483,8 @@
 					return aBlockchain.map(block => block.b).flat();
 				}
 				$scope.setBlock = function ($event) {
-					$scope.selectedBlockNumber = parseInt(document.querySelector('#selectedBlockNumber').value, 10);
+					$scope.selectedBlockNumber = parseInt(document.querySelector('#selectedBlockNumber').value,
+						10);
 					$scope.selectedBlock = aBlockchain[$scope.selectedBlockNumber];
 				}
 				$scope.clickOnBlock = function (blockId) {
@@ -570,7 +570,8 @@
 		<img src="assets/ChunkChain_Logo.svg" width="200px" />
 
 		<div class="header_items">
-			<a ng-show="chatVisible" ng-click="switchToBlockchain()">{{ levelRewards[1][0] === 2 ? 'weiter deep-diven' : 'wie es funktioniert' }}</a>
+			<a ng-show="chatVisible"
+				ng-click="switchToBlockchain()">{{ levelRewards[1][0] === 2 ? 'weiter deep-diven' : 'wie es funktioniert' }}</a>
 			<a ng-show="deepDiveVisible" ng-click="switchToChat()">wieder chatten
 				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}"
 					ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
@@ -726,7 +727,8 @@
 						Du wirst hier interaktiv Teilnehmer eines Chat-Netzwerks sein.<br />
 						Dieses läuft tatsächlich auch auf einer Blockchain.
 						Du wirst jederzeit die Gelegenheit haben, mit anderen zu chatten. <br /><br />
-						Du kannst währenddessen Missionen erfüllen, und dir eine echte Blockchain aus verschiedenen Winkeln anschauen.<br />
+						Du kannst währenddessen Missionen erfüllen, und dir eine echte Blockchain aus verschiedenen
+						Winkeln anschauen.<br />
 						Am Ende jeder Mission hast du unten einen Button mit "Mission abschliessen". <br /><br />
 						Also worauf wartest du? Let's go!
 					</p>
@@ -876,12 +878,14 @@
 						<table>
 							<tr>
 								<td>
-									Die <b>symmetrische</b> Verschlüsselung nutzt verschlüsselt und entschlüsselt mit dem gleichen Schlüssel.<br />
+									Die <b>symmetrische</b> Verschlüsselung nutzt verschlüsselt und entschlüsselt mit
+									dem gleichen Schlüssel.<br />
 									Das ist ähnlich wie bei einem Haustürschloss. Du kannst deinen Schlüssel nutzen, um
 									die Tür aufzumachen und abzuschliessen.<br /><br />
 								</td>
 								<td>
-									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen privaten Schlüssel (<b>private key</b>) und einen öffentlichen (<b>public
+									Bei einer <b>asymmetrischen</b> Verschlüsselung hast du einen privaten Schlüssel
+									(<b>private key</b>) und einen öffentlichen (<b>public
 										key</b>).<br />
 									Um ein solches Schlüssel-Paar zu erzeugen, generierst du einen private key und
 									leitest einen public key davon ab.<br />
@@ -909,7 +913,8 @@
 								</td>
 								<td>
 									<div class="form">
-										Nachricht: <input type="text" size="50" ng-model="asymInputText" ng-change="asymEncryptMessage(asymInputText)" /> <br /><br />
+										Nachricht: <input type="text" size="50" ng-model="asymInputText"
+											ng-change="asymEncryptMessage(asymInputText)" /> <br /><br />
 										public key: <div class="key">{{ keyPairOutput.publicKey }}</div> <br /><br />
 										Verschlüsselte Nachricht: <b>{{ asymOutputText }}</b>
 									</div>
@@ -1065,7 +1070,8 @@
 								<td class="center_image">
 									<select ng-change="setBlock(event)" id="selectedBlockNumber">
 										<!--ng-model="selectedBlockNumber"-->
-										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber" value="{{ item }}">
+										<option ng-repeat="item in availableBlocks" ng-selected="selectedBlockNumber"
+											value="{{ item }}">
 											Block Nr. {{ item }}
 										</option>
 									</select>
@@ -1108,7 +1114,8 @@
 							<tr>
 								<td>
 									Jede Transaktion wird direkt im gesamten Netzwerk geteilt. <br />
-									Jeder Teilnehmer kann hierbei sehr leicht prüfen, ob die Transaktion gültig ist. <br />
+									Jeder Teilnehmer kann hierbei sehr leicht prüfen, ob die Transaktion gültig ist.
+									<br />
 									Wenn dies der Fall sein sollte, landen die Transaktionen in einem Pool (unconfirmed
 									transaction pool). <br /><br />
 
@@ -1116,12 +1123,14 @@
 									Dabei sucht die Person die Lösung (Nonce) einer kryptographischen Challenge.
 									<br /><br />
 
-									Mit dem Hash der Transaktionen zusammen werden einige Informationen aus dem <b>block header</b>
+									Mit dem Hash der Transaktionen zusammen werden einige Informationen aus dem <b>block
+										header</b>
 									weiter gehasht.<br />
 									Darunter sind vorallem der Blockhash des vorherigen Blocks und
 									Zeitstempel.<br /><br />
 
-									Die kryptographische Challenge liegt darin eine Zeichenkette in Block hinzuzufügen, sodass der Endhash mit Nullen
+									Die kryptographische Challenge liegt darin eine Zeichenkette in Block hinzuzufügen,
+									sodass der Endhash mit Nullen
 									beginnt.<br />
 									Wie du vorhin gesehen hast, verändert ein Buchstabe einen Hash komplett. <br />
 									Jetzt muss jemand eine x-beliebige Zeichenfolge zu den bestehenden Daten zu finden,
@@ -1263,15 +1272,15 @@
 									Niederlande!<br />
 									Klimatechnisch eine reinste Katastrophe. <br />
 									<div class="switch_container">
-										<span
-											class="{{ !selection.isMining ? 'switch_selected' : '' }}">Nicht suchen</span>
+										<span class="{{ !selection.isMining ? 'switch_selected' : '' }}">Nicht
+											suchen</span>
 										<label class="switch">
 											<input type="checkbox" ng-model="selection.isMining"
 												ng-change="miningHasChanged()" />
 											<span class="slider"></span>
 										</label>
-										<span
-											class="{{ selection.isMining ? 'switch_selected' : '' }}">Nach Blöcken suchen</span>
+										<span class="{{ selection.isMining ? 'switch_selected' : '' }}">Nach Blöcken
+											suchen</span>
 									</div>
 								</td>
 								<td class="center_image">
@@ -1282,8 +1291,7 @@
 											Blocknummer: {{ currentBlock.b }} <br />
 											Anzahl an Transaktionen: {{ currentBlock.l.length }} <br />
 											Vorheriger Blockhash: {{ currentBlock.p }} <br /><br />
-											Nonce: <input type="text" size="40"
-												ng-model="nonceInputPoW" disabled />
+											Nonce: <input type="text" size="40" ng-model="nonceInputPoW" disabled />
 										</div>
 
 										<div class="block_body">
@@ -1413,7 +1421,8 @@
 											<div ng-repeat="message in currentBlock.l" class="block_body_item">
 												<div>
 													<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
-														{{ getNickname(message.r) }} {{ message.b ? '&#128274; ' : '' }}</span> <br />
+														{{ getNickname(message.r) }}
+														{{ message.b ? '&#128274; ' : '' }}</span> <br />
 													{{ message.m }}
 												</div>
 												<div style="display:right">
@@ -1442,6 +1451,11 @@
 									Trotzdem sind diese im ganzen Netzwerk bekannt, denn sonst würden die Miner diese
 									Infos nicht bekommen.<br /><br />
 
+									Miner suchen sich auch jene Transaktionen, bei denen sie die höchsten Gebühren
+									bekommen.<br />
+									Daher gilt normal, je mehr Tokens du für deine Nachricht ausgibst, umso schneller
+									wird sie akzeptiert.<br /><br />
+
 									Du kannst dir das analog zu einer Word-Datei vorstellen.<br />
 									Solange du die Datei nicht speicherst, sind die Änderungen nicht bestätigt.<br />
 									Mit dem Speichern (Block gefunden) werden sie endgültig gespeichert. <br />
@@ -1451,7 +1465,8 @@
 										<div ng-repeat="message in unspend.l" class="block_body_item">
 											<div>
 												<span class="msg_sender">{{ getNickname(message.s) }} &#x2192;
-													{{ getNickname(message.r) }} {{ message.b ? '&#128274; ' : '' }}</span> <br />
+													{{ getNickname(message.r) }}
+													{{ message.b ? '&#128274; ' : '' }}</span> <br />
 												{{ message.m }}
 											</div>
 											<div style="display:right">
