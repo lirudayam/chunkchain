@@ -720,6 +720,17 @@
 
 			<div class="info_container">
 				<h1 class="page_title">{{ levelList[selectedLevel][selectedMission] }}</h1>
+				<div ng-if="selectedLevel == 0 && selectedMission == 0 ">
+					<p class="introduction_section">
+						Willkommen bei unserer Blockchain-Simulation.<br />
+						Du wirst hier interaktiv Teilnehmer eines Chat-Netzwerks sein.<br />
+						Dieses läuft tatsächlich auch auf einer Blockchain.
+						Du wirst jederzeit die Gelegenheit haben, mit anderen zu chatten. <br /><br />
+						Du kannst währenddessen Missionen erfüllen, und dir eine echte Blockchain aus verschiedenen Winkeln anschauen.<br />
+						Am Ende jeder Mission hast du unten einen Button mit "Mission abschliessen". <br /><br />
+						Also worauf wartest du? Let's go!
+					</p>
+				</div>
 				<div ng-if="selectedLevel == 0 && selectedMission == 1 ">
 					<p class="introduction_section">
 						<table>

@@ -442,7 +442,7 @@ localStorage["bugout-demo-seed"] = b.seed;
 const publicAddress = b.address();
 const privateKey = getPrivateKey(b.address());
 
-const sUserNickName = prompt("Please choose a nickname", "");
+const sUserNickName = prompt("Dein Nickname", "");
 
 log(b.address());
 
