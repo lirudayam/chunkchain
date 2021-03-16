@@ -451,9 +451,6 @@ const publicAddress = b.address();
 // derive a simulated private key for the public Bugout address
 const privateKey = getPrivateKey(b.address());
 
-// nickname instead of key
-const sUserNickName = prompt("Dein Nickname", "");
-
 // Register personal nickname across the network
 b.send(
   oMessageTypes.ANNOUNCE_NICKNAME +
