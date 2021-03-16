@@ -573,8 +573,6 @@ b.on("message", function (address, message) {
     // new block arrived
     var oFoundBlock = JSON.parse(message.substr(1));
     if (verifyBlock(oFoundBlock)) {
-      // TODO: add it to the blockchain
-      oFoundBlock.l.forEach((oTx) => log(getNickname(oTx.s) + ": " + oTx.m));
       if (oMiningIntervalCaller !== null) {
         clearInterval(oMiningIntervalCaller);
       }
@@ -610,7 +608,6 @@ b.on("message", function (address, message) {
     oNickNames[oNickNameObject.k] = oNickNameObject.n;
   } else if (sFirstLetter === oMessageTypes.NICKNAME_DICT) {
     // a list of new nicknames arrived
-    console.log(message.substr(1));
     var oNickNameDirectory = JSON.parse(message.substr(1));
     for (const [sAddress, sRelatedNickName] of Object.entries(
       oNickNameDirectory
