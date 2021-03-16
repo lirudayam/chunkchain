@@ -1,0 +1,8 @@
+# manifest.yml
+applications:
+- name: webrtc-chat
+  memory: 32M
+  instances: 1
+  buildpack: https://github.com/cloudfoundry/staticfile-buildpack
+  routes:
+    - route: chat.leo-irudayam.de
