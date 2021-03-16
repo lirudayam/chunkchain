@@ -21,28 +21,36 @@ const oBlockInterface = {
 };
 
 // Enums for types of messages
-const oMsgKeys = {
-  A: "Outgoing message into unconfirmed transactions",
-  B: "New block found",
-  C: "Copy of blockchain",
-  N: "Announce nickname",
-  S: "Shared nickname dictionary",
-  "M+": "New miner",
-  "M-": "Participant stops mining",
-};
+const oMessageTypes = {
+  OUTGOING_UNCONFIRMED: 'A',
+  NEW_BLOCK: 'B',
+  COPY_BLOCKCHAIN: 'C',
+  ANNOUNCE_NICKNAME: 'N',
+  NICKNAME_DICT: 'S',
+  NEW_MINER: 'M+',
+  REMOVE_MINER: "M-",
+  ACCOMPLISHMENT: "U"
+}
+
+// Available Badges for completion of levels
 const oBadges = {
   L2: "Blockchain-Kenner Abzeichen",
   L5: "Blockchain-Experte Abzeichen",
 };
-const aKeys = Object.keys(oMsgKeys);
 
+// Main Blockchain Object
 let aBlockchain = [];
+
+// Active PoW Flag
 let bMining = true;
 
+// Estimate of active miners
 let iNumberOfMiners = 0;
 
+// Nickname dictionary
 let oNickNames = {};
 
+// new empty raw block in the format of the interface
 var oBlock = Object.assign({}, oBlockInterface);
 let oMiningIntervalCaller = null;
 
@@ -277,8 +285,9 @@ function textToArrayBuffer(str) {
 }
 
 // Functions to encrypt our messages and to decrypt them
-function createTxHash(oChat, sPrivateKey) {
+function attachTxHash(oChat, sPrivateKey) {
   oChat.t = moment().valueOf();
+  // hash over all of the available tx attributes
   var sComboundString = oChat.s + oChat.r + oChat.m + oChat.c + oChat.t;
   var sHashString = CryptoJS.enc.Hex.stringify(
     CryptoJS.SHA1(sComboundString.toString())
@@ -299,6 +308,8 @@ function verifyTx(oChat) {
   var sEncryptCombound = CryptoJS.enc.Hex.stringify(
     CryptoJS.SHA1(sComboundString.toString())
   );
+
+  // check if hashes match and compare timestamps also
   return (
     CryptoJS.AES.decrypt(oChat.h, sPrivatePersonKey).toString(
       CryptoJS.enc.Utf8
@@ -311,48 +322,40 @@ function startNewBlock() {
   oBlock = null;
   oBlock = Object.assign({}, oBlockInterface);
   oBlock.l = [];
+
+  // Index of Block
   oBlock.b = aBlockchain.length;
+
+  // Reference to previous block
   if (aBlockchain.length > 0) {
     oBlock.p = aBlockchain[aBlockchain.length - 1].h;
   } else {
     oBlock.p = "";
   }
+
+  // intended miner - only used in case of active mining
   oBlock.r = publicAddress;
 }
 
-function simulateBlockHashCalculation(oBlock) {
+function _calcBlockHash(oBlock, sNonce) {
   var sComboundString = oBlock.l.map((tx) => tx.h).join("");
-
-  // replace this soon with the real previous block
   sComboundString += oBlock.p;
   sComboundString += oBlock.t;
   sComboundString += oBlock.r;
-  sComboundString += oBlock.n;
-
+  sComboundString += sNonce;
   return CryptoJS.SHA1(sComboundString).toString();
+}
+
+function simulateBlockHashCalculation(oBlock) {
+  return _calcBlockHash(oBlock, oBlock.n);
 }
 
 function verifyBlock(oBlock) {
-  var sComboundString = oBlock.l.map((tx) => tx.h).join("");
-
-  // replace this soon with the real previous block
-  sComboundString += oBlock.p;
-  sComboundString += oBlock.t;
-  sComboundString += oBlock.r;
-  sComboundString += oBlock.n;
-
-  return oBlock.h === CryptoJS.SHA1(sComboundString).toString();
+  return oBlock.h === _calcBlockHash(oBlock, oBlock.n);
 }
 
 function calculateBlockHash(oBlock, nonce) {
-  var sComboundString = oBlock.l.map((tx) => tx.h).join("");
-
-  // replace this soon with the real previous block
-  sComboundString += oBlock.p;
-  sComboundString += oBlock.t;
-  sComboundString += oBlock.r;
-  sComboundString += nonce;
-  return CryptoJS.SHA1(sComboundString).toString();
+  return _calcBlockHash(oBlock, nonce);
 }
 
 function proofOfWorkMining() {
@@ -364,6 +367,7 @@ function proofOfWorkMining() {
   }
 
   const miningFn = () => {
+    // dynamically adjusting the difficulty of leading zeros
     var difficulty = (iNumberOfMiners >= 10 ? 3 : 2);
     if (
       bMining &&
@@ -380,21 +384,25 @@ function proofOfWorkMining() {
         oBlock.n = nonce;
 
         fnScope.token += 5; // give 5 tokens as reward
-        b.send("B" + JSON.stringify(oBlock));
-        //aBlockchain.push(oBlock);
+        b.send(oMessageTypes.NEW_BLOCK + JSON.stringify(oBlock));
+        
         startNewBlock();
         clearInterval(oMiningIntervalCaller);
         return nonce;
       }
     }
   };
+  // dynamic simulated delay of each brute force according to active miners in the network
   oMiningIntervalCaller = setInterval(miningFn, (iNumberOfMiners >= 10 ? 100 : 200));
 }
 
 const shareAccomplishment = (sKey) => {
+  // set in angular scope
   fnScope.highestAchievement = sKey;
+
+  // share with network
   b.send(
-    "U" +
+    oMessageTypes.ACCOMPLISHMENT +
       JSON.stringify({
         k: sKey,
       })
@@ -412,14 +420,14 @@ function getNickname(sAddress) {
 function startMining(b) {
   if (bMining === false) {
     bMining = true;
-    b.send("M+");
+    b.send(oMessageTypes.NEW_MINER);
   }
 }
 
 function stopMining(b) {
   if (bMining === true) {
     bMining = false;
-    b.send("M-");
+    b.send(oMessageTypes.REMOVE_MINER);
   }
 }
 
@@ -440,24 +448,25 @@ localStorage["bugout-demo-seed"] = b.seed;
 
 // Register critical information
 const publicAddress = b.address();
+// derive a simulated private key for the public Bugout address
 const privateKey = getPrivateKey(b.address());
 
+// nickname instead of key
 const sUserNickName = prompt("Dein Nickname", "");
-
-log(b.address());
 
 // Register personal nickname across the network
 b.send(
-  "N" +
+  oMessageTypes.ANNOUNCE_NICKNAME +
     JSON.stringify({
       k: publicAddress,
       n: sUserNickName,
     })
 );
+
+// recognize own nickname in dictionary
 oNickNames[publicAddress] = sUserNickName;
 
-log(privateKey + " [ private key ]");
-
+// for new participants, share all nicknames one peer knows
 b.on("seen", function (address) {
   // wait until nickname has arrived
   setTimeout(() => {
@@ -465,11 +474,11 @@ b.on("seen", function (address) {
   }, 1500);
 
   // send the nickname dicitonary as well
-  b.send(address, "S" + JSON.stringify(oNickNames));
+  b.send(address, oMessageTypes.NICKNAME_DICT + JSON.stringify(oNickNames));
 });
 
+// helper variable for tracking active number of connections
 var previousConnections = 0;
-
 b.on("connections", function (iConnections) {
   // added new connection
   if (iConnections > previousConnections) {
@@ -488,6 +497,7 @@ b.on("connections", function (iConnections) {
   previousConnections = iConnections;
 });
 
+// delete nickname and miner when peer leaves
 b.on("left", function (address) {
   fnScope.participantLeft(getNickname(address));
   iNumberOfMiners -= 1;
@@ -496,17 +506,17 @@ b.on("left", function (address) {
 });
 
 b.on("message", function (address, message) {
-  console.log(message);
-
+  
   // check what message came in
   var sFirstLetter = message.substr(0, 1);
-  if (sFirstLetter === "A") {
+  if (sFirstLetter === oMessageTypes.OUTGOING_UNCONFIRMED) {
     var oTx = JSON.parse(message.substr(1));
     if (oTx.s === address) {
       // new unconfirmed transaction arrived
       oBlock.l.push(oTx);
       fnScope.newMessage(getNickname(address), oTx.t);
 
+      // if participant is also reciever of the message
       if (oTx.r === publicAddress) {
         if (
           !fnScope.activeConversations
@@ -559,7 +569,7 @@ b.on("message", function (address, message) {
 
       proofOfWorkMining();
     }
-  } else if (sFirstLetter === "B") {
+  } else if (sFirstLetter === oMessageTypes.NEW_BLOCK) {
     // new block arrived
     var oFoundBlock = JSON.parse(message.substr(1));
     if (verifyBlock(oFoundBlock)) {
@@ -578,7 +588,7 @@ b.on("message", function (address, message) {
         oFoundBlock.b
       );
     }
-  } else if (sFirstLetter === "C") {
+  } else if (sFirstLetter === oMessageTypes.COPY_BLOCKCHAIN) {
     // the new blockchain is there
     var aRecievedBlockchain = JSON.parse(message.substr(1));
     if (aRecievedBlockchain.b.length > aBlockchain.length) {
@@ -594,11 +604,11 @@ b.on("message", function (address, message) {
         iNumberOfMiners = aRecievedBlockchain.n;
       }
     }
-  } else if (sFirstLetter === "N") {
+  } else if (sFirstLetter === oMessageTypes.ANNOUNCE_NICKNAME) {
     // a new user is there
     var oNickNameObject = JSON.parse(message.substr(1));
     oNickNames[oNickNameObject.k] = oNickNameObject.n;
-  } else if (sFirstLetter === "S") {
+  } else if (sFirstLetter === oMessageTypes.NICKNAME_DICT) {
     // a list of new nicknames arrived
     console.log(message.substr(1));
     var oNickNameDirectory = JSON.parse(message.substr(1));
@@ -611,7 +621,7 @@ b.on("message", function (address, message) {
           // whenever a new participant joins the entire blockchain will be send
           b.send(
             sAddress,
-            "C" +
+            oMessageTypes.COPY_BLOCKCHAIN +
               JSON.stringify({
                 b: aBlockchain,
                 n: iNumberOfMiners,
@@ -622,13 +632,13 @@ b.on("message", function (address, message) {
 
       oNickNames[sAddress] = sRelatedNickName;
     }
-  } else if (message.substr(0, 2) === "M+") {
+  } else if (message.substr(0, 2) === oMessageTypes.NEW_MINER) {
     // a new miner is registered
     iNumberOfMiners += 1;
-  } else if (message.substr(0, 2) === "M-") {
+  } else if (message.substr(0, 2) === oMessageTypes.REMOVE_MINER) {
     // a participant stops mining
     iNumberOfMiners -= 1;
-  } else if (message.substr(0, 1) === "U") {
+  } else if (message.substr(0, 1) === oMessageTypes.ACCOMPLISHMENT) {
     // accomplishment shared
     var oTx = JSON.parse(message.substr(1));
     fnScope.newAccomplishment(getNickname(address), oTx.k);
@@ -659,9 +669,8 @@ const sendMessage = (sMessage, sRecipient, sToken) => {
 
   oChat.c = parseInt(sToken, 10);
 
-  var oTx = createTxHash(oChat, privateKey);
-  console.log(oTx);
-  b.send("A" + JSON.stringify(createTxHash(oChat, privateKey)));
+  // share with network
+  b.send(oMessageTypes.OUTGOING_UNCONFIRMED + JSON.stringify(attachTxHash(oChat, privateKey)));
 
   proofOfWorkMining();
 };
