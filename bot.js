@@ -56,7 +56,8 @@ const aRandomMsg = [
   "Proof-of-Work ist leider überhaupt nicht umweltfreundlich",
   "Es gibt über 11'000 Blockchain Startups",
   "Blockchain speichert immer Transaktionen ab",
-  "Es gibt so viele neue Blockchains inzwischen"
+  "Es gibt so viele neue Blockchains inzwischen",
+  "Blockchains sind immer noch langsamer als klassische Datenbanken"
 ]
 
 const getRandomFromArray = (array) => {
