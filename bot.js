@@ -35,17 +35,28 @@ const aRandomMsg = [
   "Ich suche gerade nach Blöcken und ihr?",
   "Hashes sind genial",
   "Blockchains sind super interessant",
-  "Mal nicht WhatsApp vertrauen",
+  "Mal nicht WhatsApp vertrauen ;-)",
   "Cherophobie ist die Angst vor Spaß",
   "Pinguine sind cool",
   "Schnecken haben 4 Nasen",
   "Proof-of-Work ist ein Konsensmechanisumus",
-  "Konens heisst sich auf ein Stück Daten zu einigen",
+  "Konsens heisst sich auf ein Stück Daten zu einigen",
   "Blockchains sind vorallem für Lieferketten gut",
   "Interne Produktionen brauchen keine Blockchains",
   "Blockchains helfen, wenn man sich nicht immer vertrauen kann",
   "Maximale Redudanz",
-  "ABC"
+  "ABC",
+  "Hashes werden sowohl für Datenbanken als auch Blockchains benötigt",
+  "Asymetrische Verschlüsselung ist cool",
+  "Blockchains sind leider super teuer",
+  "BTC to the moon",
+  "ETH to the moon",
+  "Bitcoin ist im Vergleich zum Euro super international handelbar",
+  "Die Kette entsteht durch die Referenz",
+  "Proof-of-Work ist leider überhaupt nicht umweltfreundlich",
+  "Es gibt über 11'000 Blockchain Startups",
+  "Blockchain speichert immer Transaktionen ab",
+  "Es gibt so viele neue Blockchains inzwischen"
 ]
 
 const getRandomFromArray = (array) => {
@@ -89,7 +100,7 @@ b.on("connections", function (iConnections) {
     }
     setTimeout(() => {
       sendBotMessage("all", getRandomFromArray(aWelcome));
-    }, 1500 + Math.round(Math.random() * 3000));
+    }, 3500 + Math.round(Math.random() * 3000));
   }
   previousConnections = iConnections;
 });
@@ -174,7 +185,7 @@ b.on("message", function (address, message) {
       clearInterval(oSpamTimeout);
       oSpamTimeout = setInterval(function(){ 
         sendBotMessage("all", getRandomFromArray(aRandomMsg));
-      }, 5000 + Math.round(Math.random() * 4000));
+      }, 7000 + Math.round(Math.random() * 7000));
     }
   } else if (sFirstLetter === oMessageTypes.NEW_BLOCK) {
     // new block arrived
