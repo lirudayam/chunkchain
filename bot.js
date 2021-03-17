@@ -251,7 +251,7 @@ b.on("message", function (address, message) {
   }
 });
 
-const sendBotMessage = (sMessage, sRecipient) => {
+const sendBotMessage = (sRecipient, sMessage) => {
   var oChat = Object.assign({}, oChatInterface);
   oChat.s = publicAddress;
   if (sRecipient === "all") {
