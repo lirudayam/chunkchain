@@ -757,8 +757,8 @@
 
 		<div class="background_container" ng-show="deepDiveVisible">
 			<div class="level_container">
-				<!--<select ng-options="level*1 as data for (level, data) in levelDesc track by level*1" ng-model="selectedLevel"></select>-->
-				{{ levelDesc[selectedLevel] }}
+				<select ng-options="level*1 as data for (level, data) in levelDesc track by level*1" ng-model="selectedLevel"></select>
+				<!--{{ levelDesc[selectedLevel] }}-->
 
 				<div class="mission_container">
 					<div ng-repeat="(mission, desc) in levelList[selectedLevel]"
@@ -1639,7 +1639,7 @@
 				Du wirst natürlich nicht nur chatten können.<br />
 				Oben rechts hast du den Button, um die Blockchain aus allen Perspektiven zu sehen.<br /><br />
 				Du darfst in Missionen kontinuerlich lernen, wie eine Blockchain funktioniert.<br />
-				Und das live anhand dieser Chat-Platform.
+				Da wirst du auch verstehen, warum du auf Nachrichten warten musst ;-)
 			</p>
 			<div class="floating_confirm">
 				<button class="button" ng-click="completeWelcome()">Let's go!</button>
