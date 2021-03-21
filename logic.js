@@ -431,37 +431,44 @@ function stopMining(b) {
   }
 }
 
-// Get connected with our peers via torrent server
-var b = Bugout("chunkchain", {
-  announce: [
-    "ws://192.168.178.71:8000",
-    /*'wss://hub.bugout.link',
-  		'wss://tracker.openwebtorrent.com',
-		'wss://tracker.webtorrent.io',
-		'ws://tracker.sloppyta.co',
-		'wss://tracker.files.fm'*/
-    //'wss://webrtc-tracker.cfapps.eu10.hana.ondemand.com:443'
-  ],
-  seed: localStorage["bugout-demo-seed"],
-});
-localStorage["bugout-demo-seed"] = b.seed;
+let publicAddress, privateKey, b, sUserNickName;
 
-// Register critical information
-const publicAddress = b.address();
-// derive a simulated private key for the public Bugout address
-const privateKey = getPrivateKey(b.address());
+const startConnection = (fnCallback) => {
+  // Get connected with our peers via torrent server
+  b = Bugout("chunkchain", {
+    announce: [
+      //"ws://127.0.0.1:8000",
+      "ws://faab64e545a0.ngrok.io"
+      /*'wss://hub.bugout.link',
+        'wss://tracker.openwebtorrent.com',
+      'wss://tracker.webtorrent.io',
+      'ws://tracker.sloppyta.co',
+      'wss://tracker.files.fm'*/
+      //'wss://webrtc-tracker.cfapps.eu10.hana.ondemand.com:443'
+    ],
+    seed: localStorage["bugout-demo-seed"]
+  });
+  localStorage["bugout-demo-seed"] = b.seed;
 
-// Register personal nickname across the network
-b.send(
-  oMessageTypes.ANNOUNCE_NICKNAME +
-    JSON.stringify({
-      k: publicAddress,
-      n: sUserNickName,
-    })
-);
+  // Register critical information
+  publicAddress = b.address();
+  // derive a simulated private key for the public Bugout address
+  privateKey = getPrivateKey(b.address());
 
-// recognize own nickname in dictionary
-oNickNames[publicAddress] = sUserNickName;
+  // Register personal nickname across the network
+  b.send(
+    oMessageTypes.ANNOUNCE_NICKNAME +
+      JSON.stringify({
+        k: publicAddress,
+        n: sUserNickName,
+      })
+  );
+
+  // recognize own nickname in dictionary
+  oNickNames[publicAddress] = sUserNickName;
+
+  fnCallback();
+}
 
 const sendMessage = (sMessage, sRecipient, sToken) => {
   var oChat = Object.assign({}, oChatInterface);

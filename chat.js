@@ -1,15 +1,15 @@
-
-// for new participants, share all nicknames one peer knows
-b.on("seen", function (address) {
+const registerHandlers = () => {
+  // for new participants, share all nicknames one peer knows
+  b.on("seen", function (address) {
     // wait until nickname has arrived
     setTimeout(() => {
       fnScope.newParticipant(getNickname(address));
     }, 1500);
-  
+
     // send the nickname dicitonary as well
     b.send(address, oMessageTypes.NICKNAME_DICT + JSON.stringify(oNickNames));
   });
-  
+
   // helper variable for tracking active number of connections
   var previousConnections = 0;
   b.on("connections", function (iConnections) {
@@ -29,17 +29,16 @@ b.on("seen", function (address) {
     }
     previousConnections = iConnections;
   });
-  
+
   // delete nickname and miner when peer leaves
   b.on("left", function (address) {
     fnScope.participantLeft(getNickname(address));
     iNumberOfMiners -= 1;
-  
+
     delete oNickNames[address];
   });
-  
+
   b.on("message", function (address, message) {
-    
     // check what message came in
     var sFirstLetter = message.substr(0, 1);
     if (sFirstLetter === oMessageTypes.OUTGOING_UNCONFIRMED) {
@@ -48,7 +47,7 @@ b.on("seen", function (address) {
         // new unconfirmed transaction arrived
         oBlock.l.push(oTx);
         fnScope.newMessage(getNickname(address), oTx.t);
-  
+
         // if participant is also reciever of the message
         if (oTx.r === publicAddress) {
           if (
@@ -65,7 +64,7 @@ b.on("seen", function (address) {
             (convo) => convo.name === getNickname(address)
           );
           fnScope.activeConversations[foundIndex].lastMsg = moment().unix();
-  
+
           // for the counter
           if (
             fnScope.newMessages.hasOwnProperty(getNickname(address)) &&
@@ -84,7 +83,7 @@ b.on("seen", function (address) {
             (convo) => convo.name === "all"
           );
           fnScope.activeConversations[foundIndex].lastMsg = moment().unix();
-  
+
           // for the counter
           if (
             fnScope.newMessages.hasOwnProperty("all") &&
@@ -99,7 +98,7 @@ b.on("seen", function (address) {
             0
           );
         }
-  
+
         proofOfWorkMining();
       }
     } else if (sFirstLetter === oMessageTypes.NEW_BLOCK) {
@@ -129,7 +128,7 @@ b.on("seen", function (address) {
           aBlockchain = aRecievedBlockchain.b;
           fnScope.msgArrived(true, null);
         }
-  
+
         // recieved number of miners has changes
         if (aRecievedBlockchain.n !== iNumberOfMiners) {
           iNumberOfMiners = aRecievedBlockchain.n;
@@ -159,7 +158,7 @@ b.on("seen", function (address) {
             );
           }
         }
-  
+
         oNickNames[sAddress] = sRelatedNickName;
       }
     } else if (message.substr(0, 2) === oMessageTypes.NEW_MINER) {
@@ -176,3 +175,4 @@ b.on("seen", function (address) {
       log(getNickname(address) + ": " + message);
     }
   });
+};
