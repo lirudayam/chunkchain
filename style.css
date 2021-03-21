@@ -41,7 +41,7 @@ button {
     position: relative;
 }
 
-.button__badge {
+.button_badge {
     background-color: #fa3e3e;
     border-radius: 2px;
     color: white;
@@ -880,8 +880,8 @@ select option {
     display: inline-block;
     line-break: strict;
     word-wrap: break-word;
-    width: 400px;
-    max-height: 60px;
+    width: 90%;
+    max-height: 30px;
     overflow: scroll;
 }
 

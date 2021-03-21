@@ -285,7 +285,8 @@
 					$scope.feedNews.push({
 						'type': '+',
 						'actor': sNickname,
-						'time': moment().format("hh:mm:ss")
+						'time': moment().format("hh:mm:ss"),
+						'id': "NP" +  moment().format("hh:mm:ss:SSS") + Math.random()
 					});
 				};
 
@@ -509,7 +510,9 @@
 
 							$scope.selectedLevel += 1;
 							$scope.selectedMission = 0;
-							document.querySelector("#selectedLevelCombo").value = $scope.selectedLevel;
+							setTimeout(() => {
+								document.querySelector("#selectedLevelCombo").value = $scope.selectedLevel;
+							}, 500);
 						}
 					} else {
 						// check for rewards
@@ -636,9 +639,9 @@
 			<a ng-show="chatVisible"
 				ng-click="switchToBlockchain()">{{ levelRewards[1][0] === 2 ? 'weiter deep-diven' : 'wie es funktioniert' }}</a>
 			<a ng-show="deepDiveVisible" ng-click="switchToChat()">wieder chatten
-				<span class="button__badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}"
-					ng-show="{{ noOfNewMessages > 0 }}">{{ noOfNewMessages }}</span>
+				<span class="button_badge {{ noOfNewMessages === 0 ? 'hidden' : '' }}">{{ noOfNewMessages }}</span>
 			</a>
+			<!--ng-show="{{ noOfNewMessages > 0 }}"-->
 			<span>dein Kontostand: <b>{{ token }} Token</b>
 				{{ highestAchievement === 'L2' ? '&#129352;' : (highestAchievement === 'L5' ? '&#129351;' : '') }}</span>
 		</div>
@@ -804,7 +807,7 @@
 									dann weiter.<br />
 								</td>
 								<td>
-									Bei uns sieht das anders aus. Wie du siehst, gibt es kein Server. Jeder kommuniziert
+									Bei uns sieht das anders aus. Wie du siehst, gibt es keinen Server. Jeder kommuniziert
 									direkt mit jedem.<br />
 									Da wir alle gleichwertig in diesem Netzwerk sind, reden wir gar nicht mehr von
 									Client oder Server, sondern von <b>Peers</b>.<br />
@@ -934,7 +937,7 @@
 				<div ng-if="selectedLevel == 1 && selectedMission == 1 ">
 					<p class="introduction_section">
 						<table>
-							<tr>
+							<tr height="80px">
 								<td>
 									Die <b>symmetrische</b> Verschlüsselung verschlüsselt und entschlüsselt mit
 									dem gleichen Schlüssel.<br />
@@ -951,38 +954,61 @@
 								</td>
 							</tr>
 							<tr>
-								<td>
-									<div class="form">
-										Nachricht: <input type="text" size="50" ng-model="symText" /> <br /><br />
-										Dein Schlüssel: <input type="text" size="50" ng-model="symKey" /> <br /><br />
-										Verschlüsselte Nachricht: <b>{{ encrypt(symText, symKey) }}</b>
-									</div>
-									<br />
-									<hr /><br />
-									Zum Entschlüsseln:
-									<div class="form">
-										Verschlüsselte Nachricht: <input type="text" size="50" ng-model="symEncrypt" />
-										<br /><br />
-										Dein Schlüssel: <input type="text" size="50" ng-model="symDecryptKey" />
-										<br /><br />
-										Entschlüsselte Nachricht: <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
-									</div>
-								</td>
-								<td>
-									<div class="form">
-										Nachricht: <input type="text" size="50" ng-model="asymInputText"
-											ng-change="asymEncryptMessage(asymInputText)" /> <br /><br />
-										public key: <div class="key">{{ keyPairOutput.publicKey }}</div> <br /><br />
-										Verschlüsselte Nachricht: <b>{{ asymOutputText }}</b>
-									</div>
-									<br />
-									<hr /><br />
-									Zum Entschlüsseln:
-									<div class="form">
-										private key: <div class="key">{{ keyPairOutput.privateKey }}</div>
-										<br /><br />
-										entschlüsselt: <b>{{ asymInputText }}</b>
-									</div>
+								<td colspan="2">
+									<table>
+										<tr>
+											<td>
+												<input type="text" size="50" ng-model="symText" />
+											</td>
+											<td>
+												<input type="text" size="50" ng-model="asymInputText"
+											ng-change="asymEncryptMessage(asymInputText)" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												Dein Schlüssel: <br /><input type="text" size="50" ng-model="symKey" />
+											</td>
+											<td>
+												public key: <br /><div class="key">{{ keyPairOutput.publicKey }}</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												Verschlüsselte Nachricht:<br /> <b>{{ encrypt(symText, symKey) }}</b>
+											</td>
+											<td>
+												Verschlüsselte Nachricht:<br /> <b>{{ asymOutputText }}</b>
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2">
+												<hr />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												Verschlüsselte Nachricht:<br /> <input type="text" size="50" ng-model="symEncrypt" />
+											</td>
+											<td rowspan="2">
+												private key:<br /> <div class="key">{{ keyPairOutput.privateKey }}</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												Dein Schlüssel:<br /> <input type="text" size="50" ng-model="symDecryptKey" />
+											</td>
+											
+										</tr>
+										<tr>
+											<td>
+												Entschlüsselte Nachricht:<br /> <b>{{ decrypt(symEncrypt, symDecryptKey) }}</b>
+											</td>
+											<td>
+												entschlüsselt:<br /> <b>{{ asymInputText }}</b>
+											</td>
+										</tr>
+									</table>
 								</td>
 							</tr>
 						</table>
@@ -1052,7 +1078,7 @@
 									Dazu müssen wir uns nur unser P2P (Peer-to-Peer)-Netzwerk anschauen.<br />
 									Wir haben hier extra Redundanz, sodass das System robuster wird.<br />
 									Also hat auch jeder eine vollständige Kopie der Daten (also ein Backup).<br />
-									Das kann natürlich ziemlich schnell, ziemlich gross werden, weswegen es auch
+									Das kann natürlich ziemlich schnell, ziemlich gross werden, weswegen es
 									inzwischen auch andere Lösungen gibt.<br /><br />
 									In unserem Fall speichern wir jede Transaktion bei jedem Peer. <br />
 									Das heisst, du kannst auch immer sehen, wer wem was geschrieben hat.
@@ -1622,7 +1648,7 @@
 			<h1 class="page_title">Hej!</h1>
 			<p class="introduction_section">
 				Willkommen in unserer Blockchain.<br />
-				Du wirst gleich mit all deinen Schülern chatten können.<br />
+				Du wirst gleich mit all deinen Mitschülern chatten können.<br />
 				Besonders dabei ist, dass ihr das auf einer Blockchain werdet.
 			</p>
 			<div class="floating_confirm">
