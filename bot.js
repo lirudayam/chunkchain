@@ -1,3 +1,4 @@
+sUserNickName = "Bob the Bot";
 startConnection(() => {
 	// Register personal nickname across the network
 	b.send(
@@ -189,7 +190,7 @@ startConnection(() => {
 				clearInterval(oSpamTimeout);
 				oSpamTimeout = setInterval(function () {
 					sendBotMessage("all", getRandomFromArray(aRandomMsg));
-				}, 7000 + Math.round(Math.random() * 7000));
+				}, 9000 + Math.round(Math.random() * 7000));
 			}
 		} else if (sFirstLetter === oMessageTypes.NEW_BLOCK) {
 			// new block arrived

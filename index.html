@@ -984,7 +984,10 @@
 				</div>
 				<div ng-if="selectedLevel == 1 && selectedMission == 2 ">
 					<p class="introduction_section">
-						Deine Nachricht wird als eine Transaktion geschickt. Dabei sieht die Struktur wie folgt aus:
+						Du kannst das mal interaktiv ausprobieren, indem du eine Nachricht mal schreibst. <br />
+						Diese Nachricht wird als eine Transaktion geschickt. Dabei werden weitere Informationen, wie Sender, Empfänger, Zeitstempel, ... angehängt.<br />
+						Wie du aus dem Unterricht gelernt hast, wird auch der Hash erzeugt und mit deinem private key verschlüsselt. <br /><br />
+						Dabei sieht die Struktur wie folgt aus:
 
 						<ul class="flow">
 							<li><b>Orginale Transaktion</b> <br /><br />
@@ -1039,7 +1042,7 @@
 								<td>
 									Dazu müssen wir uns nur unser P2P (Peer-to-Peer)-Netzwerk anschauen.<br />
 									Wir haben hier extra Redundanz, sodass das System robuster wird.<br />
-									Also hat auch jeder eine vollständige Kopie der Daten (oder Backup).<br />
+									Also hat auch jeder eine vollständige Kopie der Daten (also ein Backup).<br />
 									Das kann natürlich ziemlich schnell, ziemlich gross werden, weswegen es auch
 									inzwischen auch andere Lösungen gibt.<br /><br />
 									In unserem Fall speichern wir jede Transaktion bei jedem Peer. <br />
@@ -1160,14 +1163,13 @@
 						<table>
 							<tr>
 								<td>
-									Jede Transaktion wird direkt im gesamten Netzwerk geteilt. <br />
-									Jeder Teilnehmer kann hierbei sehr leicht prüfen, ob die Transaktion gültig ist.
+									Jeder Teilnehmer kann sehr leicht prüfen, ob eine Transaktion gültig ist.
 									<br />
-									Wenn dies der Fall sein sollte, landen die Transaktionen in einem Pool (unconfirmed
+									Gültige Transaktioneen, landen die Transaktionen in einem Pool (unconfirmed
 									transaction pool). <br /><br />
 
 									Jetzt muss sich jemand der Aufgabe stellen, einen Block zu finden.<br />
-									Dabei sucht die Person die Lösung (Nonce) einer kryptographischen Challenge.
+									Dabei sucht die Person die Lösung einer kryptographischen Challenge.
 									<br /><br />
 
 									Mit dem Hash der Transaktionen zusammen werden einige Informationen aus dem <b>block
@@ -1176,13 +1178,13 @@
 									Darunter sind vorallem der Blockhash des vorherigen Blocks und
 									Zeitstempel.<br /><br />
 
-									Die kryptographische Challenge liegt darin eine Zeichenkette in Block hinzuzufügen,
-									sodass der Endhash mit Nullen
+									Die kryptographische Challenge liegt darin eine Zeichenkette (Nonce) in Block hinzuzufügen,
+									sodass der Blockhash mit Nullen
 									beginnt.<br />
-									Wie du vorhin gesehen hast, verändert ein Buchstabe einen Hash komplett. <br />
 									Jetzt muss jemand eine x-beliebige Zeichenfolge zu den bestehenden Daten zu finden,
 									sodass der Hash mit x Nullen beginnt. <br />
-									Je mehr Nullen am Anfang gefordert sind, desto schwieriger wird es. <br /><br />
+									Je mehr Nullen am Anfang gefordert sind, desto schwieriger wird es. <br />
+									Probier es doch mal aus!<br /><br />
 
 									Einfaches Beispiel: <br />
 									Wenn ein Blockhash mit einer Null beginnen soll, braucht man ca. 16 Versuche. <br />
@@ -1400,9 +1402,9 @@
 									</select><br /><br />
 
 									Deine Antwort ist:
-									{{ deleteChoice === 'y' ? 'richtig' : (deleteChoice === 'n' ? 'falsch' : '') }}
+									{{ deleteChoice === 'n' ? 'richtig' : (deleteChoice === 'y' ? 'falsch' : '') }}
 									<br />
-									{{ deleteChoice === 'y' ? 'Das sollte dir gut bewusst sein. Jede deiner Nachrichten wird für immer bleiben.' : '' }}
+									{{ deleteChoice === 'n' ? 'Das sollte dir gut bewusst sein. Jede deiner Nachrichten wird für immer bleiben.' : '' }}
 								</td>
 							</tr>
 						</table>
