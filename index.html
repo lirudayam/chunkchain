@@ -272,12 +272,13 @@
 				};
 
 				// new convo selected and refresh the messages
-				$scope.conversationSelected = function (sSelectedItem) {
+				$scope.convoSelected = function (sSelectedItem) {
 					$scope.selectedConversation = sSelectedItem;
 					$scope.msgArrived(true, null);
 					// remove potential flags for new messages 
 					delete $scope.newMessages[sSelectedItem];
 					$scope.noOfNewMessages = Object.values(fnScope.newMessages).reduce((a, b) => a + b, 0);
+					document.querySelector("#currentMessageInput").focus();
 				};
 
 				$scope.newParticipant = function (sNickname) {
@@ -309,7 +310,7 @@
 						'type': 'MSG',
 						'actor': sNickname,
 						'time': moment(oTimestamp).format("hh:mm:ss"),
-						'id': 'MSG' + sNickname + moment(oTimestamp).format("hh:mm:ss:SSS")
+						'id': 'MSG' + sNickname + moment(oTimestamp).format("hh:mm:ss:SSS") + Math.random()
 					});
 					$scope.msgArrived(false, oTimestamp);
 				};
@@ -320,7 +321,7 @@
 						'actor': sNickname,
 						'time': moment().format("hh:mm:ss"),
 						'badge': oBadges[sKey],
-						'id': 'U' + sNickname + moment().format("hh:mm:ss:SSS")
+						'id': 'U' + sNickname + moment().format("hh:mm:ss:SSS") + Math.random()
 					});
 				};
 
@@ -330,7 +331,7 @@
 							'type': 'S',
 							'nonce': sNonce,
 							'time': moment().format("hh:mm:ss"),
-							'id': 'S' + moment().format("hh:mm:ss:SSS")
+							'id': 'S' + moment().format("hh:mm:ss:SSS") + Math.random()
 						});
 					} else {
 						$scope.feedNews.push({
@@ -339,7 +340,7 @@
 							'n': iMessages,
 							'b': iBlockNumber,
 							'time': moment().format("hh:mm:ss"),
-							'id': 'B' + sNickname + moment().format("hh:mm:ss:SSS")
+							'id': 'B' + sNickname + moment().format("hh:mm:ss:SSS") + Math.random()
 						});
 					}
 					$scope.msgArrived(true);
@@ -415,6 +416,11 @@
 					return (aParticipants.filter(n => !$scope.activeConversations.map(convo => convo.name)
 						.includes(n) && n !== sUserNickName));
 				}
+				$scope.newConvoAvailable = function () {
+					var aParticipants = Object.values(oNickNames);
+					return (aParticipants.filter(n => !$scope.activeConversations.map(convo => convo.name)
+						.includes(n) && n !== sUserNickName)).length > 0;
+				}
 				$scope.newConvoSelected = function (sName) {
 					if ($scope.activeConversations.filter(convo => convo.name === sName).length === 0) {
 						$scope.activeConversations.push({
@@ -427,6 +433,8 @@
 
 					var modal = document.getElementById("popupModal");
 					modal.style.display = "none";
+
+					document.querySelector("#currentMessageInput").focus();
 				}
 				$scope.formatTime = function (iTimestamp) {
 					return moment(iTimestamp).format('LTS');
@@ -501,6 +509,7 @@
 
 							$scope.selectedLevel += 1;
 							$scope.selectedMission = 0;
+							document.querySelector("#selectedLevelCombo").value = $scope.selectedLevel;
 						}
 					} else {
 						// check for rewards
@@ -661,7 +670,7 @@
 						<p ng-repeat="convo in activeConversations | orderBy : '-lastMsg'"
 							class="conversation {{ convo.name === selectedConversation ? 'selected' : '' }}"
 							data-letters="{{ convo.name.substr(0, 1).toUpperCase() }}"
-							ng-click="conversationSelected(convo.name)">
+							ng-click="convoSelected(convo.name)">
 							{{ convo.name }}
 							<span
 								class="{{ (newMessages[convo.name] && newMessages[convo.name] > 0) ? 'dot' : '' }}"></span>
@@ -737,14 +746,14 @@
 				</div>
 				<div class="chat_window_footer">
 					<div class="chat_window_footer_new_chat_container">
-						<button class="button" ng-click="newConvo()">neuer Chat</button>
+						<button class="button" ng-click="newConvo()" ng-if="newConvoAvailable()">neuer Chat</button>
 					</div>
 					<div class="chat_window_footer_message">
 						<input type="number" size="1" maxlength="2" ng-model="tokenPerMessage" />
 						Token
 						<div class="flexible_grow"></div>
 						<form ng-submit="onSendChatMessage($event)">
-							<input type="text" size="40" maxlength="300" placeholder="Nachricht..."
+							<input type="text" id="currentMessageInput" size="40" maxlength="300" placeholder="Nachricht..."
 								ng-model="currentMessage" />
 							<button class="button" [disabled]="currentMessage !== ''">senden</button>
 						</form>
@@ -757,7 +766,7 @@
 
 		<div class="background_container" ng-show="deepDiveVisible">
 			<div class="level_container">
-				<select ng-options="level*1 as data for (level, data) in levelDesc track by level*1" ng-model="selectedLevel"></select>
+				<select ng-options="level*1 as data for (level, data) in levelDesc track by level*1" ng-model="selectedLevel" id="selectedLevelCombo"></select>
 				<!--{{ levelDesc[selectedLevel] }}-->
 
 				<div class="mission_container">
@@ -779,7 +788,7 @@
 						Du wirst jederzeit die Gelegenheit haben, mit anderen zu chatten. <br /><br />
 						Du kannst währenddessen Missionen erfüllen, und dir eine echte Blockchain aus verschiedenen
 						Winkeln anschauen.<br />
-						Am Ende jeder Mission hast du unten einen Button mit "Mission abschliessen". <br /><br />
+						Am Ende jeder Mission hast du unten einen Button mit "Zur nächsten Mission". <br /><br />
 						Also worauf wartest du? Let's go!
 					</p>
 				</div>
@@ -795,7 +804,7 @@
 									dann weiter.<br />
 								</td>
 								<td>
-									Bei uns sind das anders aus. Wie du siehst, gibt es kein Server. Jeder kommuniziert
+									Bei uns sieht das anders aus. Wie du siehst, gibt es kein Server. Jeder kommuniziert
 									direkt mit jedem.<br />
 									Da wir alle gleichwertig in diesem Netzwerk sind, reden wir gar nicht mehr von
 									Client oder Server, sondern von <b>Peers</b>.<br />
@@ -830,9 +839,9 @@
 								<td>
 									Und hier speichern wir tatsächlich <i>alle</i> Daten auf <i>allen</i>
 									Peer-Rechnern.<br />
-									Diese Redundanz ist bewusst erzeugt, um das System stabiler zu machen.<br />
+									Dieses Kopieren auf allen Rechnern (<b>Redundanz</b>) ist bewusst erzeugt, um das System stabiler zu machen.<br />
 									Fällt ein Rechner aus, sind genug andere noch da. Doch das Ganze hat auch
-									Nachteile.<br />
+									Nachteile (in den weiteren Missionen zu sehen).<br />
 								</td>
 							</tr>
 							<tr>
@@ -1569,8 +1578,7 @@
 				</div>
 
 				<div class="floating_confirm">
-					<button class="button" id="completionBtn" ng-click="missionCompleted()">Mission
-						abschliessen</button>
+					<button class="button" id="completionBtn" ng-click="missionCompleted()">zur nächsten Mission</button>
 				</div>
 
 
