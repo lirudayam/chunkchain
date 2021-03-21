@@ -439,7 +439,8 @@ const startConnection = (fnCallback) => {
     announce: [
       //"ws://127.0.0.1:8000",
       //"ws://192.168.178.71:8000"
-      "wss://40ef7c4e71d9.ngrok.io"
+      //"wss://40ef7c4e71d9.ngrok.io"
+      "wss://b6ce8e37da74.ngrok.io"
       //"ws://faab64e545a0.ngrok.io"
       /*'wss://hub.bugout.link',
         'wss://tracker.openwebtorrent.com',

@@ -60,6 +60,13 @@ startConnection(() => {
 		"Blockchain speichert immer Transaktionen ab",
 		"Es gibt so viele neue Blockchains inzwischen",
 		"Blockchains sind immer noch langsamer als klassische Datenbanken",
+		"Blockchain ist ein aufkommender Trend",
+		"Bitcoin und Blockchain sind nicht das gleiche",
+		"Mehr praktisches Lernen. Woohooo!",
+		"Mit Blockchains hab ich den digitalen Beweis",
+		"Damals hat man für Verfizierungen noch ein Codewort versteckt",
+		"Asymmetrische Verschlüsselung ist stärker als symmetrische",
+		"Signierte Hashes sind die best Möglichkeit"
 	];
 
 	const getRandomFromArray = (array) => {

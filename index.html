@@ -490,6 +490,8 @@
 							$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L5 +
 								" verdient.");
 							shareAccomplishment("L5");
+							delete $scope.levelRewards[$scope.selectedLevel].f;
+							$scope.switchToChat();
 						} else {
 							// check for rewards
 							if ($scope.levelRewards[$scope.selectedLevel].hasOwnProperty("f")) {
@@ -564,14 +566,14 @@
 					$scope.deepDiveVisible = true;
 				}
 				$scope.simulateBlockHashCalculation = function (oBlock, sNonce) {
-					if (oBlock && oBlock.p) {
+					if (oBlock && oBlock.p !== null) {
 						return _calcBlockHash(oBlock, sNonce);
 					}
 					return "";
 				}
 
 				$scope.simulatePoW = function (oBlock) {
-					if (oBlock && oBlock.p) {
+					if (oBlock && oBlock.p !== null) {
 						return _calcBlockHash(oBlock, $scope.nonceInputPoW);
 					}
 					return "";
@@ -752,7 +754,7 @@
 						<button class="button" ng-click="newConvo()" ng-if="newConvoAvailable()">neuer Chat</button>
 					</div>
 					<div class="chat_window_footer_message">
-						<input type="number" size="1" maxlength="2" ng-model="tokenPerMessage" />
+						<input type="number" size="1" maxlength="2" min="1" ng-model="tokenPerMessage" />
 						Token
 						<div class="flexible_grow"></div>
 						<form ng-submit="onSendChatMessage($event)">
@@ -1200,7 +1202,7 @@
 								<td>
 									Jeder Teilnehmer kann sehr leicht prüfen, ob eine Transaktion gültig ist.
 									<br />
-									Gültige Transaktioneen, landen die Transaktionen in einem Pool (unconfirmed
+									Gültige Transaktionen landen die Transaktionen in einem Pool (unconfirmed
 									transaction pool). <br /><br />
 
 									Jetzt muss sich jemand der Aufgabe stellen, einen Block zu finden.<br />
@@ -1216,7 +1218,7 @@
 									Die kryptographische Challenge liegt darin eine Zeichenkette (Nonce) in Block hinzuzufügen,
 									sodass der Blockhash mit Nullen
 									beginnt.<br />
-									Jetzt muss jemand eine x-beliebige Zeichenfolge zu den bestehenden Daten zu finden,
+									Jetzt muss jemand eine x-beliebige Zeichenfolge zu den bestehenden Daten finden,
 									sodass der Hash mit x Nullen beginnt. <br />
 									Je mehr Nullen am Anfang gefordert sind, desto schwieriger wird es. <br />
 									Probier es doch mal aus!<br /><br />
@@ -1310,7 +1312,7 @@
 									Wir nutzen eine public blockchain, also jeder kann teilnehmen.<br /><br />
 
 									Das heisst auch, dass jeder die gesamte Historie sehen kann.<br />
-									Da deine Nachrichten bisher in Klartext verschickt worden, kann jeder deine
+									Da deine Nachrichten bisher in Klartext verschickt worden sind, kann jeder deine
 									Nachrichten lesen.<br />
 									Nun können wir uns den Trick der asymmetrischen Verschlüsselung zu nutze
 									machen.<br /><br />
@@ -1318,10 +1320,9 @@
 									Statt dass du selbst deinen private Key zum Verschlüsseln nimmst, nimmst du jemand
 									anders sein Key.<br />
 									Genauer gesagt, den public key deines Empfängers.<br />
-									Denn damit kann nur er mit seinem private key deine Nachricht entschlüsseln.
-								</td>
-								<td class="center_image">
-									<img src="./assets/Encryption.svg" /> <br />
+									Denn damit kann nur er mit seinem private key deine Nachricht entschlüsseln.<br /><br />
+									
+									Wie möchtest du zukünftige Nachrichten schicken? <br />
 									<div class="switch_container">
 										<span
 											class="{{ !selection.encryptMessageFlag ? 'switch_selected' : '' }}">unverschlüsselt</span>
@@ -1333,6 +1334,10 @@
 											class="{{ selection.encryptMessageFlag ? 'switch_selected' : '' }}">Nachrichten
 											verschlüsseln</span>
 									</div>
+								</td>
+								<td class="center_image">
+									<img src="./assets/Encryption.svg" />
+									
 								</td>
 							</tr>
 						</table>
@@ -1353,7 +1358,7 @@
 									Du probierst x-beliebige random Zeichenfolgen, um den Nonce zu finden.<br />
 									Das ist aber auch wahnsinnig rechenintensiv.<br /><br />
 
-									Denn je Power du hast, desto wahrscheinlicher ist es, dass du einen Block
+									Denn je mehr Power du hast, desto wahrscheinlicher ist es, dass du einen Block
 									findest.<br />
 									Dafür bekommst du natürlich auch eine Belohnung.<br />
 									Im Bitcoin-Netzwerk würdest du über 6 Bitcoin pro Block bekommen.<br /><br />
@@ -1416,14 +1421,14 @@
 							<tr>
 								<td>
 									Die Frage darfst du dir selbst beantworten.<br />
-									Denn das ist gar nicht so trivial und viele vergessen das.<br /><br />
+									Denn diese Frage ist gar nicht so trivial und viele vergessen das.<br /><br />
 
 									Blockchains haben folgende Eigenschaften:
 									<ul>
 										<li>Die Daten liegen bei allen Teilnehmern</li>
 										<li>Jedes kleine Stück Daten kann über Hashes verifiziert werden</li>
 										<li>Dadurch kannst du nichts aus der Vergangenheit ändern</li>
-										<li>Nichts ändern heisst du kannst nicht mal ein Zeichen verändern</li>
+										<li>Nichts ändern heisst, du kannst nicht mal ein Zeichen verändern</li>
 									</ul>
 								</td>
 								<td>
@@ -1493,7 +1498,7 @@
 									Wichtig dabei, es ist sehr schwer die Lösung zu finden, aber sehr leicht sie zu
 									verifizieren.<br /><br />
 
-									Das heisst also, dass wer als erstes diesen Nonce findet, dieser Miner den Block
+									Das heisst also, wer als erstes diesen Nonce findet, hat damit den Block
 									gefunden hat.<br />
 									Idealerweise sind in solch öffentlichen Netzwerken, die Schwierigkeitsstufen
 									dynamisch geregelt.<br />
@@ -1591,7 +1596,7 @@
 									Transaktionsdaten kannst du nicht manipulieren, wegen den fehlenden private
 									keys.<br />
 									Du kannst dich aber als Miner betätigen, und so über neue Daten entscheiden.<br />
-									Wenn du also die absolute Mehrheit (>50%) der Rechenpower hat, kannst du das
+									Wenn du also die absolute Mehrheit (>50%) der Rechenpower hast, kannst du das
 									ziemlich gut sogar. <br /><br />
 
 									Aber das ist so gut wie unmöglich.
