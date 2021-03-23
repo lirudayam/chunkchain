@@ -439,15 +439,12 @@ const startConnection = (fnCallback) => {
     announce: [
       //"ws://127.0.0.1:8000",
       //"ws://192.168.178.71:8000"
-      //"wss://40ef7c4e71d9.ngrok.io"
-      "wss://b6ce8e37da74.ngrok.io"
-      //"ws://faab64e545a0.ngrok.io"
+      "wss://ba964dd276b2.ngrok.io"
       /*'wss://hub.bugout.link',
         'wss://tracker.openwebtorrent.com',
       'wss://tracker.webtorrent.io',
       'ws://tracker.sloppyta.co',
       'wss://tracker.files.fm'*/
-      //'wss://webrtc-tracker.cfapps.eu10.hana.ondemand.com:443'
     ],
     seed: localStorage["bugout-demo-seed"]
   });
