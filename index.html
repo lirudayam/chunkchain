@@ -22,7 +22,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 	<script src="https://momentjs.com/downloads/moment.js"></script>
 
-	<script src="https://cdn.jsdelivr.net/gh/mathusummut/confetti.js/confetti.min.js"></script>
+	<!--<script src="https://cdn.jsdelivr.net/gh/mathusummut/confetti.js/confetti.min.js"></script>-->
+	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 
 	<script src="./logic.js" type="application/javascript"></script>
 	<script src="./chat.js" type="application/javascript"></script>
@@ -484,7 +485,11 @@
 
 						if ($scope.selectedLevel + 1 >= aLevels.length) {
 							// complete finished
-							confetti.start(5000, 700);
+							confetti({
+								particleCount: 5000,
+								spread: 250,
+								angle: 100
+							});
 							$scope.showTokenIncrease(20);
 							$scope.token += 20;
 							$scope.showBadgeReward("Mission accomplished: Du hast dir das " + oBadges.L5 +
@@ -497,7 +502,11 @@
 							if ($scope.levelRewards[$scope.selectedLevel].hasOwnProperty("f")) {
 								$scope.showTokenIncrease($scope.levelRewards[$scope.selectedLevel].f);
 								$scope.token += $scope.levelRewards[$scope.selectedLevel].f;
-								confetti.start(2000, 200);
+								confetti({
+									particleCount: 2000,
+									spread: 250,
+									angle: 100
+								});
 								delete $scope.levelRewards[$scope.selectedLevel].f;
 
 								$scope.switchToChat();
@@ -523,7 +532,11 @@
 								.selectedMission
 							]);
 							$scope.token += $scope.levelRewards[$scope.selectedLevel][$scope.selectedMission];
-							confetti.start(1000, 50);
+							confetti({
+								particleCount: 1000,
+								spread: 250,
+								angle: 100
+							});
 							delete $scope.levelRewards[$scope.selectedLevel][$scope.selectedMission];
 						}
 
