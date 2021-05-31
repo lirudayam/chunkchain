@@ -437,12 +437,7 @@ const startConnection = (fnCallback) => {
   // Get connected with our peers via torrent server
   b = Bugout("chunkchain", {
     announce: [
-      "wss://9cdae7c77eeb.ngrok.io",
-      'wss://hub.bugout.link',
-      'wss://tracker.openwebtorrent.com',
-      'wss://tracker.webtorrent.io',
-      /*'ws://tracker.sloppyta.co',
-      'wss://tracker.files.fm'*/
+      'wss://tracker.openwebtorrent.com'
     ],
     seed: localStorage["bugout-demo-seed"]
   });
