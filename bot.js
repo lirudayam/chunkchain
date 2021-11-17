@@ -270,7 +270,7 @@ startConnection(() => {
 			var oTx = JSON.parse(message.substr(1));
 			fnScope.newAccomplishment(getNickname(address), oTx.k);
 		} else {
-			log(getNickname(address) + ": " + message);
+			console.log(getNickname(address) + ": " + message);
 		}
 	});
 
